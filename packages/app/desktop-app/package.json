@@ -1,0 +1,89 @@
+{
+  "name": "desktop-app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/electron/electron.js",
+  "homepage": "./",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.98",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "component-shared": "0.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4",
+    "@types/eslint": "8.4.6",
+    "@types/estree": "1.0.5"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron:build:portable:win": "npm run build && tsc -p electron && electron-builder --win --x64 --dir",
+    "electron:build:portable:mac": "npm run build && tsc -p electron && electron-builder --mac --dir",
+    "electron:build:nis:win": "npm run build && tsc -p electron && electron-builder --win --x64",
+    "electron:build:nis:mac": "npm run build && tsc -p electron && electron-builder --mac"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      "last 1 electron version",
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 electron version",
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^31.0.1",
+    "electron-builder": "^24.13.3",
+    "wait-on": "^7.2.0"
+  },
+  "author": "...",
+  "description": "...",
+  "build": {
+    "extends": null,
+    "electronVersion": "31.0.1",
+    "files": [
+      "build/**/*",
+      "dist/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  },
+  "mac": {
+    "target": [
+      "dmg",
+      "zip"
+    ],
+    "category": "public.app-category.utilities",
+    "icon": "assets/icon.png",
+    "hardenedRuntime": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "gatekeeperAssess": false,
+    "executableName": "desktop-app",
+    "productName": "desktop-app"
+  }
+}

@@ -1,0 +1,8 @@
+# distフォルダ以下の全てのファイルを無視
+dist/
+
+# buildフォルダ以下の全てのファイルを無視
+build/
+
+# node_modulesフォルダ以下の全てのファイルを無視
+node_modules/
