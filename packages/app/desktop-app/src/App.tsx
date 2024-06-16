@@ -21,9 +21,32 @@ function App() {
 
   return (
     <div className="App">
+      {/* タブ部分 */}
+      <div className="square-space-tab">
+        <button className="square-space-tab-button">メイン画面</button>
+        <button className="square-space-tab-button">ASIN管理</button>
+      </div>
+
+      {/* メニュー部分 */}
+      <div className="square-space-menu">
+        <div className="square-space-menu-container-left">
+          menu-container-left
+        </div>
+        <div className="square-space-menu-container-center">
+          menu-container-left
+        </div>
+        <div className="square-space-menu-container-right">
+          menu-container-right
+        </div>
+      </div>
+
+      {/* リスト全体 */}
       <div className="globalList">
-        <div className="asin-item">
-          {/* 要素 ASIN */}
+        {/* リストヘッダー部分 */}
+        <div className="asin-list-header">
+          {/* 要素0 チェック */}
+          <div className="square-space-amazon-num">削除</div>
+          {/* 要素1 ASIN */}
           <div className="square-space-asin">{<p>ASIN</p>}</div>
 
           {/* 要素2 3ボタン */}
@@ -45,12 +68,58 @@ function App() {
 
           {/* 要素5 Amazon在庫数 */}
           <div className="square-space-amazon-num">
-            <p>Amazon</p>
+            <p>AMAZON</p>
           </div>
+
+          {/* 要素6 FBAセラー数 */}
+          <div className="square-space-amazon-num">
+            <p>FBA数</p>
+          </div>
+
+          {/* 要素7 合計在庫 */}
+          <div className="square-space-amazon-num">
+            <p>合計在庫</p>
+          </div>
+
+          {/* 要素8 カート価格 */}
+          <div className="square-space-amazon-num">
+            <p>カート価格</p>
+          </div>
+
+          {/* 要素9 本日の減少数 */}
+          <div className="square-space-amazon-num">
+            <p>減少１</p>
+          </div>
+
+          {/* 要素10 週間の減少数 */}
+          <div className="square-space-amazon-num">
+            <p>減少２</p>
+          </div>
+
+          {/* 要素11 最新取得 */}
+          <div className="square-space-update-latest">
+            <p>最新取得</p>
+          </div>
+
+          {/* 要素12 取得状況 */}
+          <div className="square-space-update-state">
+            <p>取得状況</p>
+          </div>
+
+          {/* 要素13 親ASIN */}
+          <div className="square-space-asin">{<p>親ASIN</p>}</div>
         </div>
+        {/* リスト部分 */}
         {asinArray.map((asin) => (
-          <div className="asin-item">
-            {/* 要素 ASIN */}
+          <div className="asin-list">
+            {/* 要素0 チェック */}
+            <div className="square-space-amazon-num">
+              <label>
+                <input type="checkbox" />
+              </label>
+            </div>
+
+            {/* 要素1 ASIN */}
             <div className="square-space-asin">{<p>{asin}</p>}</div>
 
             {/* 要素2 3ボタン */}
@@ -81,6 +150,45 @@ function App() {
             <div className="square-space-amazon-num">
               <p>0</p>
             </div>
+
+            {/* 要素6 FBAセラー数 */}
+            <div className="square-space-amazon-num">
+              <p>0</p>
+            </div>
+
+            {/* 要素7 合計在庫数 */}
+            <div className="square-space-amazon-num">
+              <p>0</p>
+            </div>
+
+            {/* 要素8 カート価格 */}
+            <div className="square-space-amazon-num">
+              <p>0</p>
+            </div>
+
+            {/* 要素9 本日の減少数 */}
+            <div className="square-space-amazon-num">
+              <p>0</p>
+            </div>
+
+            {/* 要素10 週間の減少数 */}
+            <div className="square-space-amazon-num">
+              <p>0</p>
+            </div>
+
+            {/* 要素11 最新取得 */}
+            <div className="square-space-update-latest">
+              <p>24/04/25</p>
+              <p>15:34</p>
+            </div>
+
+            {/* 要素12 取得状況 */}
+            <div className="square-space-update-state">
+              <p>取得完了</p>
+            </div>
+
+            {/* 要素13 親ASIN */}
+            <div className="square-space-asin">{<p>B0C4SR7V7R</p>}</div>
           </div>
         ))}
       </div>

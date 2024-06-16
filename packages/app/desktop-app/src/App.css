@@ -1,9 +1,6 @@
 .App {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
+  height: 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -21,14 +18,72 @@
   }
 }
 
-.globalList {
+.square-space-tab {
+  height: 30px;
+  width: 100%;
+  border: 0.5px solid #c0c0c0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.square-space-tab-button {
+  width: 180px;
+  height: 30px;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.asin-item {
+.square-space-menu {
+  width: 100%;
+  height: 110px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.square-space-menu-container-left {
+  width: 357.5px;
+  height: 110px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-space-menu-container-center {
+  width: 819px;
+  height: 110px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-space-menu-container-right {
+  width: 212px;
+  height: 110px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.globalList {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+}
+
+.asin-list-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.asin-list {
   display: flex;
   flex-direction: row;
 }
@@ -107,7 +162,7 @@
 }
 
 .square-space-amazon-num {
-  width: 50px;
+  width: 6cap;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -120,6 +175,39 @@
   max-height: 65px;
   padding: 3px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-all;
+}
+
+.square-space-amazon-num input[type="checkbox"] {
+  transform: scale(1.5); /* サイズを1.5倍に拡大 */
+}
+
+.square-space-update-latest {
+  width: 100px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-space-update-latest p {
+  margin: 0; /* <p>タグのデフォルトのマージンをリセット */
+  line-height: 1.5; /* 行間を調整 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-space-update-state {
+  width: 100px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   word-break: break-all;
