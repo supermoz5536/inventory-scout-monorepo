@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import "./App.css";
-import { ButtonShared } from "component-shared";
+// import { ButtonShared } from "component-shared";
 
 function App() {
   // 開発用ハードコードのオブジェクト群
@@ -13,7 +13,7 @@ function App() {
     "コモライフ ビューナ うねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
 
   // 開発用の空関数
-  const handleForDev = () => {};
+  // const handleForDev = () => {};
 
   const gotoURL = (url: string) => {
     window.myAPI.openExternal(url);
@@ -30,13 +30,39 @@ function App() {
       {/* メニュー部分 */}
       <div className="square-space-menu">
         <div className="square-space-menu-container-left">
-          menu-container-left
+          <input
+            type="checkbox"
+            className="square-space-menu-container-left-check"
+          />
+          <input
+            type="text"
+            className="square-space-menu-container-left-input"
+          />
         </div>
+
         <div className="square-space-menu-container-center">
-          menu-container-left
+          <p className="square-space-menu-container-center-decrease1">
+            減少１：最新取得分の減少数
+          </p>
+          <p className="square-space-menu-container-center-decrease2">
+            減少２：直近１週間の減少数
+          </p>
+          <input
+            type="text"
+            className="square-space-menu-container-center-input"
+          />
         </div>
         <div className="square-space-menu-container-right">
-          menu-container-right
+          <button className="square-space-menu-container-right-delete-button">
+            チェックしたASINを削除
+          </button>
+          <p className="square-space-menu-container-right-asin-num">
+            登録ASIN数：300
+          </p>
+          <input
+            type="text"
+            className="square-space-menu-container-right-input"
+          />
         </div>
       </div>
 
