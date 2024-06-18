@@ -43,11 +43,16 @@ function Manage() {
         <button className="square-space-tab-button">ASIN管理</button>
       </div>
       <div className="body">
+        {/* 左Columnエリア */}
         <div className="left-column">
           <input type="text" className="input-asin" />
-          <div className="left-column-down-container"></div>
+          {/* 下部コンテナ */}
+          <div className="left-column-down-container">
+            <p className="add-asin-count">300</p>
+            <button className="add-asin-button">登録</button>
+          </div>
         </div>
-
+        {/* 右Columnエリア */}
         <div className="right-column">
           {/* リスト全体 */}
           <div className="globalList">
@@ -111,15 +116,28 @@ function Manage() {
 
                 {/* 要素7 親ASIN */}
                 <div className="square-space-asin">
-                  <p>0</p>
+                  <p>B0C4SR7V7R</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="right-column-down-container"></div>
+          {/* 下部コンテナ */}
+          <div className="right-column-down-container">
+            <button className="delete-selected-asin-button">
+              選択したASINを削除
+            </button>
+            <button className="delete-no-fba-asin-button">
+              FBAセラーのいないASINを削除
+            </button>
+            <button className="delete-no-protected-asin-button">
+              保護されたASIN以外を削除
+            </button>
+          </div>
         </div>
       </div>
-      <div className="body-bottom-container"></div>
+      <div className="body-bottom-container">
+        <p className="bottom-system-message">取得中・・・</p>
+      </div>
     </div>
   );
 }

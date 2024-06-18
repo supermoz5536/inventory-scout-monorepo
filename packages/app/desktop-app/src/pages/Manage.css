@@ -65,10 +65,9 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
+/* 各ASINのアイテムを横に左から並べる役割 */
 .asin-list-header {
-  height: 65;
-  width: 1095px;
-  background-color: gainsboro;
+  /* ヘッダー部分のwidthは、各ASINリストのアイテムの横幅の合計になっている */
   display: flex;
   flex-direction: row;
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
@@ -88,6 +87,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-name {
@@ -97,6 +97,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-name p {
@@ -117,6 +118,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-lock-flag {
@@ -126,6 +128,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-amazon-num {
@@ -135,6 +138,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-amazon-num p {
@@ -161,8 +165,30 @@
 .left-column-down-container {
   height: 60px;
   width: 100%;
+  display: flex;
   background-color: blueviolet;
   border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.add-asin-count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+}
+
+.add-asin-button {
+  height: 30px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 80%;
+  transform: translate(-50%, -50%);
 }
 
 .right-column {
@@ -177,6 +203,43 @@
   width: 100%;
   background-color: chocolate;
   border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.delete-selected-asin-button {
+  height: 30px;
+  width: 170px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 12%;
+  transform: translate(-50%, -50%);
+}
+
+.delete-no-fba-asin-button {
+  height: 30px;
+  width: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 30%;
+  left: 84.5%;
+  transform: translate(-50%, -50%);
+}
+
+.delete-no-protected-asin-button {
+  height: 30px;
+  width: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 70%;
+  left: 84.5%;
+  transform: translate(-50%, -50%);
 }
 
 .body-bottom-container {
@@ -184,4 +247,14 @@
   width: 100%;
   background-color: darkkhaki;
   border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.body-bottom-container p {
+  font-size: 15px;
+  font-family: "Courier New", Courier, monospace;
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  transform: translate(0%, -50%); /* 第一引数がx軸、第二引数がy軸 */
 }
