@@ -26,7 +26,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && sleep 2 && tsc -p electron -w\" \"wait-on http://localhost:3000 && sleep 2 && tsc -p electron && electron .\"",
+    "electron:dev": "concurrently \"cross-env BROWSER=none npm start\" \"tsc -p electron -w & tsc -p electron && electron .\"",
     "electron:build:portable:win": "npm run build && tsc -p electron && electron-builder --win --x64 --dir",
     "electron:build:portable:mac": "npm run build && tsc -p electron && electron-builder --mac --dir",
     "electron:build:nis:win": "npm run build && tsc -p electron && electron-builder --win --x64",
