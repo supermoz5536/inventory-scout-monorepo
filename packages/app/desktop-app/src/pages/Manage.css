@@ -1,0 +1,260 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  width: 1150px;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.square-space-tab {
+  height: 30px;
+  width: 1150px;
+  min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.square-space-tab-button {
+  width: 180px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.body {
+  height: 760px;
+  width: 1150px;
+  background-color: aqua;
+  display: flex;
+}
+
+.input-asin {
+  background-color: #c0c0c0;
+  width: 190px;
+  height: 700px;
+  border: 0.5px solid #c0c0c0;
+}
+
+.globalList {
+  width: 960px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  max-height: 650px; /* この縦幅以上にリストが増えたらスクロール開始 */
+  max-width: 960px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  overflow-y: auto;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+/* 各ASINのアイテムを横に左から並べる役割 */
+.asin-list-header {
+  /* ヘッダー部分のwidthは、各ASINリストのアイテムの横幅の合計になっている */
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.asin-list {
+  width: 1150px;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-asin {
+  width: 110px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-name {
+  height: 65px;
+  width: 500px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-name p {
+  max-height: 65px;
+  max-width: 800px;
+  padding: 5px;
+  display: flex;
+  overflow: hidden;
+  font-size: 15px;
+  font-family: "Courier New", Courier, monospace;
+  white-space: nowrap; /* テキストを折り返さない */
+}
+
+.square-space-st-code {
+  width: 90px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-lock-flag {
+  width: 90px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-amazon-num {
+  width: 90px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+}
+
+.square-space-amazon-num p {
+  max-width: 50px;
+  max-height: 65px;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-all;
+}
+
+.square-space-amazon-num input[type="checkbox"] {
+  transform: scale(1.5); /* サイズを1.5倍に拡大 */
+}
+
+.left-column {
+  width: 190px;
+  height: 760px;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-column-down-container {
+  height: 60px;
+  width: 100%;
+  display: flex;
+  background-color: blueviolet;
+  border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.add-asin-count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+}
+
+.add-asin-button {
+  height: 30px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+}
+
+.right-column {
+  width: 960px;
+  height: 760px;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-column-down-container {
+  height: 100%;
+  width: 100%;
+  background-color: chocolate;
+  border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.delete-selected-asin-button {
+  height: 30px;
+  width: 170px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 12%;
+  transform: translate(-50%, -50%);
+}
+
+.delete-no-fba-asin-button {
+  height: 30px;
+  width: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 30%;
+  left: 84.5%;
+  transform: translate(-50%, -50%);
+}
+
+.delete-no-protected-asin-button {
+  height: 30px;
+  width: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 70%;
+  left: 84.5%;
+  transform: translate(-50%, -50%);
+}
+
+.body-bottom-container {
+  height: 40px;
+  width: 100%;
+  background-color: darkkhaki;
+  border: 0.5px solid #c0c0c0;
+  position: relative;
+}
+
+.body-bottom-container p {
+  font-size: 15px;
+  font-family: "Courier New", Courier, monospace;
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  transform: translate(0%, -50%); /* 第一引数がx軸、第二引数がy軸 */
+}
