@@ -1,39 +1,14 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
-.App {
-  height: 100%; /* ASINのListItemが追加されるたびに縦に延長冴えるため */
-  width: 1150px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.square-space-tab {
+.top-square-space-tab {
   height: 30px;
   width: 100%;
-  min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
   border: 0.5px solid #c0c0c0;
+  background-color: aquamarine;
   display: flex;
   flex-direction: row;
   justify-content: start;
 }
 
-.square-space-tab-button {
+.top-square-space-tab-button {
   width: 180px;
   height: 30px;
   display: flex;
@@ -41,17 +16,18 @@
   justify-content: center;
 }
 
-.square-space-menu {
-  background-color: rgb(212, 212, 212);
+.top-square-space-menu {
+  background-color: rgb(255, 165, 165);
   width: 100%;
   height: 110px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   flex-direction: row;
   justify-content: start;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-menu-container-left {
+.top-square-space-menu-container-left {
   width: 357.5px;
   height: 110px;
   border: 0.5px solid #c0c0c0;
@@ -59,14 +35,14 @@
   position: relative;
 }
 
-.square-space-menu-container-left-check {
+.top-square-space-menu-container-left-check {
   position: absolute;
   top: 77%;
   left: 7%;
   transform: scale(1.5); /* サイズを1.5倍に拡大 */
 }
 
-.square-space-menu-container-left-input {
+.top-square-space-menu-container-left-input {
   width: 100px;
   height: 20px;
   position: absolute;
@@ -74,7 +50,7 @@
   left: 20%;
 }
 
-.square-space-menu-container-center {
+.top-square-space-menu-container-center {
   width: 819px;
   height: 110px;
   border: 0.5px solid #c0c0c0;
@@ -84,7 +60,7 @@
   justify-content: center;
 }
 
-.square-space-menu-container-center-input {
+.top-square-space-menu-container-center-input {
   width: 280px;
   height: 20px;
   position: absolute;
@@ -92,21 +68,21 @@
   left: 1%;
 }
 
-.square-space-menu-container-center-decrease1 {
+.top-square-space-menu-container-center-decrease1 {
   position: absolute;
   top: 55%;
   left: 72%;
   font-size: 15px;
 }
 
-.square-space-menu-container-center-decrease2 {
+.top-square-space-menu-container-center-decrease2 {
   position: absolute;
   top: 75%;
   left: 72%;
   font-size: 15px;
 }
 
-.square-space-menu-container-right {
+.top-square-space-menu-container-right {
   width: 212px;
   height: 110px;
   border: 0.5px solid #c0c0c0;
@@ -116,28 +92,28 @@
   justify-content: center;
 }
 
-.square-space-menu-container-right-delete-button {
+.top-square-space-menu-container-right-delete-button {
   width: 165px;
   height: 20px;
   position: absolute;
-  top: 0%;
-  left: 0%;
+  top: 5%;
+  left: 5%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.square-space-menu-container-right-asin-num {
+.top-square-space-menu-container-right-asin-num {
   position: absolute;
-  top: 20%;
-  left: 0%;
+  top: 25%;
+  left: 5%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 15px;
 }
 
-.square-space-menu-container-right-input {
+.top-square-space-menu-container-right-input {
   width: 100px;
   height: 20px;
   position: absolute;
@@ -145,34 +121,65 @@
   left: 48%;
 }
 
-.globalList {
+.top-globalList {
+  width: 100%;
+  min-width: 100%;
+  background-color: aqua;
   display: flex;
   flex-direction: column;
-  align-items: left;
+  position: relative;
+}
+
+.top-asin-list-header {
+  z-index: 10; /* リスト要素の前面に表示する設定 */
+  background-color: beige;
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+}
+
+.top-asinArray-map-wrapper-top-css {
+  display: flex;
+  flex-direction: column;
+  z-index: 200px;
+  background-color: rgb(215, 215, 255);
+  position: absolute;
+  top: 65px;
+  left: 0%;
+}
+
+.top-asin-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.top-square-space-asin-delete {
+  width: 65px;
+  height: 65px;
+  border: 0.5px solid #c0c0c0;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.asin-list-header {
-  background-color: rgb(243, 243, 243);
-  display: flex;
-  flex-direction: row;
+.top-square-space-asin-delete input[type="checkbox"] {
+  transform: scale(1.5); /* サイズを1.5倍に拡大 */
 }
 
-.asin-list {
-  display: flex;
-  flex-direction: row;
-}
-
-.square-space-asin {
+.top-square-space-asin {
   width: 110px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-3buttonp-out {
+.top-square-space-3buttonp-out {
   width: 110px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -180,9 +187,10 @@
   direction: column;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-3buttonp-elements {
+.top-square-space-3buttonp-elements {
   width: 110px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -192,7 +200,7 @@
   justify-content: center;
 }
 
-.square-space-each-button {
+.top-square-space-each-button {
   width: 50;
   height: 19px;
   display: flex;
@@ -201,30 +209,32 @@
   margin: 0.5px 0;
 }
 
-.square-space-img {
+.top-square-space-img {
   width: 65px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-img img {
+.top-square-space-img img {
   max-width: 95%;
   max-height: 95%;
 }
 
-.square-space-name {
+.top-square-space-name {
   width: 300px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-name p {
+.top-square-space-name p {
   max-width: 300px;
   max-height: 65px;
   padding: 5px;
@@ -236,16 +246,17 @@
   line-height: 1.5; /* 行間を調整 */
 }
 
-.square-space-amazon-num {
-  width: 6cap;
+.top-square-space-amazon-num {
+  width: 67.5px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-amazon-num p {
+.top-square-space-amazon-num p {
   max-width: 50px;
   max-height: 65px;
   padding: 3px;
@@ -255,11 +266,11 @@
   word-break: break-all;
 }
 
-.square-space-amazon-num input[type="checkbox"] {
+.top-square-space-amazon-num input[type="checkbox"] {
   transform: scale(1.5); /* サイズを1.5倍に拡大 */
 }
 
-.square-space-update-latest {
+.top-square-space-update-latest {
   width: 100px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -267,9 +278,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-update-latest p {
+.top-square-space-update-latest p {
   margin: 0; /* <p>タグのデフォルトのマージンをリセット */
   line-height: 1.5; /* 行間を調整 */
   display: flex;
@@ -277,7 +289,7 @@
   justify-content: center;
 }
 
-.square-space-update-state {
+.top-square-space-update-state {
   width: 100px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -286,4 +298,5 @@
   align-items: center;
   justify-content: center;
   word-break: break-all;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }

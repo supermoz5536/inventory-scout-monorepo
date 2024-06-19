@@ -1,31 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
-.App {
-  height: 100%;
-  width: 1150px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.square-space-tab {
+.manage-square-space-tab {
   height: 30px;
-  width: 1150px;
+  width: 1390px;
   min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -33,32 +8,32 @@
   justify-content: start;
 }
 
-.square-space-tab-button {
+.manage-square-space-tab-button {
   width: 180px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.body {
+.manage-body {
   height: 760px;
-  width: 1150px;
+  width: 1390px;
   background-color: aqua;
   display: flex;
 }
 
-.input-asin {
-  background-color: #c0c0c0;
+.manage-input-asin {
+  background-color: #ffffff;
   width: 190px;
   height: 700px;
-  border: 0.5px solid #c0c0c0;
+  border: 0.5px solid #7a7a7a;
 }
 
-.globalList {
+.manage-globalList {
   height: 650px;
-  width: 960px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  width: 1200px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
   max-height: 650px; /* この縦幅以上にリストが増えたらスクロール開始 */
-  max-width: 960px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  max-width: 1200px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
   display: flex;
   flex-direction: column;
   overflow-x: auto;
@@ -68,13 +43,14 @@
 }
 
 /* 各ASINのアイテムを横に左から並べる役割 */
-.asin-list-header {
+.manage-asin-list-header {
   /* position: sticky;
   top: 0; */
   z-index: 10; /* リスト要素の前面に表示する設定 */
   height: 65px; /* ヘッダーの縦サイズです */
-  width: 1095px; /* スクロール領域内の各リスト横幅の最大値に合わせます */
+  width: 1195px; /* スクロール領域内の各リスト横幅の最大値に合わせます */
   display: flex;
+  background-color: beige;
   flex-direction: row;
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
   position: absolute;
@@ -82,7 +58,8 @@
   left: 0%;
 }
 
-.asinArray-map-wrapper {
+.manage-asinArray-map-wrapper-manage-css {
+  width: 1195px; /* スクロール領域内の各リスト横幅の最大値に合わせます */
   display: flex;
   flex-direction: column;
   z-index: 200px;
@@ -92,14 +69,14 @@
   left: 0%;
 }
 
-.asin-list {
+.manage-asin-list {
   width: 1150px;
   display: flex;
   flex-direction: row;
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-asin {
+.manage-square-space-asin {
   width: 110px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -109,9 +86,9 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-name {
+.manage-square-space-name {
   height: 65px;
-  width: 500px;
+  width: 600px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   align-items: center;
@@ -119,7 +96,7 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-name p {
+.manage-square-space-name p {
   max-height: 65px;
   max-width: 800px;
   padding: 5px;
@@ -130,7 +107,7 @@
   white-space: nowrap; /* テキストを折り返さない */
 }
 
-.square-space-st-code {
+.manage-square-space-st-code {
   width: 90px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -140,7 +117,7 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-lock-flag {
+.manage-square-space-lock-flag {
   width: 90px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -150,7 +127,7 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-amazon-num {
+.manage-square-space-amazon-num {
   width: 90px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
@@ -160,7 +137,7 @@
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
-.square-space-amazon-num p {
+.manage-square-space-amazon-num p {
   max-width: 50px;
   max-height: 65px;
   padding: 3px;
@@ -170,18 +147,18 @@
   word-break: break-all;
 }
 
-.square-space-amazon-num input[type="checkbox"] {
+.manage-square-space-amazon-num input[type="checkbox"] {
   transform: scale(1.5); /* サイズを1.5倍に拡大 */
 }
 
-.left-column {
+.manage-left-column {
   width: 190px;
   height: 760px;
   display: flex;
   flex-direction: column;
 }
 
-.left-column-down-container {
+.manage-left-column-down-container {
   height: 60px;
   width: 100%;
   display: flex;
@@ -190,7 +167,7 @@
   position: relative;
 }
 
-.add-asin-count {
+.manage-add-asin-count {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -198,7 +175,7 @@
   font-size: 16px;
 }
 
-.add-asin-button {
+.manage-add-asin-button {
   height: 30px;
   width: 50px;
   display: flex;
@@ -210,14 +187,14 @@
   transform: translate(-50%, -50%);
 }
 
-.right-column {
-  width: 960px;
+.manage-right-column {
+  width: 100%;
   height: 760px;
   display: flex;
   flex-direction: column;
 }
 
-.right-column-down-container {
+.manage-right-column-down-container {
   height: 100%;
   width: 100%;
   background-color: chocolate;
@@ -225,7 +202,7 @@
   position: relative;
 }
 
-.delete-selected-asin-button {
+.manage-delete-selected-asin-button {
   height: 30px;
   width: 170px;
   display: flex;
@@ -237,7 +214,7 @@
   transform: translate(-50%, -50%);
 }
 
-.delete-no-fba-asin-button {
+.manage-delete-no-fba-asin-button {
   height: 30px;
   width: 230px;
   display: flex;
@@ -249,7 +226,7 @@
   transform: translate(-50%, -50%);
 }
 
-.delete-no-protected-asin-button {
+.manage-delete-no-protected-asin-button {
   height: 30px;
   width: 230px;
   display: flex;
@@ -261,7 +238,7 @@
   transform: translate(-50%, -50%);
 }
 
-.body-bottom-container {
+.manage-bottom-container {
   height: 40px;
   width: 100%;
   background-color: darkkhaki;
@@ -269,7 +246,7 @@
   position: relative;
 }
 
-.body-bottom-container p {
+.manage-bottom-container p {
   font-size: 15px;
   font-family: "Courier New", Courier, monospace;
   position: absolute;
