@@ -176,8 +176,8 @@ function Manage() {
           </div>
         </div>
       </div>
-      <div className="manage-body-bottom-container">
-        <p className="manage-bottom-system-message">取得中・・・</p>
+      <div className="manage-bottom-container">
+        <p>取得中・・・</p>
       </div>
     </div>
   );

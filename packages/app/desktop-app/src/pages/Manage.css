@@ -1,6 +1,6 @@
 .manage-square-space-tab {
   height: 30px;
-  width: 1150px;
+  width: 1390px;
   min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -17,23 +17,23 @@
 }
 .manage-body {
   height: 760px;
-  width: 1150px;
+  width: 1390px;
   background-color: aqua;
   display: flex;
 }
 
 .manage-input-asin {
-  background-color: #c0c0c0;
+  background-color: #ffffff;
   width: 190px;
   height: 700px;
-  border: 0.5px solid #c0c0c0;
+  border: 0.5px solid #7a7a7a;
 }
 
 .manage-globalList {
   height: 650px;
-  width: 960px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  width: 1200px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
   max-height: 650px; /* この縦幅以上にリストが増えたらスクロール開始 */
-  max-width: 960px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  max-width: 1200px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
   display: flex;
   flex-direction: column;
   overflow-x: auto;
@@ -48,8 +48,9 @@
   top: 0; */
   z-index: 10; /* リスト要素の前面に表示する設定 */
   height: 65px; /* ヘッダーの縦サイズです */
-  width: 1095px; /* スクロール領域内の各リスト横幅の最大値に合わせます */
+  width: 1195px; /* スクロール領域内の各リスト横幅の最大値に合わせます */
   display: flex;
+  background-color: beige;
   flex-direction: row;
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
   position: absolute;
@@ -187,7 +188,7 @@
 }
 
 .manage-right-column {
-  width: 960px;
+  width: 100%;
   height: 760px;
   display: flex;
   flex-direction: column;
@@ -237,7 +238,7 @@
   transform: translate(-50%, -50%);
 }
 
-.manage-body-bottom-container {
+.manage-bottom-container {
   height: 40px;
   width: 100%;
   background-color: darkkhaki;
@@ -245,7 +246,7 @@
   position: relative;
 }
 
-.manage-body-bottom-container p {
+.manage-bottom-container p {
   font-size: 15px;
   font-family: "Courier New", Courier, monospace;
   position: absolute;

@@ -3,7 +3,23 @@ import "./Top.css";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = ["B0C4SR7V7R", "B0C4SR7V7R", "B0C4SR7V7R"];
+  const asinArray: Array<string> = [
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+  ];
   const productURL: string =
     "https://m.media-amazon.com/images/I/7141kPbAYsL._AC_SL1200_.jpg";
   const amazonURL: string = "https://www.amazon.co.jp/dp/B0C4SR7V7R/ ";
@@ -87,7 +103,7 @@ function Top() {
         {/* リストヘッダー部分 */}
         <div className="top-asin-list-header">
           {/* 要素0 チェック */}
-          <div className="top-square-space-amazon-num">削除</div>
+          <div className="top-square-space-asin-delete">削除</div>
           {/* 要素1 ASIN */}
           <div className="top-square-space-asin">{<p>ASIN</p>}</div>
 
@@ -157,7 +173,7 @@ function Top() {
           {asinArray.map((asin) => (
             <div className="top-asin-list">
               {/* 要素0 チェック */}
-              <div className="top-square-space-amazon-num">
+              <div className="top-square-space-asin-delete">
                 <label>
                   <input type="checkbox" />
                 </label>
