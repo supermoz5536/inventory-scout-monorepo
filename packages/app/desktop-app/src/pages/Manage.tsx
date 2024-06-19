@@ -19,6 +19,24 @@ function Manage() {
     "B0C4SR7V7R",
     "B0C4SR7V7R",
     "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
+    "B0C4SR7V7R",
   ];
   const productURL: string =
     "https://m.media-amazon.com/images/I/7141kPbAYsL._AC_SL1200_.jpg";
@@ -101,41 +119,46 @@ function Manage() {
                 <p> 親ASIN</p>
               </div>
             </div>
+
             {/* リスト部分 */}
-            {asinArray.map((asin, index) => (
-              <div className="asin-list">
-                {/* 要素 ID */}
-                <div className="square-space-amazon-num">
-                  <p>{index}</p>
-                </div>
-                {/* 要素0 チェック */}
-                <div className="square-space-amazon-num">
-                  <label>
-                    <input type="checkbox" />
-                  </label>
-                </div>
-                {/* 要素1 ASIN */}
-                <div className="square-space-asin">{<p>{asin}</p>}</div>
+            <div className="asinArray-map-wrapper">
+              {asinArray.map((asin, index) => (
+                <div className="asin-list" key={index}>
+                  {/* 要素 ID */}
+                  <div className="square-space-amazon-num">
+                    <p>{index}</p>
+                  </div>
+                  {/* 要素0 チェック */}
+                  <div className="square-space-amazon-num">
+                    <label>
+                      <input type="checkbox" />
+                    </label>
+                  </div>
+                  {/* 要素1 ASIN */}
+                  <div className="square-space-asin">{<p>{asin}</p>}</div>
 
-                {/* 要素4 商品名 */}
-                <div className="square-space-name">{<p>{productName}</p>}</div>
+                  {/* 要素4 商品名 */}
+                  <div className="square-space-name">
+                    {<p>{productName}</p>}
+                  </div>
 
-                {/* 要素5 st-code */}
-                <div className="square-space-st-code">
-                  <p>取得完了</p>
-                </div>
+                  {/* 要素5 st-code */}
+                  <div className="square-space-st-code">
+                    <p>取得完了</p>
+                  </div>
 
-                {/* 要素6 lock-flag */}
-                <div className="square-space-amazon-num">
-                  <p>0</p>
-                </div>
+                  {/* 要素6 lock-flag */}
+                  <div className="square-space-amazon-num">
+                    <p>0</p>
+                  </div>
 
-                {/* 要素7 親ASIN */}
-                <div className="square-space-asin">
-                  <p>B0C4SR7V7R</p>
+                  {/* 要素7 親ASIN */}
+                  <div className="square-space-asin">
+                    <p>B0C4SR7V7R</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
           {/* 下部コンテナ */}
           <div className="right-column-down-container">

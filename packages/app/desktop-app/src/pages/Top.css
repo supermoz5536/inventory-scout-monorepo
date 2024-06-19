@@ -4,8 +4,8 @@
 }
 
 .App {
-  width: 1388.5px;
   height: 100%; /* ASINのListItemが追加されるたびに縦に延長冴えるため */
+  width: 1150px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
