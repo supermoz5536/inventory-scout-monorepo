@@ -25,9 +25,9 @@
 
 .square-space-tab {
   height: 30px;
-  width: 100%;
-  min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
+  width: 1050px;
   border: 0.5px solid #c0c0c0;
+  background-color: aquamarine;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -42,13 +42,14 @@
 }
 
 .square-space-menu {
-  background-color: rgb(212, 212, 212);
+  background-color: rgb(255, 118, 118);
   width: 100%;
   height: 110px;
   border: 0.5px solid #c0c0c0;
   display: flex;
   flex-direction: row;
   justify-content: start;
+  flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
 }
 
 .square-space-menu-container-left {
@@ -146,16 +147,29 @@
 }
 
 .globalList {
+  width: 1150px;
+  min-width: 1150px;
+  background-color: aqua;
   display: flex;
   flex-direction: column;
-  align-items: left;
-  justify-content: center;
 }
 
 .asin-list-header {
+  z-index: 10; /* リスト要素の前面に表示する設定 */
   background-color: rgb(243, 243, 243);
   display: flex;
   flex-direction: row;
+}
+
+.asinArray-map-wrapper {
+  width: 1600px;
+  display: flex;
+  flex-direction: column;
+  z-index: 200px;
+  background-color: rgb(73, 73, 81);
+  position: absolute;
+  top: 65px;
+  left: 0%;
 }
 
 .asin-list {
@@ -237,7 +251,7 @@
 }
 
 .square-space-amazon-num {
-  width: 6cap;
+  max-width: 50px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;

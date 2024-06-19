@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./Top.css";
+import style from "./Top.module.css";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -151,88 +151,95 @@ function Top() {
           {/* 要素13 親ASIN */}
           <div className="square-space-asin">{<p>親ASIN</p>}</div>
         </div>
-        {/* リスト部分 */}
-        {asinArray.map((asin) => (
-          <div className="asin-list">
-            {/* 要素0 チェック */}
-            <div className="square-space-amazon-num">
-              <label>
-                <input type="checkbox" />
-              </label>
-            </div>
 
-            {/* 要素1 ASIN */}
-            <div className="square-space-asin">{<p>{asin}</p>}</div>
-
-            {/* 要素2 3ボタン */}
-            <div className="square-space-3button">
-              <div className="square-space-3buttonp-elements">
-                <button className="square-space-each-button">出品者一覧</button>
-                <button
-                  className="square-space-each-button"
-                  onClick={() => {
-                    gotoURL(amazonURL);
-                  }}
-                >
-                  商品URL
-                </button>
-                <button className="square-space-each-button">在庫データ</button>
+        <div className="asinArray-map-wrapper">
+          {/* リスト部分 */}
+          {asinArray.map((asin) => (
+            <div className="asin-list">
+              {/* 要素0 チェック */}
+              <div className="square-space-amazon-num">
+                <label>
+                  <input type="checkbox" />
+                </label>
               </div>
+
+              {/* 要素1 ASIN */}
+              <div className="square-space-asin">{<p>{asin}</p>}</div>
+
+              {/* 要素2 3ボタン */}
+              <div className="square-space-3button">
+                <div className="square-space-3buttonp-elements">
+                  <button className="square-space-each-button">
+                    出品者一覧
+                  </button>
+                  <button
+                    className="square-space-each-button"
+                    onClick={() => {
+                      gotoURL(amazonURL);
+                    }}
+                  >
+                    商品URL
+                  </button>
+                  <button className="square-space-each-button">
+                    在庫データ
+                  </button>
+                </div>
+              </div>
+
+              {/* 要素3 画像 */}
+              <div className="square-space-img">
+                <img src={productURL} alt="" />
+              </div>
+
+              {/* 要素4 商品名 */}
+              <div className="square-space-name">{<p>{productName}</p>}</div>
+
+              {/* 要素5 Amazon在庫数 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素6 FBAセラー数 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素7 合計在庫数 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素8 カート価格 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素9 本日の減少数 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素10 週間の減少数 */}
+              <div className="square-space-amazon-num">
+                <p>0</p>
+              </div>
+
+              {/* 要素11 最新取得 */}
+              <div className="square-space-update-latest">
+                <p>24/04/25</p>
+                <p>15:34</p>
+              </div>
+
+              {/* 要素12 取得状況 */}
+              <div className="square-space-update-state">
+                <p>取得完了</p>
+              </div>
+
+              {/* 要素13 親ASIN */}
+              <div className="square-space-asin">{<p>B0C4SR7V7R</p>}</div>
             </div>
-
-            {/* 要素3 画像 */}
-            <div className="square-space-img">
-              <img src={productURL} alt="" />
-            </div>
-
-            {/* 要素4 商品名 */}
-            <div className="square-space-name">{<p>{productName}</p>}</div>
-
-            {/* 要素5 Amazon在庫数 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素6 FBAセラー数 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素7 合計在庫数 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素8 カート価格 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素9 本日の減少数 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素10 週間の減少数 */}
-            <div className="square-space-amazon-num">
-              <p>0</p>
-            </div>
-
-            {/* 要素11 最新取得 */}
-            <div className="square-space-update-latest">
-              <p>24/04/25</p>
-              <p>15:34</p>
-            </div>
-
-            {/* 要素12 取得状況 */}
-            <div className="square-space-update-state">
-              <p>取得完了</p>
-            </div>
-
-            {/* 要素13 親ASIN */}
-            <div className="square-space-asin">{<p>B0C4SR7V7R</p>}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

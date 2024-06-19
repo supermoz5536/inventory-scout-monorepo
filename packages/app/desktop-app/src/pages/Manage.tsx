@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./Manage.css";
+import "./Manage.module.css";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群

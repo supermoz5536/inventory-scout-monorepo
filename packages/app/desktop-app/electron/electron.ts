@@ -4,7 +4,7 @@ import * as url from "url";
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 1170,
+    width: 1150,
     height: 870,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
