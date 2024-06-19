@@ -1,6 +1,5 @@
-// import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Manage.css";
-// import { ButtonShared } from "component-shared";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
@@ -35,12 +34,29 @@ function Manage() {
     window.myAPI.openExternal(url);
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="App">
       {/* タブ部分 */}
       <div className="square-space-tab">
-        <button className="square-space-tab-button">メイン画面</button>
-        <button className="square-space-tab-button">ASIN管理</button>
+        <button
+          className="square-space-tab-button"
+          onClick={() => {
+            // App.tsxでマッピングしたURLパスを指定
+            navigate("/Top");
+          }}
+        >
+          メイン画面
+        </button>
+        <button
+          className="square-space-tab-button"
+          onClick={() => {
+            navigate("/Manage");
+          }}
+        >
+          ASIN管理
+        </button>
       </div>
       <div className="body">
         {/* 左Columnエリア */}
