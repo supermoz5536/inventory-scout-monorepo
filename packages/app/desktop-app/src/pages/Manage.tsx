@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./Manage.module.css";
+import "./Manage.css";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
@@ -121,7 +121,7 @@ function Manage() {
             </div>
 
             {/* リスト部分 */}
-            <div className="asinArray-map-wrapper">
+            <div className="asinArray-map-wrapper-manage-css">
               {asinArray.map((asin, index) => (
                 <div className="asin-list" key={index}>
                   {/* 要素 ID */}
@@ -148,7 +148,7 @@ function Manage() {
                   </div>
 
                   {/* 要素6 lock-flag */}
-                  <div className="square-space-amazon-num">
+                  <div className="square-space-lock-flag">
                     <p>0</p>
                   </div>
 

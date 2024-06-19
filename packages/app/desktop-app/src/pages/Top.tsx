@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import style from "./Top.module.css";
+import "./Top.css";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -152,7 +152,7 @@ function Top() {
           <div className="square-space-asin">{<p>親ASIN</p>}</div>
         </div>
 
-        <div className="asinArray-map-wrapper">
+        <div className="asinArray-map-wrapper-top-css">
           {/* リスト部分 */}
           {asinArray.map((asin) => (
             <div className="asin-list">
