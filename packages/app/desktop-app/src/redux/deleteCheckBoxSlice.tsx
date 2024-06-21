@@ -9,7 +9,7 @@ export const deleteCheckSlice = createSlice({
   initialState: false,
   // 更新関数の定義
   reducers: {
-    reverseCheck: (state) => {
+    switchCheck: (state) => {
       // Redux Toolkit を用いる場合は
       // 自動でイミュータブルな処理を行ってくれますが
       // 以下の構文に従う必要があります。
@@ -28,7 +28,7 @@ export const deleteCheckSlice = createSlice({
 // reverseCheckというプロパティを抽出し、
 // 同名の"deleteCheckSlice" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { reverseCheck } = deleteCheckSlice.actions;
+export const { switchCheck: reverseCheck } = deleteCheckSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。

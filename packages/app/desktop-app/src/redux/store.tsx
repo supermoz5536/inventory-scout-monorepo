@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import asinDataListSlice from "./asinDataListSlice";
-import deleteCheckSlice from "./deleteCheckSlice";
+import deleteCheckBoxSlice from "./deleteCheckBoxSlice";
 
 // store: 状態(=state)と、状態変更関数のreducer(=Notifier)をまとめて、各sliceを格納したコンテナ
 // このstoreというコンテナ内の情報を安全にグローバルに公開するのがProvider
@@ -12,7 +12,7 @@ export const store = configureStore({
     // プロパティ名はSlice名（＝グローバル管理する値の関連名）
     // riverpodのproviderの.dartファイルにつける名前と同じと考えて良い
     asinDataList: asinDataListSlice,
-    deleteCheck: deleteCheckSlice,
+    deleteCheckBox: deleteCheckBoxSlice,
   },
 });
 
