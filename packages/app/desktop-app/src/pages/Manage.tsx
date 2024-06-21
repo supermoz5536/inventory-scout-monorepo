@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import "./Manage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
-import { addAsin } from "../redux/asinListSlice";
+import { addAsin } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
 
 function Manage() {
@@ -58,7 +58,7 @@ function Manage() {
   const navigate = useNavigate();
 
   // グローバル変数のASINリストの値を取得
-  const asinList = useSelector((state: RootState) => state.asin.value);
+  const asinList = useSelector((state: RootState) => state.asinDataList.value);
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、

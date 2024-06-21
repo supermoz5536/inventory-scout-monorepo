@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState: AsinState = { value: [] };
+const initialState: AsinDataListState = { value: [] };
 
 // createSlice: {state, reducer, ActionCreator}の枠組みを簡単に作成できる関数
 // 「stateの初期値」「reducerの関数定義」をすれば、
 // ActionCreatorは(関数のプロバイダーだと思えばいい、Riverpodのrefのようなもの)
 // バックグランド自動的に生成されている。
 export const asinSlice = createSlice({
-  name: "asinListSlice",
+  name: "asinDataListSlice",
   initialState: initialState,
   // 更新関数の定義
   reducers: {

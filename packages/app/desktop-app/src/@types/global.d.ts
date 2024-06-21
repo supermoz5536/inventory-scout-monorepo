@@ -16,7 +16,7 @@ export declare global {
   // ASINState型のオブジェクトが
   // ASINData型のvalueプロパティを
   // 持つことを定義している。
-  interface AsinState {
+  interface AsinDataListState {
     value: AsinData[];
   }
 }
