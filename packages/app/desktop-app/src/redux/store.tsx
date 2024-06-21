@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import asinSlice from "./asinSlice";
+import asinSlice from "./asinListSlice";
 
 // store: 状態(=state)と、状態変更関数のreducer(=Notifier)をまとめて、各sliceを格納したコンテナ
 // このstoreというコンテナ内の情報を安全にグローバルに公開するのがProvider

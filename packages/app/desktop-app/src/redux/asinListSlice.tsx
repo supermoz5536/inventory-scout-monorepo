@@ -7,7 +7,7 @@ const initialState: AsinState = { value: [] };
 // ActionCreatorは(関数のプロバイダーだと思えばいい、Riverpodのrefのようなもの)
 // バックグランド自動的に生成されている。
 export const asinSlice = createSlice({
-  name: "asinDataSlice",
+  name: "asinListSlice",
   initialState: initialState,
   // 更新関数の定義
   reducers: {

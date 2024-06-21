@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import "./Manage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
-import { addAsin } from "../redux/asinSlice";
+import { addAsin } from "../redux/asinListSlice";
 import { useEffect, useState } from "react";
 
 function Manage() {
