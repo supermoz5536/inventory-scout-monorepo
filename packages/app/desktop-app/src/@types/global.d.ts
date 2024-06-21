@@ -10,7 +10,8 @@ export declare global {
   // 持つことを定義している。
   interface AsinData {
     asin: string;
-    id?: number;
+    id: string;
+    deleteCheck: boolean;
   }
 
   // initialStateの型定義

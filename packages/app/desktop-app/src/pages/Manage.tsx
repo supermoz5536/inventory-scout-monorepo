@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
 import { addAsin } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
@@ -100,6 +101,8 @@ function Manage() {
       // プロパティの値: 各map処理で変数asin代入されるASIN番号
       const inputAsinDatas: AsinData[] = inputAsinLines.map((asin) => ({
         asin,
+        id: uuidv4(),
+        deleteCheck: false,
       }));
 
       // 入力したASINリストにfilterメソッドを適用して
