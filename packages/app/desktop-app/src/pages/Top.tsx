@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { switchCheck } from "../redux/asinDataListSlice";
+import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
+import { useEffect, useState } from "react";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -30,6 +31,8 @@ function Top() {
   const productName: string =
     "コモライフ ビューナ うねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
 
+  const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
+
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
   // その型をAppDispatchとして指定することで
@@ -48,8 +51,13 @@ function Top() {
   );
 
   const handleDeleteCheck = (id: string) => {
-    dispatch(switchCheck(id));
+    dispatch(switchRemoveCheck(id));
   };
+
+  useEffect(() => {
+    const asinDataListCount = asinDataList.length;
+    setAsinDataListCount(asinDataListCount);
+  }, [asinDataList.length]);
 
   return (
     <div className="App">
@@ -100,11 +108,16 @@ function Top() {
           />
         </div>
         <div className="top-square-space-menu-container-right">
-          <button className="top-square-space-menu-container-right-delete-button">
+          <button
+            className="top-square-space-menu-container-right-delete-button"
+            onClick={() => {
+              dispatch(removeAsin());
+            }}
+          >
             チェックしたASINを削除
           </button>
           <p className="top-square-space-menu-container-right-asin-num">
-            登録ASIN数：300
+            登録ASIN数：{asinDataListCount}
           </p>
           <input
             type="text"

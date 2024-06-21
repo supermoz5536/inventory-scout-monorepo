@@ -29,20 +29,16 @@ export const asinSlice = createSlice({
       // console.log("state.value after push:", state.value);
     },
 
-    deleteAsin: (state, action) => {
-      // asinは、配列の現在の要素です。
-      // asin.asinは、現在の要素のasinプロパティです。
-      // action.paylodは、入力した削除対象のASINです。
-
-      // filterメソッドで、状態管理してるasinListの各要素に対して
-      // 引数の削除対象のasinこ一致してるかどうかをチェックする
-      // 一致してない場合のみ ! でTrueとなって、新規配列に加えられる
+    removeAsin: (state) => {
+      // チェックされてないasinDataオブジェクトのみを
+      // 返り値で取得して新たに配列を生成し、
+      // 状態を更新します。
       state.value = state.value.filter(
-        (asin: AsinData) => !action.payload.includes(asin.asin)
+        (asinData: AsinData) => asinData.deleteCheck == false
       );
     },
 
-    switchCheck: (state, action: PayloadAction<string>) => {
+    switchRemoveCheck: (state, action: PayloadAction<string>) => {
       // Redux Toolkit を用いる場合は
       // 自動でイミュータブルな処理を行ってくれますが
       // 以下の構文に従う必要があります。
@@ -61,6 +57,8 @@ export const asinSlice = createSlice({
       if (asinDataChecked) {
         asinDataChecked.deleteCheck = !asinDataChecked.deleteCheck;
       }
+
+      // removedelete;
     },
   },
 });
@@ -69,7 +67,7 @@ export const asinSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { addAsin, deleteAsin, switchCheck } = asinSlice.actions;
+export const { addAsin, removeAsin, switchRemoveCheck } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。
