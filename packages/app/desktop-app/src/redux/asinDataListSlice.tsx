@@ -41,6 +41,27 @@ export const asinSlice = createSlice({
         (asin: AsinData) => !action.payload.includes(asin.asin)
       );
     },
+
+    switchCheck: (state, action: PayloadAction<string>) => {
+      // Redux Toolkit を用いる場合は
+      // 自動でイミュータブルな処理を行ってくれますが
+      // 以下の構文に従う必要があります。
+      // ■ プロパティを持たない状態オブジェクトの場合
+      // return state = new state;
+      // ■ プロパティを持つオブジェクトの場合
+      // state.プロパティ名 = new property value;
+
+      // findメソッドは、
+      // 配列内の要素を検索し
+      // 指定された条件を満たす最初の要素を返します。
+      const asinDataChecked: AsinData | undefined = state.value.find(
+        (asinData) => action.payload == asinData.id
+      );
+
+      if (asinDataChecked) {
+        asinDataChecked.deleteCheck = !asinDataChecked.deleteCheck;
+      }
+    },
   },
 });
 
@@ -48,7 +69,7 @@ export const asinSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { addAsin, deleteAsin } = asinSlice.actions;
+export const { addAsin, deleteAsin, switchCheck } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。

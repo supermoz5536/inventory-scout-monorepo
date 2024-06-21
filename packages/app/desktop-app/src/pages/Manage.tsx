@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import "./Manage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
-import { addAsin } from "../redux/asinDataListSlice";
+import { addAsin, deleteAsin, switchCheck } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -130,7 +130,9 @@ function Manage() {
     }
   };
 
-  const handleDeleteCheck = () => {};
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchCheck(id));
+  };
 
   // useEffectを使用して、状態が変更されたときにログを出力する
   useEffect(() => {
@@ -222,7 +224,13 @@ function Manage() {
                   {/* 要素0 チェック */}
                   <div className="manage-square-space-amazon-num">
                     <label>
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        onChange={() => {
+                          handleDeleteCheck(asinData.id);
+                        }}
+                        checked={asinData.deleteCheck}
+                      />
                     </label>
                   </div>
                   {/* 要素1 ASIN */}
