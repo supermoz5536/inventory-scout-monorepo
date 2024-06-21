@@ -1,5 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import "./Manage.css";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
+import { addAsin } from "../redux/asinSlice";
+import { useEffect, useState } from "react";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
@@ -38,21 +42,93 @@ function Manage() {
     "B0C4SR7V7R",
     "B0C4SR7V7R",
   ];
-  const productURL: string =
-    "https://m.media-amazon.com/images/I/7141kPbAYsL._AC_SL1200_.jpg";
-  const amazonURL: string = "https://www.amazon.co.jp/dp/B0C4SR7V7R/ ";
 
   const productName: string =
     "コモライフ ビューナ うねりケアトリーうねりケアトリーうねりケアトリーうねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
 
-  // 開発用の空関数
-  // const handleForDev = () => {};
+  // 入力フィールドの状態を管理するためのuseState
+  const [inputAsin, setInputAsin] = useState<string>("");
 
-  const gotoURL = (url: string) => {
-    window.myAPI.openExternal(url);
+  // インプット文字列情報を取得するための関数
+  const handleInputChange = (event: any) => {
+    setInputAsin(event.target.value);
   };
 
+  // タブ切り替えのフック
   const navigate = useNavigate();
+
+  // グローバル変数のASINリストの値を取得
+  const asinList = useSelector((state: RootState) => state.asin.value);
+
+  // dispatch: storeへのreducer起動のお知らせ役
+  // dispatch関数を取得し、
+  // その型をAppDispatchとして指定することで
+  // アクションをディスパッチする際に型安全性が確保されます。
+  const dispatch = useDispatch<AppDispatch>();
+
+  // ボタンをクリックしたときにアクションをディスパッチする関数
+  const handleAddAsin = () => {
+    // まず、入力されたASINコードが
+    // 空でないか（または空白だけでないか）を確認します。
+    if (inputAsin.trim()) {
+      const inputAsinLines = inputAsin
+        // 改行で文字列を各ine要素にスプリット
+        // /：正規表現リテラルの開始と終了を示します。
+        // []：中括弧内の任意の一文字にマッチします（文字クラス）。
+        // \r：古いMacOSでの改行文字にマッチ
+        //\n：Unix/Linuxおよび新しいMacOSシステムでの改行文字にマッチ
+        //\s：空白文字（スペース、タブ、改行、フォームフィードなど）にマッチします。
+        //+：直前の文字または文字クラスが1回以上繰り返されることにマッチします。
+        .split(/[\r\n\s]+/)
+        // 各lineに空白のトリム処理を実行
+        .map((line) => line.trim())
+        // 各lineに対して、空白でなければ
+        // そのlineを新たな配列の要素に加える処理を実行
+        .filter((line) => line !== "");
+
+      // ASINの配列をAsinData型のオブジェクトの配列に変換
+      // (asin) => ({ asin }): この書き方は
+      //「mapメソッドのイテレートな処理による各要素の文字列の値」を格納した
+      //「変数asin」を値に持つ、
+      //「asin」というプロパティ名を持ったオブジェクトを作成します。
+      // つまり、sring[]型の asinLines の各要素を
+      // mapメソッドで1つ1つ以下のオブジェクトにキャストしています。
+      // オブジェクト名: asinDataArray
+      // プロパティ名: asin
+      // プロパティの値: 各map処理で変数asin代入されるASIN番号
+      const inputAsinDatas: AsinData[] = inputAsinLines.map((asin) => ({
+        asin,
+      }));
+
+      // 入力したASINリストにfilterメソッドを適用して
+      // 各イテレート処理において、asinListの各要素と一致するかをイテレートに照合
+      // 照合にはsomeメソッドを使う。
+      // 一致した場合(True)は、重複してる必要のないASINなので
+      // 論理否定演算子！で真偽値の結果を反転させて
+      // ASINが重複してないのイテレート処理の場合のみ要素を返す操作を行う
+      const inputAsinDatasFilterd: AsinData[] = inputAsinDatas.filter(
+        (inputAsinData: AsinData) =>
+          !asinList.some(
+            (asinData: AsinData) => asinData.asin === inputAsinData.asin
+          )
+      );
+
+      // dispatch関数を使って、
+      // addAsinアクションをストアに送信します。
+      // このアクションは、入力されたASINコードを
+      // ストアに追加するためのものです。
+      // addAsin([{ asin: inputAsin }])で、
+      // ASINコードを含むオブジェクトの配列を
+      // アクションとしてディスパッチしています。
+      dispatch(addAsin(inputAsinDatasFilterd));
+      setInputAsin(""); // 入力フィールドをクリア
+    }
+  };
+
+  // useEffectを使用して、状態が変更されたときにログを出力する
+  useEffect(() => {
+    console.log("asinList after state update:", asinList);
+  }, [asinList]);
 
   return (
     <div className="App">
@@ -79,11 +155,19 @@ function Manage() {
       <div className="manage-body">
         {/* 左Columnエリア */}
         <div className="manage-left-column">
-          <input type="text" className="manage-input-asin" />
+          <textarea
+            className="manage-input-asin"
+            value={inputAsin} /* valueの値をinputAsinに紐づけています。*/
+            onChange={handleInputChange}
+            rows={300}
+            cols={10}
+          />
           {/* 下部コンテナ */}
           <div className="manage-left-column-down-container">
             <p className="manage-add-asin-count">300</p>
-            <button className="manage-add-asin-button">登録</button>
+            <button className="manage-add-asin-button" onClick={handleAddAsin}>
+              登録
+            </button>
           </div>
         </div>
         {/* 右Columnエリア */}
