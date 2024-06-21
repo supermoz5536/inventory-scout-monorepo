@@ -125,6 +125,8 @@ function Manage() {
     }
   };
 
+  const handleDeleteCheck = () => {};
+
   // useEffectを使用して、状態が変更されたときにログを出力する
   useEffect(() => {
     console.log("asinList after state update:", asinList);
