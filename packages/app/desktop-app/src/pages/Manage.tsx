@@ -2,12 +2,17 @@ import { useNavigate } from "react-router-dom";
 import "./Manage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
-import { addAsin } from "../redux/asinSlice";
+import {
+  addAsin,
+  removeAsin,
+  switchRemoveCheck,
+} from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = [
+  const asinHardCodeArray: Array<string> = [
     "B0C4SR7V7R",
     "B0C4SR7V7R",
     "B0C4SR7V7R",
@@ -48,6 +53,7 @@ function Manage() {
 
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
+  const [inputAsinCount, setInputAsinCount] = useState<number>(0);
 
   // インプット文字列情報を取得するための関数
   const handleInputChange = (event: any) => {
@@ -58,7 +64,9 @@ function Manage() {
   const navigate = useNavigate();
 
   // グローバル変数のASINリストの値を取得
-  const asinList = useSelector((state: RootState) => state.asin.value);
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -98,6 +106,8 @@ function Manage() {
       // プロパティの値: 各map処理で変数asin代入されるASIN番号
       const inputAsinDatas: AsinData[] = inputAsinLines.map((asin) => ({
         asin,
+        id: uuidv4(),
+        deleteCheck: false,
       }));
 
       // 入力したASINリストにfilterメソッドを適用して
@@ -108,7 +118,7 @@ function Manage() {
       // ASINが重複してないのイテレート処理の場合のみ要素を返す操作を行う
       const inputAsinDatasFilterd: AsinData[] = inputAsinDatas.filter(
         (inputAsinData: AsinData) =>
-          !asinList.some(
+          !asinDataList.some(
             (asinData: AsinData) => asinData.asin === inputAsinData.asin
           )
       );
@@ -125,10 +135,22 @@ function Manage() {
     }
   };
 
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchRemoveCheck(id));
+  };
+
+  useEffect(() => {
+    const inputAsinLinesLength = inputAsin
+      .split(/[\r\n\s]+/)
+      .map((line) => line.trim())
+      .filter((line) => line !== "").length;
+    setInputAsinCount(inputAsinLinesLength);
+  }, [inputAsin]);
+
   // useEffectを使用して、状態が変更されたときにログを出力する
   useEffect(() => {
-    console.log("asinList after state update:", asinList);
-  }, [asinList]);
+    console.log("asinList after state update:", asinDataList);
+  }, [asinDataList]);
 
   return (
     <div className="App">
@@ -159,12 +181,23 @@ function Manage() {
             className="manage-input-asin"
             value={inputAsin} /* valueの値をinputAsinに紐づけています。*/
             onChange={handleInputChange}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                // デフォルトのブラウザの動作による
+                // Enterキーの動作(改行)を防ぎます。
+                event.preventDefault();
+                handleAddAsin();
+              }
+            }}
             rows={300}
             cols={10}
+            placeholder={
+              "追加ASINを改行で入力\n推奨：Excelから直接貼り付け\n\nB000000000\nB000000000\nB000000000\n    .\n    .\n    .\n    .\n    ."
+            }
           />
           {/* 下部コンテナ */}
           <div className="manage-left-column-down-container">
-            <p className="manage-add-asin-count">300</p>
+            <p className="manage-add-asin-count">{inputAsinCount}</p>
             <button className="manage-add-asin-button" onClick={handleAddAsin}>
               登録
             </button>
@@ -206,21 +239,27 @@ function Manage() {
 
             {/* リスト部分 */}
             <div className="manage-asinArray-map-wrapper-manage-css">
-              {asinArray.map((asin, index) => (
+              {asinDataList.map((asinData, index) => (
                 <div className="manage-asin-list" key={index}>
                   {/* 要素 ID */}
                   <div className="manage-square-space-amazon-num">
-                    <p>{index}</p>
+                    <p>{index + 1}</p>
                   </div>
                   {/* 要素0 チェック */}
                   <div className="manage-square-space-amazon-num">
                     <label>
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        onChange={() => {
+                          handleDeleteCheck(asinData.id);
+                        }}
+                        checked={asinData.deleteCheck}
+                      />
                     </label>
                   </div>
                   {/* 要素1 ASIN */}
                   <div className="manage-square-space-asin">
-                    {<p>{asin}</p>}
+                    {<p>{asinData.asin}</p>}
                   </div>
 
                   {/* 要素4 商品名 */}
@@ -248,7 +287,12 @@ function Manage() {
           </div>
           {/* 下部コンテナ */}
           <div className="manage-right-column-down-container">
-            <button className="manage-delete-selected-asin-button">
+            <button
+              className="manage-delete-selected-asin-button"
+              onClick={() => {
+                dispatch(removeAsin());
+              }}
+            >
               選択したASINを削除
             </button>
             <button className="manage-delete-no-fba-asin-button">

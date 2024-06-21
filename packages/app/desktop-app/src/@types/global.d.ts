@@ -10,13 +10,15 @@ export declare global {
   // 持つことを定義している。
   interface AsinData {
     asin: string;
+    id: string;
+    deleteCheck: boolean;
   }
 
   // initialStateの型定義
   // ASINState型のオブジェクトが
   // ASINData型のvalueプロパティを
   // 持つことを定義している。
-  interface AsinState {
+  interface AsinDataListState {
     value: AsinData[];
   }
 }

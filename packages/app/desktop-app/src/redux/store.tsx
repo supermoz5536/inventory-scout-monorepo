@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import asinSlice from "./asinSlice";
+import asinDataListSlice from "./asinDataListSlice";
 
 // store: 状態(=state)と、状態変更関数のreducer(=Notifier)をまとめて、各sliceを格納したコンテナ
 // このstoreというコンテナ内の情報を安全にグローバルに公開するのがProvider
@@ -10,12 +10,11 @@ export const store = configureStore({
   reducer: {
     // プロパティ名はSlice名（＝グローバル管理する値の関連名）
     // riverpodのproviderの.dartファイルにつける名前と同じと考えて良い
-    asin: asinSlice,
+    asinDataList: asinDataListSlice,
   },
 });
 
 // RootStateの型をエクスポート
-
 // store.getState()の戻り値の型（ストアの状態の型）を取得し、
 // それを現在アプリ全体の状態、つまりのRootStateとしてエクスポートします。
 // RootStateは、Reduxストアの全体の状態ツリーの型を表します。
@@ -26,6 +25,7 @@ export const store = configureStore({
 // ストアの状態の構造と内容を型安全に扱うことができます。
 export type RootState = ReturnType<typeof store.getState>;
 
+// DisPatchの型をエクスポート
 // store.dispatchの型を取得し、それをAppDispatchとしてエクスポートします。
 // dispatch関数は、
 // アクションをストアに送信するために使用されます。

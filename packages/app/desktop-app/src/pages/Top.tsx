@@ -1,5 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import "./Top.css";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
+import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
+import { useEffect, useState } from "react";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -27,14 +31,33 @@ function Top() {
   const productName: string =
     "コモライフ ビューナ うねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
 
-  // 開発用の空関数
-  // const handleForDev = () => {};
+  const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
+
+  // dispatch: storeへのreducer起動のお知らせ役
+  // dispatch関数を取得し、
+  // その型をAppDispatchとして指定することで
+  // アクションをディスパッチする際に型安全性が確保されます。
+  const dispatch = useDispatch<AppDispatch>();
 
   const gotoURL = (url: string) => {
     window.myAPI.openExternal(url);
   };
 
   const navigate = useNavigate();
+
+  // グローバル変数のASINリストの値を取得
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
+
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchRemoveCheck(id));
+  };
+
+  useEffect(() => {
+    const asinDataListCount = asinDataList.length;
+    setAsinDataListCount(asinDataListCount);
+  }, [asinDataList.length]);
 
   return (
     <div className="App">
@@ -85,11 +108,16 @@ function Top() {
           />
         </div>
         <div className="top-square-space-menu-container-right">
-          <button className="top-square-space-menu-container-right-delete-button">
+          <button
+            className="top-square-space-menu-container-right-delete-button"
+            onClick={() => {
+              dispatch(removeAsin());
+            }}
+          >
             チェックしたASINを削除
           </button>
           <p className="top-square-space-menu-container-right-asin-num">
-            登録ASIN数：300
+            登録ASIN数：{asinDataListCount}
           </p>
           <input
             type="text"
@@ -170,17 +198,25 @@ function Top() {
 
         <div className="top-asinArray-map-wrapper-top-css">
           {/* リスト部分 */}
-          {asinArray.map((asin) => (
+          {asinDataList.map((asinData) => (
             <div className="top-asin-list">
               {/* 要素0 チェック */}
               <div className="top-square-space-asin-delete">
                 <label>
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    onChange={() => {
+                      handleDeleteCheck(asinData.id);
+                    }}
+                    checked={asinData.deleteCheck}
+                  />
                 </label>
               </div>
 
               {/* 要素1 ASIN */}
-              <div className="top-square-space-asin">{<p>{asin}</p>}</div>
+              <div className="top-square-space-asin">
+                {<p>{asinData.asin}</p>}
+              </div>
 
               {/* 要素2 3ボタン */}
               <div className="top-square-space-3button">
