@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 function Manage() {
   // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = [
+  const asinHardCodeArray: Array<string> = [
     "B0C4SR7V7R",
     "B0C4SR7V7R",
     "B0C4SR7V7R",
@@ -58,7 +58,9 @@ function Manage() {
   const navigate = useNavigate();
 
   // グローバル変数のASINリストの値を取得
-  const asinList = useSelector((state: RootState) => state.asinDataList.value);
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -108,7 +110,7 @@ function Manage() {
       // ASINが重複してないのイテレート処理の場合のみ要素を返す操作を行う
       const inputAsinDatasFilterd: AsinData[] = inputAsinDatas.filter(
         (inputAsinData: AsinData) =>
-          !asinList.some(
+          !asinDataList.some(
             (asinData: AsinData) => asinData.asin === inputAsinData.asin
           )
       );
@@ -129,8 +131,8 @@ function Manage() {
 
   // useEffectを使用して、状態が変更されたときにログを出力する
   useEffect(() => {
-    console.log("asinList after state update:", asinList);
-  }, [asinList]);
+    console.log("asinList after state update:", asinDataList);
+  }, [asinDataList]);
 
   return (
     <div className="App">
@@ -208,7 +210,7 @@ function Manage() {
 
             {/* リスト部分 */}
             <div className="manage-asinArray-map-wrapper-manage-css">
-              {asinArray.map((asin, index) => (
+              {asinDataList.map((asinData, index) => (
                 <div className="manage-asin-list" key={index}>
                   {/* 要素 ID */}
                   <div className="manage-square-space-amazon-num">
@@ -222,7 +224,7 @@ function Manage() {
                   </div>
                   {/* 要素1 ASIN */}
                   <div className="manage-square-space-asin">
-                    {<p>{asin}</p>}
+                    {<p>{asinData.asin}</p>}
                   </div>
 
                   {/* 要素4 商品名 */}
