@@ -4,28 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
+import scraperPromise from "../components/Scraper";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = [
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-  ];
+  const asinArray: Array<string> = ["B0C4SR7V7R", "B0C4SR7V7R", "B0C4SR7V7R"];
   const productURL: string =
-    "https://m.media-amazon.com/images/I/7141kPbAYsL._AC_SL1200_.jpg";
+    "https://m.media-amazon.com/images/I/41sEsXPy8QL._AC_SL1000_.jpg";
   const amazonURL: string = "https://www.amazon.co.jp/dp/B0C4SR7V7R/ ";
 
   const productName: string =
@@ -59,6 +44,11 @@ function Top() {
     setAsinDataListCount(asinDataListCount);
   }, [asinDataList.length]);
 
+  const handleScrape = async (hardCord: string) => {
+    const scrape = await scraperPromise;
+    scrape.runScraping(hardCord);
+  };
+
   return (
     <div className="App">
       {/* タブ部分 */}
@@ -85,10 +75,19 @@ function Top() {
       {/* メニュー部分 */}
       <div className="top-square-space-menu">
         <div className="top-square-space-menu-container-left">
+          {/* Scraperコンポーネントの実行ボタン */}
+          {/* <button
+            className="top-square-space-menu-container-left-update"
+            onClick={() => handleScrape("B0C4SR7V7R")}
+          >
+            更新
+          </button> */}
+          {/* 全選択チェック */}
           <input
             type="checkbox"
             className="top-square-space-menu-container-left-check"
           />
+          {/* ASIN検索入力欄 */}
           <input
             type="text"
             className="top-square-space-menu-container-left-input"
