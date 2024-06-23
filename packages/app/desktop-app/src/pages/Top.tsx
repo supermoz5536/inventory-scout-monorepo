@@ -78,7 +78,7 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-update"
-            onClick={() => handleScrape("B0C4SR7V7R")}
+            onClick={() => handleScrape("B0BCHL7KX9")}
           >
             更新
           </button>

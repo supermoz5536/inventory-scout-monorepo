@@ -5,8 +5,24 @@ import puppeteer, { Browser, Page } from "puppeteer";
 // 擬似的なオブジェクト指向となり
 // 基本的なクラスを定義した記法と同じ構文になる
 const scrapePromise = (async () => {
-  // 初期化処理の設定はないので
-  // 即時関数だがトリガーされるまで何も実行さない
+  // 即時関数で立ち上げ直後に読み込まれる初期化処理
+
+  /// 指定された時間だけ処理を遅延させる関数の宣言
+  const sleep = (time: number) =>
+    // new Promiseは、コンストラクタ関数で
+    // Promise(非同期)オブジェクトを生成します。
+    //
+    // Promiseコンストラクタには1つの関数の引数が必要です。
+    // この関数は2つの引数（resolve, reject）を取りますが、
+    // この場合はresolveのみを使用しています。
+    //
+    // resolveはPromiseを成功（完了）としてマークするための関数です。
+    // setTimeoutは、指定された時間（ミリ秒）後に指定された関数を実行します。
+    //
+    // resolve関数をsetTimeoutに渡し
+    // setTimeoutが指定された時間後にresolveを呼び出し、
+    // Promiseを完了します。
+    new Promise((resolve) => setTimeout(resolve, time));
 
   // 各メソッドの定義
   return {
@@ -47,6 +63,45 @@ const scrapePromise = (async () => {
         waitUntil: "networkidle2",
       });
       console.log("3.2");
+    },
+
+    /// 新品の出品リンクをクリックして
+    // 出品者一覧のDrawerを展開
+    openSellerDrawer: async (page: Page) => {
+      // 「新品の出品」のリンクをセレクタで指定してクリックします。
+      await page.click('a[href*="/gp/offer-listing/"][href*="condition=NEW"]');
+      console.log("3.3");
+      // 出品者一覧ページへの画面遷移を待機します。
+      await page.waitForNavigation({ waitUntil: "networkidle2" });
+      console.log("3.4");
+    },
+
+    /// 絞り込みボタンをクリックしてプルダウンを展開
+    applyFilters: async (page: Page) => {
+      // 絞り込みボタンが表示されるまで待機します。
+      await page.waitForSelector(
+        ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div",
+        { timeout: 10000 }
+      );
+      console.log("3.5");
+      // 絞り込みボタンをクリック
+      await page.click(
+        ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div"
+      );
+      console.log("3.5");
+      // プライムのチェックボックスが表示されるのを待機
+      await page.waitForSelector('#primeEligible input[type="checkbox"]', {
+        timeout: 10000,
+      });
+      console.log("3.5.1");
+      // プライムのチェックボックスをクリック
+      await page.click('#primeEligible input[type="checkbox"]');
+      await sleep(1000);
+
+      console.log("3.6");
+      // 新品のチェックボックスをクリック
+      await page.click('#new input[type="checkbox"]');
+      console.log("3.7");
     },
 
     /// 「カートに入れる」をクリック
@@ -128,16 +183,18 @@ const scrapePromise = (async () => {
     runScraping: async (ASIN: string) => {
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
-      const scraper = await scrapePromise;
-      const browser = await scraper.launchBrowser();
-      const page = await scraper.launchPage(browser);
-      await scraper.accessProductPage(ASIN, page);
-      await scraper.addToCart(page);
-      await scraper.goToCart(page);
-      await scraper.setQuantity(page);
-      const stockCount = await scraper.getStockCount(page);
-      console.log(`在庫数: ${stockCount}`);
-      await scraper.emptyCart(page);
+      const scrape = await scrapePromise;
+      const browser = await scrape.launchBrowser();
+      const page = await scrape.launchPage(browser);
+      await scrape.accessProductPage(ASIN, page);
+      await scrape.openSellerDrawer(page);
+      await scrape.applyFilters(page);
+      // await scraper.addToCart(page);
+      // await scraper.goToCart(page);
+      // await scraper.setQuantity(page);
+      // const stockCount = await scraper.getStockCount(page);
+      // console.log(`在庫数: ${stockCount}`);
+      // await scraper.emptyCart(page);
     },
   };
 })();
