@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import * as url from "url";
+import scrapePromis from "../src/components/Scrape";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -29,6 +30,19 @@ const createWindow = () => {
     win.webContents.openDevTools();
   }
 };
+
+ipcMain.handle("scrape", async (event, asin: string) => {
+  try {
+    console.log("mainProcess 1");
+    const scrape = await scrapePromis;
+    console.log("mainProcess 2");
+    scrape.runScraping(asin);
+    console.log("mainProcess 3");
+  } catch (error) {
+    console.error("MyAPI scrape ERROR", error);
+    return "MyAPI scrape ERROR"; // エラーメッセージを返す
+  }
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

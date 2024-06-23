@@ -3,6 +3,7 @@ export declare global {
     myAPI: {
       counter: (count: number) => number;
       openExternal: (url: string) => void | null;
+      scrape: (asin: string) => void | null;
     };
   }
   // ASINData型のオブジェクトが

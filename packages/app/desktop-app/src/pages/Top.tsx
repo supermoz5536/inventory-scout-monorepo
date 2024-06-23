@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
-import scraperPromise from "../components/Scraper";
+import scrapePromise from "../components/Scrape";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -45,8 +45,8 @@ function Top() {
   }, [asinDataList.length]);
 
   const handleScrape = async (hardCord: string) => {
-    const scrape = await scraperPromise;
-    scrape.runScraping(hardCord);
+    console.log("Top 1");
+    window.myAPI.scrape(hardCord);
   };
 
   return (
@@ -76,12 +76,12 @@ function Top() {
       <div className="top-square-space-menu">
         <div className="top-square-space-menu-container-left">
           {/* Scraperコンポーネントの実行ボタン */}
-          {/* <button
+          <button
             className="top-square-space-menu-container-left-update"
             onClick={() => handleScrape("B0C4SR7V7R")}
           >
             更新
-          </button> */}
+          </button>
           {/* 全選択チェック */}
           <input
             type="checkbox"
