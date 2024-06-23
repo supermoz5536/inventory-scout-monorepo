@@ -14,15 +14,15 @@ const scrapePromise = (async () => {
       const browser = await puppeteer.launch({
         headless: false,
         args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-infobars",
-          "--window-position=0,0",
-          "--ignore-certifcate-errors",
-          "--ignore-certifcate-errors-spki-list",
-          "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
-          "--disable-gpu",
+          "--no-sandbox", // サンドボックスはセキュリティ機能であり、これを無効にすることでブラウザがより軽量に実行されます。
+          "--disable-setuid-sandbox", // --no-sandboxと一緒に使われ、同様の理由でサンドボックスを無効にします。
+          "--disable-infobars", // Chromeブラウザが「Chromeは自動テスト ソフトウェアによって制御されています」という情報バーを表示するのを無効にします。このバーが表示されると、スクレイピングツールの使用が検知されやすくなります。
+          "--window-position=0,0", // ウィンドウの位置を画面の左上に設定することで、ブラウザウィンドウが特定の位置に固定されます。これは人間が操作しているブラウザの挙動に近づけるために使われます。
+          "--ignore-certifcate-errors", // SSL証明書のエラーを無視することで、自己署名証明書や期限切れの証明書が原因でページの読み込みが失敗するのを防ぎます。
+          "--ignore-certifcate-errors-spki-list", // 特定のSPKIリストに関連する証明書エラーを無視します。これもSSL証明書の問題を回避するためです。
+          "--disable-dev-shm-usage", // 共有メモリの使用を無効にすることで、メモリ使用量を抑え、ブラウザのクラッシュを防ぐことができます。
+          "--disable-accelerated-2d-canvas", // 2Dキャンバスのハードウェアアクセラレーションを無効にすることで、描画の問題やブラウザのクラッシュを防ぎます。
+          "--disable-gpu", // GPUを無効にすることで、GPU関連のクラッシュを防ぎます。
           "--window-size=1280,960",
         ],
       });
