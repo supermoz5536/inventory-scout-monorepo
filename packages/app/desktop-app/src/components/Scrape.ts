@@ -104,6 +104,90 @@ const scrapePromise = (async () => {
       console.log("3.7");
     },
 
+    // Drawer内のセラーID、出荷元、販売者データを取得
+    getAllSellerInfoOnDrawer: async (page: Page) => {
+      // 各コンテナ情報を取得
+      // .$は指定したCSSセレクタと一致する「最初の要素」を取得
+      // .$$は指定したCSSセレクタと一致する「全ての要素」を取得するメソッド
+      const offers = await page.$$("#aod-pinned-offer, #aod-offer");
+
+      // 取得した情報を格納するための空の配列を用意
+      const sellerInfos = [];
+
+      // 各コンテナをループで処理
+      for (const offer of offers) {
+        // CSSセレクタの記述では、
+        // スペースで区切るだけで、
+        // 親子関係の指定ができます。
+
+        // セラーIDが含まれる要素の参照を取得
+        // <a>タグ（アンカータグ）で、href属性に"/gp/aag/main"を含む要素を指定します。
+        const sellerIdElement = await offer.$('a[href*="/gp/aag/main"]');
+
+        // 出荷元の名前が含まれる要素の参照を取得
+        const shippingSourceElement = await offer.$(
+          "#aod-offer-shipsFrom .a-size-small.a-color-base"
+        );
+        console.log("shippingSourceElement", shippingSourceElement);
+
+        // 販売元の名前が含まれる要素の参照を取得
+        const sellerNameElement = await offer.$(
+          "#aod-offer-soldBy .a-size-small.a-link-normal"
+        );
+
+        // セラーIDの抽出処理
+        const sellerId = sellerIdElement
+          ? // セラーIDのタグが見つかった場合
+            // .evaluate: ページ内でJavaScriptを実行するメソッド
+            // 第一引数に、ページ内で実行する関数を指定
+            // 第二引数に、第一引数の関数に渡す引数を指定（ここではsellerIdElement）。
+            await page.evaluate(
+              // 引数として受け取ったel（要素）から
+              // href属性の値を取得し、
+              // 正規表現を使用してセラーIDを抽出します。
+              // []内の^は否定を意味し、
+              // [^&]+ は & 以外の文字が1回以上続く部分にマッチし、
+              // & が出現した時点でマッチが終了します。
+
+              // 第一引数の関数
+              (el) => {
+                const href = el.getAttribute("href");
+                const match = href ? href.match(/seller=([^&]+)/) : null;
+                return match ? match[1] : null;
+              },
+              // 第二引数
+              sellerIdElement
+            )
+          : // セラーIDのタグが見つからなかった場合
+            null;
+
+        // 出荷元名の抽出処理
+        // 要素が存在する場合は
+        // そのテキストを取得しトリムする
+        const shippingSource = shippingSourceElement
+          ? await page.evaluate((el) => {
+              const textContent = el.textContent;
+              return textContent ? textContent.trim() : null;
+            }, shippingSourceElement)
+          : null;
+
+        // 販売元の名前を抽出
+        // テキストコンテンツを取得しトリムする
+        const sellerName = sellerNameElement
+          ? await page.evaluate((el) => {
+              const textContent = el.textContent;
+              return textContent ? textContent.trim() : null;
+            }, sellerNameElement)
+          : null;
+
+        // 取得した情報をオブジェクトとして配列に追加
+        sellerInfos.push({ sellerId, shippingSource, sellerName });
+      }
+
+      // すべてのオファーから取得した情報が入った配列を返す
+      return sellerInfos;
+    },
+
     /// 「カートに入れる」をクリック
     addToCart: async (page: Page) => {
       // クリックするボタンをセレクタ（#add-to-cart-button）で指定します。
@@ -189,6 +273,7 @@ const scrapePromise = (async () => {
       await scrape.accessProductPage(ASIN, page);
       await scrape.openSellerDrawer(page);
       await scrape.applyFilters(page);
+      await scrape.getAllSellerInfoOnDrawer(page);
       // await scraper.addToCart(page);
       // await scraper.goToCart(page);
       // await scraper.setQuantity(page);
