@@ -112,7 +112,7 @@ function Manage() {
         name: "",
         amazonStock: -1,
         fbaSellerNOP: -1,
-        totalInv: -1,
+        totalStock: -1,
         cartPrice: -1,
         decrease1: -1,
         decrease2: -1,

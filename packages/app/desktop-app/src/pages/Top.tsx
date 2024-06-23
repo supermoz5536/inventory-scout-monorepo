@@ -249,32 +249,34 @@ function Top() {
 
               {/* 要素5 Amazon在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.amazonStock}</p>
+                <p>{asinData.amazonStock == -1 ? "" : asinData.amazonStock}</p>
               </div>
 
               {/* 要素6 FBAセラー数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.fbaSellerNOP}</p>
+                <p>
+                  {asinData.fbaSellerNOP == -1 ? "" : asinData.fbaSellerNOP}
+                </p>
               </div>
 
               {/* 要素7 合計在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.totalInv}</p>
+                <p>{asinData.totalStock == -1 ? "" : asinData.totalStock}</p>
               </div>
 
               {/* 要素8 カート価格 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.cartPrice}</p>
+                <p>{asinData.cartPrice == -1 ? "" : asinData.cartPrice}</p>
               </div>
 
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease1}</p>
+                <p>{asinData.decrease1 == -1 ? "" : asinData.decrease1}</p>
               </div>
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease2}</p>
+                <p>{asinData.decrease2 == -1 ? "" : asinData.decrease2}</p>
               </div>
 
               {/* 要素11 最新取得 */}

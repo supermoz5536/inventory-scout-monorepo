@@ -26,7 +26,7 @@ export declare global {
     name: string;
     amazonStock: number;
     fbaSellerNOP: number;
-    totalInv: number;
+    totalStock: number;
     cartPrice: number;
     decrease1: number;
     decrease2: number;
