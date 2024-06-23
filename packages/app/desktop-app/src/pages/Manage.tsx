@@ -105,9 +105,21 @@ function Manage() {
       // プロパティ名: asin
       // プロパティの値: 各map処理で変数asin代入されるASIN番号
       const inputAsinDatas: AsinData[] = inputAsinLines.map((asin) => ({
-        asin,
         id: uuidv4(),
         deleteCheck: false,
+        asin,
+        imageUrl: "",
+        name: "",
+        amazonStock: -1,
+        fbaSellerNOP: -1,
+        totalInv: -1,
+        cartPrice: -1,
+        decrease1: -1,
+        decrease2: -1,
+        fetchLatestDate: "",
+        fetchCurrentStatus: "",
+        asinParent: "",
+        fbasellerDatas: { fbaSellerData: [] },
       }));
 
       // 入力したASINリストにfilterメソッドを適用して
