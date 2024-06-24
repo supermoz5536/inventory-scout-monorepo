@@ -111,7 +111,7 @@ const scrapePromise = (async () => {
     // },
 
     scrollToBottom: async (page: Page) => {
-      await sleep(1500);
+      await sleep(1000);
       const drawerSelector = "#all-offers-display";
       const drawerElement = await page.$(drawerSelector);
       console.log("drawerElement", drawerElement);
@@ -125,79 +125,45 @@ const scrapePromise = (async () => {
             boundingBox.y + boundingBox.height / 2
           );
 
-          for (let i = 0; i < 5; i++) {
-            await page.mouse.wheel({ deltaY: boundingBox.height });
+          let previousPosition = await page.evaluate(() => window.scrollY);
+          let samePositionTimes: number = 0;
 
-            // 要素のトップの高さを取得
+          for (let i = 0; i < 6; i++) {
+            console.log("i =", i);
+            await page.mouse.wheel({
+              deltaY: boundingBox.height,
+            });
+
+            // 要素のトップの高さを取得して強制的に更新
             await page.evaluate((selector) => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1500); // 500ms待機
-          }
+            await sleep(1250); // 500ms待機
 
-          for (let i = 0; i < 5; i++) {
-            await page.mouse.wheel({ deltaY: -boundingBox.height });
-            await sleep(1500); // 500ms待機
+            // let currentPosition = await page.evaluate((selector) => {
+            //   const element = document.querySelector(selector);
+            //   return element ? element.scrollTop : null;
+            // }, drawerSelector);
+
+            // console.log("previousPosition", previousPosition);
+            // console.log("currentPosition", currentPosition);
+
+            // if (currentPosition === previousPosition) {
+            //   ++samePositionTimes;
+            //   if (samePositionTimes >= 4) {
+            //     console.log("ポジションが3回以上変わらないのでループ終了");
+            //     break;
+            //   }
+            // } else {
+            //   // ポジションが変わった場合はカウントをリセット
+            //   samePositionTimes = 0;
+            // }
+            // previousPosition = currentPosition;
           }
         }
       }
     },
-
-    // scrollToBottom: async (page: Page) => {
-    //   await sleep(3000);
-
-    //   const drawerSelector = "#all-offers-display";
-
-    //   for (let i = 0; i < 5; i++) {
-    //     const drawerElement = await page.$(drawerSelector);
-    //     console.log("drawerElement", drawerElement);
-
-    //     if (drawerElement) {
-    //       const boundingBox = await drawerElement.boundingBox();
-
-    //       if (boundingBox) {
-    //         await page.mouse.move(
-    //           boundingBox.x + boundingBox.width / 2,
-    //           boundingBox.y + boundingBox.height / 2
-    //         );
-
-    //         console.log("boundingBox", boundingBox);
-    //         console.log("i =", i);
-    //         await page.mouse.wheel({ deltaY: 960 });
-
-    //         await sleep(2000); // 2秒待機
-    //       }
-    //     }
-    //   }
-
-    //   for (let i = 0; i < 5; i++) {
-    //     const drawerElement = await page.$(drawerSelector);
-    //     console.log("drawerElement", drawerElement);
-
-    //     if (drawerElement) {
-    //       const boundingBox = await drawerElement.boundingBox();
-
-    //       if (boundingBox) {
-    //         await page.mouse.move(
-    //           boundingBox.x + boundingBox.width / 2,
-    //           boundingBox.y + boundingBox.height / 2
-    //         );
-
-    //         console.log("boundingBox", boundingBox);
-    //         console.log("i =", i);
-    //         await page.mouse.wheel({ deltaY: -960 });
-    //         await sleep(2000); // 2秒待機
-    //       } else {
-    //         console.log("Bounding box not found");
-    //         break;
-    //       }
-    //     } else {
-    //       console.log("Drawer element not found");
-    //       break;
-    //     }
-    //   }
-    // },
 
     // Drawer内のセラーID、出荷元、販売者データを取得
     getSellerInfo: async (page: Page) => {
@@ -277,7 +243,6 @@ const scrapePromise = (async () => {
         // 取得した情報をオブジェクトとして配列に追加
         sellerInfos.push({ sellerId, shippingSource, sellerName });
       }
-      console.log("sellerInfos", sellerInfos);
 
       // すべてのオファーから取得した情報が入った配列を返す
       return sellerInfos;
@@ -290,13 +255,13 @@ const scrapePromise = (async () => {
       // const offers = await page.$$("#aod-pinned-offer");
       const offers = await page.$$("#aod-pinned-offer, #aod-offer");
       console.log("3.8.0.2");
-      console.log("3.8.0.2", offers);
 
       for (let i = 0; i < offers.length; i++) {
-        console.log("3.8.0");
+        console.log("i=", i);
+        // console.log("3.8.0");
         await sleep(1000);
 
-        console.log("3.8.1");
+        // console.log("3.8.1");
         let addCartButton = await offers[i].$(
           `span.a-button-inner .a-button-input`
         );
@@ -312,12 +277,14 @@ const scrapePromise = (async () => {
             }, shippingSourceElement)
           : null;
 
-        console.log("3.8.2");
         if (addCartButton && shippingSource == "Amazon") {
           await sleep(1000); // 要素が安定するまで少し待つ
           try {
             await addCartButton.click();
-            console.log(`Offer ${i} added to cart successfully.`);
+            if (i == 0) {
+              await sleep(3000);
+              await addCartButton.click();
+            }
           } catch (error) {
             console.error(`Failed to add offer ${i} to cart:`, error);
 
@@ -345,33 +312,79 @@ const scrapePromise = (async () => {
       }
     },
 
-    /// 「カートに移動」をクリック
-    goToCart: async (page: Page) => {
-      await page.click("#hlb-view-cart-announce");
-      console.log("6");
-      // 「ショッピンカートページ」への画面遷移を待機します。
-      await page.waitForNavigation({ waitUntil: "networkidle2" });
-      console.log("7");
+    closeDrawer: async (page: Page) => {
+      await page.click("#aod-close");
+      await sleep(1000);
     },
 
-    setQuantity: async (page: Page) => {
-      // 「数量」のプルダウン（select[name="quantity"]）から
-      //「10+」の項目を選択します。
-      await page.select('select[name="quantity"]', "10+");
-      console.log("8");
-      // 数量の入力ボックス（input[name="quantityBox"]）が表示されるまで待機します。
-      // ■■■■■■■ 待機系メソッドが原因でスタックすることがあるので注意 ■■■■■■■
-      await page.waitForSelector('input[name="quantityBox"]');
-      console.log("10");
-      // 数量の入力ボックスに「999」を入力(type)します。
-      await page.type('input[name="quantityBox"]', "999");
-      console.log("11");
-      // 更新ボタンを押して入力完了します。
-      await page.click('input[value="更新"]');
-      console.log("12");
-      // 在庫数を表示するポップアップの表示完了を待機します。
-      await page.waitForNavigation({ waitUntil: "networkidle2" });
-      console.log("13");
+    /// 「カートに移動」をクリック
+    goToCart: async (page: Page) => {
+      await page.click("#nav-cart-count-container .nav-cart-icon");
+      console.log("3.9.1");
+
+      // // 「ショッピンカートページ」への画面遷移を待機します。
+      // await page.waitForNavigation({ waitUntil: "networkidle2" });
+      await sleep(2000);
+      console.log("3.9.2");
+    },
+
+    setQuantity: async (page: Page, ASIN: string) => {
+      console.log("4.1");
+
+      // ページの完全な読み込みを待つ
+
+      await page.waitForSelector("body", { timeout: 10000 });
+
+      console.log("4.1.1");
+
+      // まずはコンテナーを全て取得
+      const items = await page.$$(
+        `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+      );
+      await page.mouse.click(10, 10);
+      console.log("4.1.２");
+      await sleep(1000);
+      console.log("4.1.3");
+      console.log("4.1.4", items.length);
+      for (const item of items) {
+        await sleep(1000);
+        console.log("4.2.1");
+        //「数量」のプルダウンボタンの要素を取得
+        const pulldownButton = await item.$(
+          "span.a-button-inner > span.a-button-text.a-declarative"
+          // "span.a-button-inner"
+        );
+        console.log("4.2.2");
+
+        if (pulldownButton) {
+          console.log("4.2.3");
+          // JavaScriptを使用してクリック
+          await page.evaluate(async (button) => button.click(), pulldownButton);
+          console.log("4.2.4");
+        }
+        console.log("4.2.5");
+
+        // await page.click("span.a-button-inner.a-button-text a-declarative");
+        // // 数量入力ボックスが表示されるまで待機します。
+        // // ■■■■■■■ 待機系メソッドが原因でスタックすることがあるので注意 ■■■■■■■
+        // await page.waitForSelector("a#quantity_10");
+        // //「10+」の項目を選択します。
+        // await page.click("a#quantity_10");
+      }
+
+      // console.log("9");
+      // // ■■■■■■■ 待機系メソッドが原因でスタックすることがあるので注意 ■■■■■■■
+      // await page.waitForSelector('input[type="text"]');
+      // console.log("10");
+      // // 数量の入力ボックスに「999」を入力(type)します。
+      // await page.type('input[name="quantityBox"]', "999");
+      // console.log("11");
+      // // 更新ボタンを押して入力完了します。
+      // await page.click('input[value="更新"]');
+      // console.log("12");
+      // // 在庫数を表示するポップアップの表示完了を待機します。
+      // await page.waitForNavigation({ waitUntil: "networkidle2" });
+      // console.log("13");
     },
 
     getStockCount: async (page: Page) => {
@@ -423,8 +436,9 @@ const scrapePromise = (async () => {
       // await scrape.applyFilters(page);
       await scrape.getSellerInfo(page);
       await scrape.addToCart(page);
-      // await scraper.goToCart(page);
-      // await scraper.setQuantity(page);
+      await scrape.closeDrawer(page);
+      await scrape.goToCart(page);
+      await scrape.setQuantity(page, ASIN);
       // const stockCount = await scraper.getStockCount(page);
       // console.log(`在庫数: ${stockCount}`);
       // await scraper.emptyCart(page);
