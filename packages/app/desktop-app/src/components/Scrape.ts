@@ -76,40 +76,6 @@ const scrapePromise = (async () => {
       console.log("3.4");
     },
 
-    // /// 絞り込みボタンをクリックしてプルダウンを展開
-    // applyFilters: async (page: Page) => {
-    //   // 絞り込みボタンが表示されるまで待機します。
-    //   await page.waitForSelector(
-    //     ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div",
-    //     { timeout: 10000 }
-    //   );
-    //   console.log("3.5");
-    //   // 絞り込みボタンをクリック
-    //   await sleep(1000);
-    //   await page.click(
-    //     ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div"
-    //   );
-    //   console.log("3.5");
-    //   // プライムのチェックボックスが表示されるのを待機
-    //   await page.waitForSelector('#primeEligible input[type="checkbox"]', {
-    //     timeout: 10000,
-    //   });
-    //   console.log("3.5.1");
-    //   // プライムのチェックボックスをクリック
-    //   await page.click('#primeEligible input[type="checkbox"]');
-    //   await sleep(1000);
-
-    //   console.log("3.6");
-    //   // 新品のチェックボックスをクリック
-    //   await page.click('#new input[type="checkbox"]');
-    //   console.log("3.7");
-
-    //   // フィルタリング後にマウスを移動させる
-    //   // ウィンドウの左上隅にマウスを移動させる（座標(0, 0)）
-    //   await page.mouse.move(0, 0);
-    //   console.log("3.7.1");
-    // },
-
     scrollToBottom: async (page: Page) => {
       await sleep(1000);
       const drawerSelector = "#all-offers-display";
@@ -433,7 +399,6 @@ const scrapePromise = (async () => {
       await scrape.accessProductPage(ASIN, page);
       await scrape.openSellerDrawer(page);
       await scrape.scrollToBottom(page);
-      // await scrape.applyFilters(page);
       await scrape.getSellerInfo(page);
       await scrape.addToCart(page);
       await scrape.closeDrawer(page);
