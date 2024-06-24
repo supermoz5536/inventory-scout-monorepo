@@ -76,36 +76,131 @@ const scrapePromise = (async () => {
       console.log("3.4");
     },
 
-    /// 絞り込みボタンをクリックしてプルダウンを展開
-    applyFilters: async (page: Page) => {
-      // 絞り込みボタンが表示されるまで待機します。
-      await page.waitForSelector(
-        ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div",
-        { timeout: 10000 }
-      );
-      console.log("3.5");
-      // 絞り込みボタンをクリック
-      await page.click(
-        ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div"
-      );
-      console.log("3.5");
-      // プライムのチェックボックスが表示されるのを待機
-      await page.waitForSelector('#primeEligible input[type="checkbox"]', {
-        timeout: 10000,
-      });
-      console.log("3.5.1");
-      // プライムのチェックボックスをクリック
-      await page.click('#primeEligible input[type="checkbox"]');
-      await sleep(1000);
+    // /// 絞り込みボタンをクリックしてプルダウンを展開
+    // applyFilters: async (page: Page) => {
+    //   // 絞り込みボタンが表示されるまで待機します。
+    //   await page.waitForSelector(
+    //     ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div",
+    //     { timeout: 10000 }
+    //   );
+    //   console.log("3.5");
+    //   // 絞り込みボタンをクリック
+    //   await sleep(1000);
+    //   await page.click(
+    //     ".a-button.a-button-dropdown.a-button-base.aod-filter-button-div"
+    //   );
+    //   console.log("3.5");
+    //   // プライムのチェックボックスが表示されるのを待機
+    //   await page.waitForSelector('#primeEligible input[type="checkbox"]', {
+    //     timeout: 10000,
+    //   });
+    //   console.log("3.5.1");
+    //   // プライムのチェックボックスをクリック
+    //   await page.click('#primeEligible input[type="checkbox"]');
+    //   await sleep(1000);
 
-      console.log("3.6");
-      // 新品のチェックボックスをクリック
-      await page.click('#new input[type="checkbox"]');
-      console.log("3.7");
+    //   console.log("3.6");
+    //   // 新品のチェックボックスをクリック
+    //   await page.click('#new input[type="checkbox"]');
+    //   console.log("3.7");
+
+    //   // フィルタリング後にマウスを移動させる
+    //   // ウィンドウの左上隅にマウスを移動させる（座標(0, 0)）
+    //   await page.mouse.move(0, 0);
+    //   console.log("3.7.1");
+    // },
+
+    scrollToBottom: async (page: Page) => {
+      await sleep(1500);
+      const drawerSelector = "#all-offers-display";
+      const drawerElement = await page.$(drawerSelector);
+      console.log("drawerElement", drawerElement);
+
+      if (drawerElement) {
+        const boundingBox = await drawerElement.boundingBox();
+
+        if (boundingBox) {
+          await page.mouse.move(
+            boundingBox.x + boundingBox.width / 2,
+            boundingBox.y + boundingBox.height / 2
+          );
+
+          for (let i = 0; i < 5; i++) {
+            await page.mouse.wheel({ deltaY: boundingBox.height });
+
+            // 要素のトップの高さを取得
+            await page.evaluate((selector) => {
+              document.querySelector(selector);
+            }, drawerSelector);
+
+            await sleep(1500); // 500ms待機
+          }
+
+          for (let i = 0; i < 5; i++) {
+            await page.mouse.wheel({ deltaY: -boundingBox.height });
+            await sleep(1500); // 500ms待機
+          }
+        }
+      }
     },
 
+    // scrollToBottom: async (page: Page) => {
+    //   await sleep(3000);
+
+    //   const drawerSelector = "#all-offers-display";
+
+    //   for (let i = 0; i < 5; i++) {
+    //     const drawerElement = await page.$(drawerSelector);
+    //     console.log("drawerElement", drawerElement);
+
+    //     if (drawerElement) {
+    //       const boundingBox = await drawerElement.boundingBox();
+
+    //       if (boundingBox) {
+    //         await page.mouse.move(
+    //           boundingBox.x + boundingBox.width / 2,
+    //           boundingBox.y + boundingBox.height / 2
+    //         );
+
+    //         console.log("boundingBox", boundingBox);
+    //         console.log("i =", i);
+    //         await page.mouse.wheel({ deltaY: 960 });
+
+    //         await sleep(2000); // 2秒待機
+    //       }
+    //     }
+    //   }
+
+    //   for (let i = 0; i < 5; i++) {
+    //     const drawerElement = await page.$(drawerSelector);
+    //     console.log("drawerElement", drawerElement);
+
+    //     if (drawerElement) {
+    //       const boundingBox = await drawerElement.boundingBox();
+
+    //       if (boundingBox) {
+    //         await page.mouse.move(
+    //           boundingBox.x + boundingBox.width / 2,
+    //           boundingBox.y + boundingBox.height / 2
+    //         );
+
+    //         console.log("boundingBox", boundingBox);
+    //         console.log("i =", i);
+    //         await page.mouse.wheel({ deltaY: -960 });
+    //         await sleep(2000); // 2秒待機
+    //       } else {
+    //         console.log("Bounding box not found");
+    //         break;
+    //       }
+    //     } else {
+    //       console.log("Drawer element not found");
+    //       break;
+    //     }
+    //   }
+    // },
+
     // Drawer内のセラーID、出荷元、販売者データを取得
-    getAllSellerInfoOnDrawer: async (page: Page) => {
+    getSellerInfo: async (page: Page) => {
       // 各コンテナ情報を取得
       // .$は指定したCSSセレクタと一致する「最初の要素」を取得
       // .$$は指定したCSSセレクタと一致する「全ての要素」を取得するメソッド
@@ -128,7 +223,6 @@ const scrapePromise = (async () => {
         const shippingSourceElement = await offer.$(
           "#aod-offer-shipsFrom .a-size-small.a-color-base"
         );
-        console.log("shippingSourceElement", shippingSourceElement);
 
         // 販売元の名前が含まれる要素の参照を取得
         const sellerNameElement = await offer.$(
@@ -183,19 +277,72 @@ const scrapePromise = (async () => {
         // 取得した情報をオブジェクトとして配列に追加
         sellerInfos.push({ sellerId, shippingSource, sellerName });
       }
+      console.log("sellerInfos", sellerInfos);
 
       // すべてのオファーから取得した情報が入った配列を返す
       return sellerInfos;
     },
 
-    /// 「カートに入れる」をクリック
+    /// Drawer内の各セラーの「カートに入れる」をクリック
     addToCart: async (page: Page) => {
-      // クリックするボタンをセレクタ（#add-to-cart-button）で指定します。
-      await page.click("#add-to-cart-button");
-      console.log("4");
-      // 「カートの小計」への画面遷移を待機します。
-      await page.waitForNavigation({ waitUntil: "networkidle2" });
-      console.log("5");
+      await sleep(1000);
+      console.log("3.8.0.1");
+      // const offers = await page.$$("#aod-pinned-offer");
+      const offers = await page.$$("#aod-pinned-offer, #aod-offer");
+      console.log("3.8.0.2");
+      console.log("3.8.0.2", offers);
+
+      for (let i = 0; i < offers.length; i++) {
+        console.log("3.8.0");
+        await sleep(1000);
+
+        console.log("3.8.1");
+        let addCartButton = await offers[i].$(
+          `span.a-button-inner .a-button-input`
+        );
+        // 出荷元の名前が含まれる要素の参照を取得
+        const shippingSourceElement = await offers[i].$(
+          "#aod-offer-shipsFrom .a-size-small.a-color-base"
+        );
+
+        const shippingSource = shippingSourceElement
+          ? await page.evaluate((el) => {
+              const textContent = el.textContent;
+              return textContent ? textContent.trim() : null;
+            }, shippingSourceElement)
+          : null;
+
+        console.log("3.8.2");
+        if (addCartButton && shippingSource == "Amazon") {
+          await sleep(1000); // 要素が安定するまで少し待つ
+          try {
+            await addCartButton.click();
+            console.log(`Offer ${i} added to cart successfully.`);
+          } catch (error) {
+            console.error(`Failed to add offer ${i} to cart:`, error);
+
+            // エラーが発生した場合、要素を再取得して再試行
+            await sleep(1000);
+            addCartButton = await offers[i].$(
+              "span.a-button-inner .a-button-input"
+            );
+            if (addCartButton) {
+              try {
+                await addCartButton.click();
+                console.log(`Offer ${i} added to cart successfully on retry.`);
+              } catch (retryError) {
+                console.error(
+                  `Retry failed to add offer ${i} to cart:`,
+                  retryError
+                );
+              }
+            }
+          }
+
+          console.log("3.8.3");
+        }
+        console.log("3.8.4");
+      }
     },
 
     /// 「カートに移動」をクリック
@@ -272,9 +419,10 @@ const scrapePromise = (async () => {
       const page = await scrape.launchPage(browser);
       await scrape.accessProductPage(ASIN, page);
       await scrape.openSellerDrawer(page);
-      await scrape.applyFilters(page);
-      await scrape.getAllSellerInfoOnDrawer(page);
-      // await scraper.addToCart(page);
+      await scrape.scrollToBottom(page);
+      // await scrape.applyFilters(page);
+      await scrape.getSellerInfo(page);
+      await scrape.addToCart(page);
       // await scraper.goToCart(page);
       // await scraper.setQuantity(page);
       // const stockCount = await scraper.getStockCount(page);

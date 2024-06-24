@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
-import scrapePromise from "../components/Scrape";
 
 function Top() {
   // 開発用ハードコードのオブジェクト群
@@ -45,8 +44,9 @@ function Top() {
   }, [asinDataList.length]);
 
   const handleScrape = async (hardCord: string) => {
-    console.log("Top 1");
-    window.myAPI.scrape(hardCord);
+    if (hardCord != "") {
+      window.myAPI.scrape(hardCord);
+    }
   };
 
   return (
@@ -78,7 +78,9 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-update"
-            onClick={() => handleScrape("B0BCHL7KX9")}
+            onClick={() =>
+              handleScrape(asinDataList[0] ? asinDataList[0].asin : "")
+            }
           >
             更新
           </button>
