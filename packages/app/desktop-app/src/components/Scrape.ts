@@ -307,18 +307,24 @@ const scrapePromise = (async () => {
       const items = await page.$$(
         `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
       );
+
       await page.mouse.click(10, 10);
+
       console.log("4.1.２");
+
       await sleep(1000);
+
       console.log("4.1.3");
       console.log("4.1.4", items.length);
+
       for (const item of items) {
-        await sleep(1000);
         console.log("4.2.1");
+
+        await sleep(1000);
+
         //「数量」のプルダウンボタンの要素を取得
         const pulldownButton = await item.$(
           "span.a-button-inner > span.a-button-text.a-declarative"
-          // "span.a-button-inner"
         );
         console.log("4.2.2");
 
@@ -330,27 +336,64 @@ const scrapePromise = (async () => {
         }
         console.log("4.2.5");
 
-        // await page.click("span.a-button-inner.a-button-text a-declarative");
-        // // 数量入力ボックスが表示されるまで待機します。
-        // // ■■■■■■■ 待機系メソッドが原因でスタックすることがあるので注意 ■■■■■■■
-        // await page.waitForSelector("a#quantity_10");
-        // //「10+」の項目を選択します。
-        // await page.click("a#quantity_10");
-      }
+        // ポップオーバーメニューが表示されるまで待機
+        const popoverSelector = ".a-popover-inner";
+        await page.waitForSelector(popoverSelector);
+        console.log("4.2.5.5");
 
-      // console.log("9");
-      // // ■■■■■■■ 待機系メソッドが原因でスタックすることがあるので注意 ■■■■■■■
-      // await page.waitForSelector('input[type="text"]');
-      // console.log("10");
-      // // 数量の入力ボックスに「999」を入力(type)します。
-      // await page.type('input[name="quantityBox"]', "999");
-      // console.log("11");
-      // // 更新ボタンを押して入力完了します。
-      // await page.click('input[value="更新"]');
-      // console.log("12");
-      // // 在庫数を表示するポップアップの表示完了を待機します。
-      // await page.waitForNavigation({ waitUntil: "networkidle2" });
-      // console.log("13");
+        // ポップオーバーメニューのルート要素を取得
+        const popoverElement = await page.$(popoverSelector);
+
+        if (popoverElement) {
+          const element10Selector = "a#quantity_10";
+
+          // 数量入力ボックスが表示されるまで待機します。
+          await page.waitForSelector(element10Selector);
+          console.log("4.2.7");
+
+          // ポップオーバーメニュー内の「10+」の項目を取得
+          const element10 = await popoverElement.$("a#quantity_10");
+          console.log("4.2.6 element10", element10);
+
+          if (element10) {
+            await sleep(500);
+            await page.evaluate((button) => button.click(), element10);
+            console.log("4.2.8");
+          }
+        }
+        console.log("4.2.9");
+
+        const inputBoxSelector = `input[type="text"]`;
+
+        // 入力欄の表示を待機
+        await page.waitForSelector(inputBoxSelector);
+        console.log("4.3.0");
+
+        // 入力欄の要素を取得
+        const inputBox = await item.$(inputBoxSelector);
+        console.log("4.3.1");
+        if (inputBox) {
+          // 入力欄を選択
+          await page.evaluate((inputBox) => inputBox.click(), inputBox);
+          console.log("4.3.2");
+
+          // 入力欄に値を入力
+          await page.evaluate((inputBox) => {
+            inputBox.value = "999";
+          }, inputBox);
+          console.log("4.3.2.1");
+        }
+        console.log("4.3.3");
+
+        // 更新ボタンを押して入力完了します。
+        await page.click(
+          'span.a-button-inner>a[data-action="update"].a-button-text'
+        );
+        console.log("4.3.5");
+
+        // 在庫数を表示するポップアップの表示完了を待機します。
+        await page.waitForNavigation({ waitUntil: "networkidle2" });
+      }
     },
 
     getStockCount: async (page: Page) => {
@@ -404,7 +447,7 @@ const scrapePromise = (async () => {
       await scrape.closeDrawer(page);
       await scrape.goToCart(page);
       await scrape.setQuantity(page, ASIN);
-      // const stockCount = await scraper.getStockCount(page);
+      await scrape.getStockCount(page);
       // console.log(`在庫数: ${stockCount}`);
       // await scraper.emptyCart(page);
     },
