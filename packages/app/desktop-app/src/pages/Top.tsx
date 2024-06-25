@@ -43,9 +43,9 @@ function Top() {
     setAsinDataListCount(asinDataListCount);
   }, [asinDataList.length]);
 
-  const handleScrape = async (hardCord: string) => {
-    if (hardCord != "") {
-      window.myAPI.scrape(hardCord);
+  const handleRunScraping = async (asinDataList: AsinData[]) => {
+    if (asinDataList) {
+      window.myAPI.runScraping(asinDataList);
     }
   };
 
@@ -78,9 +78,7 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-update"
-            onClick={() =>
-              handleScrape(asinDataList[0] ? asinDataList[0].asin : "")
-            }
+            onClick={() => handleRunScraping(asinDataList)}
           >
             更新
           </button>

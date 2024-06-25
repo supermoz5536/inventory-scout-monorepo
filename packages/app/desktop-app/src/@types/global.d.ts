@@ -1,9 +1,10 @@
-export declare global {
+declare global {
+  // export declare global {
   interface Window {
     myAPI: {
       counter: (count: number) => number;
       openExternal: (url: string) => void | null;
-      scrape: (asin: string) => void | null;
+      runScraping: (asinDataList: AsinData[]) => void | null;
     };
   }
 
@@ -45,3 +46,13 @@ export declare global {
     stockCount;
   }
 }
+
+// tsの構文では
+// declare global を使う場合は、
+// ファイルの最後に空の export {} を追加することで、
+// エクスポート可能なモジュールとして扱えます。
+
+// これにより、レンダラープロセスのグローバルな型定義を
+// tsの構文で正しく適用しつつ、
+// ファイルをモジュールとしてメインプロセスにインポートできます。
+export {};

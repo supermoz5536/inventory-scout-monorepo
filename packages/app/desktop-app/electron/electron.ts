@@ -1,3 +1,9 @@
+// レンダラープロセスのグローバル型定義を明示的に参照します
+// 一度グローバルな型定義ファイルが参照されると、
+// その型定義はプロジェクト（メインプロセス）全体に適用されます。
+// なので、自動的にpreload.tsでも参照が反映されます。
+/// <reference path="../src/@types/global.d.ts" />
+
 import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import * as url from "url";
@@ -31,12 +37,12 @@ const createWindow = () => {
   }
 };
 
-ipcMain.handle("scrape", async (event, asin: string) => {
+ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
   try {
     console.log("mainProcess 1");
     const scrape = await scrapePromis;
     console.log("mainProcess 2");
-    scrape.runScraping(asin);
+    scrape.runScraping(asinDataList);
     console.log("mainProcess 3");
   } catch (error) {
     console.error("MyAPI scrape ERROR", error);

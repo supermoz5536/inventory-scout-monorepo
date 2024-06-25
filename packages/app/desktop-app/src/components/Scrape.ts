@@ -1,4 +1,6 @@
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
@@ -105,14 +107,14 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1250);
+            await sleep(1500);
           }
         }
       }
     },
 
     // Drawer内のセラーID、出荷元、販売者データを取得
-    getSellerInfo: async (page: Page) => {
+    fetchSellerInfo: async (page: Page) => {
       // 各コンテナ情報を取得
       // .$は指定したCSSセレクタと一致する「最初の要素」を取得
       // .$$は指定したCSSセレクタと一致する「全ての要素」を取得するメソッド
@@ -222,7 +224,10 @@ const scrapePromise = (async () => {
             }, shippingSourceElement)
           : null;
 
-        if (addCartButton && shippingSource == "Amazon") {
+        if (
+          (addCartButton && shippingSource == "Amazon") ||
+          (addCartButton && shippingSource == "Amazon.co.jp")
+        ) {
           // 要素が安定するまで少し待つ
           await sleep(500);
           try {
@@ -515,34 +520,34 @@ const scrapePromise = (async () => {
       console.log("6.0.1 Cart and session cleared.");
     },
 
-    runScraping: async (ASIN: string) => {
+    runScraping: async (asinDataList: AsinData[]) => {
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
       const scrape = await scrapePromise;
       const browser = await scrape.launchBrowser();
       const page = await scrape.launchPage(browser);
-      await scrape.accessProductPage(ASIN, page);
-      await scrape.openSellerDrawer(page);
-      await scrape.scrollOnDrawer(page);
-      await scrape.getSellerInfo(page);
-      await scrape.addToCart(page);
-      await scrape.closeDrawer(page);
-      await scrape.goToCart(page);
 
-      // ガート画面の各商品コンテナを全取得
-      const items = await page.$$(
-        `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-      );
+      for (const asinData of asinDataList) {
+        await scrape.accessProductPage(asinData.asin, page);
+        await scrape.openSellerDrawer(page);
+        await scrape.scrollOnDrawer(page);
+        await scrape.fetchSellerInfo(page);
+        await scrape.addToCart(page);
+        await scrape.closeDrawer(page);
+        await scrape.goToCart(page);
 
-      for (const item of items) {
-        await scrape.setQuantity(page, ASIN, item);
-        await scrape.getStockCount(page);
+        // ガート画面の各商品コンテナを全取得
+        const items = await page.$$(
+          `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
+        );
+
+        for (const item of items) {
+          await scrape.setQuantity(page, asinData.asin, item);
+          await scrape.getStockCount(page);
+        }
+
+        await scrape.clearCart(page);
       }
-      await scrape.scrollOnCartPage(page);
-      console.log("emptyCart start");
-      // await scrape.emptyCart(page, ASIN);
-      await scrape.clearCart(page);
-      console.log("emptyCart end");
     },
   };
 })();

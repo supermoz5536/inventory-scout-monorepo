@@ -4,7 +4,12 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "../build",
-    "rootDir": "../"
+    "rootDir": "../",
+    "baseUrl": "../",
+    "paths": {
+      "@types/*": ["src/@types/*"]
+    },
+    "jsx": "react"
   },
   "include": ["*"]
 }

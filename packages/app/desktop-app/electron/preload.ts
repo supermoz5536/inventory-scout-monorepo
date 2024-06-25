@@ -28,5 +28,6 @@ contextBridge.exposeInMainWorld("myAPI", {
   // ・複雑な処理や長時間かかる処理に向いている。
   // ・メインプロセスでのエラーハンドリングが簡単にできる。
   // .invokeは、呼び出す意味のメソッド
-  scrape: (asin: string) => ipcRenderer.invoke("scrape", asin),
+  runScraping: (asinDataList: AsinData[]) =>
+    ipcRenderer.invoke("runScraping", asinDataList),
 });
