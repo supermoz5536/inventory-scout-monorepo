@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page } from "puppeteer";
+import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
@@ -294,8 +294,12 @@ const scrapePromise = (async () => {
       console.log("3.9.2");
     },
 
-    setQuantity: async (page: Page, ASIN: string) => {
-      console.log("4.1");
+    setQuantity: async (
+      page: Page,
+      ASIN: string,
+      item: ElementHandle<HTMLDivElement>
+    ) => {
+      console.log("4.1.0");
 
       // ページの完全な読み込みを待つ
 
@@ -303,134 +307,177 @@ const scrapePromise = (async () => {
 
       console.log("4.1.1");
 
-      // まずはコンテナーを全て取得
-      const items = await page.$$(
-        `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-      );
-
       await page.mouse.click(10, 10);
 
       console.log("4.1.２");
 
       await sleep(1000);
 
-      console.log("4.1.3");
-      console.log("4.1.4", items.length);
+      console.log("4.2.1");
 
-      for (const item of items) {
-        console.log("4.2.1");
+      await sleep(1000);
 
-        await sleep(1000);
+      // プルダウンボタンの要素を取得
+      const pulldownButton = await item.$(
+        "span.a-button-inner > span.a-button-text.a-declarative"
+      );
+      console.log("4.2.2");
 
-        //「数量」のプルダウンボタンの要素を取得
-        const pulldownButton = await item.$(
-          "span.a-button-inner > span.a-button-text.a-declarative"
-        );
-        console.log("4.2.2");
-
-        if (pulldownButton) {
-          console.log("4.2.3");
-          // JavaScriptを使用してクリック
-          await page.evaluate(async (button) => button.click(), pulldownButton);
-          console.log("4.2.4");
-        }
-        console.log("4.2.5");
-
-        // ポップオーバーメニューが表示されるまで待機
-        const popoverSelector = ".a-popover-inner";
-        await page.waitForSelector(popoverSelector);
-        console.log("4.2.5.5");
-
-        // ポップオーバーメニューのルート要素を取得
-        const popoverElement = await page.$(popoverSelector);
-
-        if (popoverElement) {
-          const element10Selector = "a#quantity_10";
-
-          // 数量入力ボックスが表示されるまで待機します。
-          await page.waitForSelector(element10Selector);
-          console.log("4.2.7");
-
-          // ポップオーバーメニュー内の「10+」の項目を取得
-          const element10 = await popoverElement.$("a#quantity_10");
-          console.log("4.2.6 element10", element10);
-
-          if (element10) {
-            await sleep(500);
-            await page.evaluate((button) => button.click(), element10);
-            console.log("4.2.8");
-          }
-        }
-        console.log("4.2.9");
-
-        const inputBoxSelector = `input[type="text"]`;
-
-        // 入力欄の表示を待機
-        await page.waitForSelector(inputBoxSelector);
-        console.log("4.3.0");
-
-        // 入力欄の要素を取得
-        const inputBox = await item.$(inputBoxSelector);
-        console.log("4.3.1");
-        if (inputBox) {
-          // 入力欄を選択
-          await page.evaluate((inputBox) => inputBox.click(), inputBox);
-          console.log("4.3.2");
-
-          // 入力欄に値を入力
-          await page.evaluate((inputBox) => {
-            inputBox.value = "999";
-          }, inputBox);
-          console.log("4.3.2.1");
-        }
-        console.log("4.3.3");
-
-        // 更新ボタンを押して入力完了します。
-        await page.click(
-          'span.a-button-inner>a[data-action="update"].a-button-text'
-        );
-        console.log("4.3.5");
-
-        // 在庫数を表示するポップアップの表示完了を待機します。
-        await page.waitForNavigation({ waitUntil: "networkidle2" });
+      if (pulldownButton) {
+        console.log("4.2.3");
+        // プルダウンボタンの要素をクリック
+        await page.evaluate(async (button) => button.click(), pulldownButton);
+        console.log("4.2.4");
       }
+      console.log("4.2.5");
+
+      // ポップオーバーメニューが表示されるまで待機
+      const popoverSelector =
+        "body > div.a-popover.a-dropdown.a-dropdown-common.a-declarative";
+      await sleep(1500);
+      console.log("4.2.5.5");
+
+      // 最後に追加生成されたポップオーバーメニューのコンテナを取得
+      // 全ての要素を取得して、配列の最後の要素を指定
+      const popoverElements = await page.$$(popoverSelector);
+      const popoverElement = popoverElements[popoverElements.length - 1];
+      console.log("4.2.5.5 popoverElement", popoverElement);
+
+      if (popoverElement) {
+        // 「10+」の要素のセレクタを宣言
+        const element10Selector = "a#quantity_10";
+
+        // 「10+」の要素が表示されるまで待機します。
+        await page.waitForSelector(element10Selector);
+        console.log("4.2.7");
+
+        // 「10+」の要素を取得
+        const element10 = await page.$(element10Selector);
+        console.log("4.2.6 element10", element10);
+
+        if (element10) {
+          await sleep(1500);
+          await page.evaluate((button) => button.click(), element10);
+          console.log("4.2.8");
+        }
+      }
+      console.log("4.2.9");
+
+      const inputBoxSelector = `input[type="text"]`;
+
+      // 入力欄の表示を待機
+      await page.waitForSelector(inputBoxSelector);
+      console.log("4.3.0");
+
+      // 入力欄の要素を取得
+      const inputBox = await item.$(inputBoxSelector);
+      console.log("4.3.1");
+      if (inputBox) {
+        // 入力欄を選択
+        await page.evaluate((inputBox) => inputBox.click(), inputBox);
+        console.log("4.3.2");
+
+        // 入力欄に値を入力
+        await page.evaluate((inputBox) => {
+          inputBox.value = "999";
+        }, inputBox);
+        console.log("4.3.2.1");
+      }
+      console.log("4.3.3");
+
+      await sleep(1000);
+
+      // 更新ボタン要素のセレクタの宣言
+      const updateButtonSelector = `span.a-button-inner > a[data-action="update"].a-button-text`;
+
+      // 更新ボタン要素の表示の待機
+      await page.waitForSelector(updateButtonSelector);
+      console.log("4.3.4");
+
+      // 更新ボタン要素の取得
+      const updateButton = await item.$(updateButtonSelector);
+
+      // 更新ボタン要素をクリック
+      if (updateButton) {
+        await page.evaluate(
+          (updateButton) => updateButton.click(),
+          updateButton
+        );
+      }
+      console.log("4.3.5");
+
+      // 在庫数を表示するポップアップの表示完了を待機します。
+      await sleep(1000);
     },
 
     getStockCount: async (page: Page) => {
-      // page.evaluateメソッドを使用すると、
-      // 指定した関数をブラウザのコンテキスト内で実行し、
-      // その関数が返す結果を取得することができます。
-      console.log("14.1");
+      console.log("5.1.1");
       const stockText = await page.evaluate(() => {
         // document: DOMのルートオブジェクト、HTMLドキュメント全体を表します。
         // querySelector: 指定されたCSSセレクタに一致する最初の要素を返します。
-        const stockInfo = document.querySelector(".a-popover-inner");
-        console.log("14.2");
+        const stockInfo = document.querySelector("div.a-popover-content");
+        console.log("5.1.2");
         // オブジェクト取得があった場合、テキストデータが格納されたプロパティをreturn
         // オブジェクト取得がなかった場合、nullをreturn
         return stockInfo ? stockInfo.textContent : null;
       });
-      console.log("15");
+      console.log("5.1.3");
 
       // ポップアップのテキストが取得できた場合、
-      const stockCount = stockText
+      const stockCountStr = stockText
         ? // \d は数字（0-9）を表します。
           // + は直前の項目が1回以上繰り返されることを意味します。
           // (\d+) は、1桁以上の連続する数字をキャプチャします。
           // この部分はキャプチャグループとして括られ、後で取り出すことができます。
           stockText.match(/この出品者のお取り扱い数は(\d+)点です。/)
         : null;
-      console.log("16");
-      return stockCount ? stockCount[1] : "N/A";
+      console.log("5.1.4");
+
+      if (stockCountStr) {
+        console.log("5.1.5");
+
+        // stockCount[1]は文字列なので、数値に変換する必要があります
+        // parseInt 関数で、10進数（10）を指定して
+        // 文字列から数値に変換します。
+        const stockCountNum = parseInt(stockCountStr[1], 10);
+        console.log("5.1.6 stockCountNum =", stockCountNum);
+        return stockCountNum;
+      }
+      console.log("5.1.7 stockCountNum = N");
+      return "N/A";
     },
 
-    emptyCart: async (page: Page) => {
-      // 削除ボタンをクリック
-      await page.click(".sc-action-delete input");
-      console.log("17");
-      // 削除の完了を待機
-      await page.waitForNavigation({ waitUntil: "networkidle2" });
-      console.log("18");
+    emptyCart: async (page: Page, items: ElementHandle<HTMLDivElement>[]) => {
+      console.log("6.1.0");
+      for (const item of items) {
+        console.log("6.1.1");
+        // 削除ボタンの要素のセレクタを定義
+        const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
+        console.log("6.1.2");
+
+        // 削除ボタンの要素の表示を待機
+        await page.waitForSelector(deleteButtonSelector);
+        console.log("6.1.3");
+
+        // 削除ボタンの要素を取得
+        const deleteButton = await item.$(deleteButtonSelector);
+        console.log("6.1.4");
+
+        // 削除ボタンをクリック
+        if (deleteButton) {
+          console.log("6.1.5");
+
+          await page.evaluate((deleteButton) => {
+            deleteButton.click();
+          }, deleteButton);
+          console.log("6.1.6");
+        }
+        console.log("6.1.7");
+
+        // 削除の完了を待機
+        await page.waitForNavigation({ waitUntil: "networkidle2" });
+        console.log("6.1.8");
+      }
     },
 
     runScraping: async (ASIN: string) => {
@@ -446,10 +493,15 @@ const scrapePromise = (async () => {
       await scrape.addToCart(page);
       await scrape.closeDrawer(page);
       await scrape.goToCart(page);
-      await scrape.setQuantity(page, ASIN);
-      await scrape.getStockCount(page);
-      // console.log(`在庫数: ${stockCount}`);
-      // await scraper.emptyCart(page);
+      // ガート画面の各商品コンテナを全取得
+      const items = await page.$$(
+        `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+      );
+      for (const item of items) {
+        await scrape.setQuantity(page, ASIN, item);
+        await scrape.getStockCount(page);
+      }
+      await scrape.emptyCart(page, items);
     },
   };
 })();
