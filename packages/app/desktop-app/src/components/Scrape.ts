@@ -76,8 +76,8 @@ const scrapePromise = (async () => {
       console.log("3.4");
     },
 
-    scrollToBottom: async (page: Page) => {
-      await sleep(1000);
+    scrollOnDrawer: async (page: Page) => {
+      await sleep(750);
       const drawerSelector = "#all-offers-display";
       const drawerElement = await page.$(drawerSelector);
       console.log("drawerElement", drawerElement);
@@ -105,27 +105,7 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1250); // 500ms待機
-
-            // let currentPosition = await page.evaluate((selector) => {
-            //   const element = document.querySelector(selector);
-            //   return element ? element.scrollTop : null;
-            // }, drawerSelector);
-
-            // console.log("previousPosition", previousPosition);
-            // console.log("currentPosition", currentPosition);
-
-            // if (currentPosition === previousPosition) {
-            //   ++samePositionTimes;
-            //   if (samePositionTimes >= 4) {
-            //     console.log("ポジションが3回以上変わらないのでループ終了");
-            //     break;
-            //   }
-            // } else {
-            //   // ポジションが変わった場合はカウントをリセット
-            //   samePositionTimes = 0;
-            // }
-            // previousPosition = currentPosition;
+            await sleep(1250);
           }
         }
       }
@@ -216,7 +196,6 @@ const scrapePromise = (async () => {
 
     /// Drawer内の各セラーの「カートに入れる」をクリック
     addToCart: async (page: Page) => {
-      await sleep(1000);
       console.log("3.8.0.1");
       // const offers = await page.$$("#aod-pinned-offer");
       const offers = await page.$$("#aod-pinned-offer, #aod-offer");
@@ -225,7 +204,7 @@ const scrapePromise = (async () => {
       for (let i = 0; i < offers.length; i++) {
         console.log("i=", i);
         // console.log("3.8.0");
-        await sleep(1000);
+        await sleep(500);
 
         // console.log("3.8.1");
         let addCartButton = await offers[i].$(
@@ -244,11 +223,12 @@ const scrapePromise = (async () => {
           : null;
 
         if (addCartButton && shippingSource == "Amazon") {
-          await sleep(1000); // 要素が安定するまで少し待つ
+          // 要素が安定するまで少し待つ
+          await sleep(500);
           try {
             await addCartButton.click();
             if (i == 0) {
-              await sleep(3000);
+              await sleep(2000);
               await addCartButton.click();
             }
           } catch (error) {
@@ -311,11 +291,9 @@ const scrapePromise = (async () => {
 
       console.log("4.1.２");
 
-      await sleep(1000);
-
       console.log("4.2.1");
 
-      await sleep(1000);
+      await sleep(500);
 
       // プルダウンボタンの要素を取得
       const pulldownButton = await item.$(
@@ -334,7 +312,7 @@ const scrapePromise = (async () => {
       // ポップオーバーメニューが表示されるまで待機
       const popoverSelector =
         "body > div.a-popover.a-dropdown.a-dropdown-common.a-declarative";
-      await sleep(1500);
+      await sleep(500);
       console.log("4.2.5.5");
 
       // 最後に追加生成されたポップオーバーメニューのコンテナを取得
@@ -356,7 +334,7 @@ const scrapePromise = (async () => {
         console.log("4.2.6 element10", element10);
 
         if (element10) {
-          await sleep(1500);
+          await sleep(500);
           await page.evaluate((button) => button.click(), element10);
           console.log("4.2.8");
         }
@@ -385,7 +363,7 @@ const scrapePromise = (async () => {
       }
       console.log("4.3.3");
 
-      await sleep(1000);
+      await sleep(500);
 
       // 更新ボタン要素のセレクタの宣言
       const updateButtonSelector = `span.a-button-inner > a[data-action="update"].a-button-text`;
@@ -407,7 +385,7 @@ const scrapePromise = (async () => {
       console.log("4.3.5");
 
       // 在庫数を表示するポップアップの表示完了を待機します。
-      await sleep(1000);
+      await sleep(750);
     },
 
     getStockCount: async (page: Page) => {
@@ -447,37 +425,94 @@ const scrapePromise = (async () => {
       return "N/A";
     },
 
-    emptyCart: async (page: Page, items: ElementHandle<HTMLDivElement>[]) => {
-      console.log("6.1.0");
-      for (const item of items) {
-        console.log("6.1.1");
-        // 削除ボタンの要素のセレクタを定義
-        const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
-        console.log("6.1.2");
+    scrollOnCartPage: async (page: Page) => {
+      await page.evaluate(() => {
+        // ページを一番上までスクロール
+        window.scrollTo(0, 0);
+      });
+    },
 
-        // 削除ボタンの要素の表示を待機
-        await page.waitForSelector(deleteButtonSelector);
-        console.log("6.1.3");
+    // emptyCart: async (page: Page, ASIN: string) => {
+    //   // ガート画面の各商品コンテナの最新データを再び全取得
+    //   let items = await page.$$(
+    //     `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+    //   );
 
-        // 削除ボタンの要素を取得
-        const deleteButton = await item.$(deleteButtonSelector);
-        console.log("6.1.4");
+    //   while (items.length > 0) {
+    //     console.log("6.1.1 現在のitem数 =", items.length);
+    //     console.log("6.1.1 現在のitem[0] =", items[0]);
 
-        // 削除ボタンをクリック
-        if (deleteButton) {
-          console.log("6.1.5");
+    //     // 削除ボタンの要素のセレクタを定義
+    //     const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
+    //     console.log("6.1.2");
 
-          await page.evaluate((deleteButton) => {
-            deleteButton.click();
-          }, deleteButton);
-          console.log("6.1.6");
-        }
-        console.log("6.1.7");
+    //     // 削除ボタンの要素の表示を待機
+    //     await items[0].waitForSelector(deleteButtonSelector);
 
-        // 削除の完了を待機
-        await page.waitForNavigation({ waitUntil: "networkidle2" });
-        console.log("6.1.8");
-      }
+    //     console.log("6.1.3");
+
+    //     // 削除ボタンの要素を取得
+    //     const deleteButton = await items[0].$(deleteButtonSelector);
+    //     console.log("6.1.4", deleteButton);
+
+    //     // 削除ボタンをクリック
+    //     if (deleteButton) {
+    //       console.log("6.1.5");
+
+    //       await page.evaluate((deleteButton) => {
+    //         deleteButton.click();
+    //       }, deleteButton);
+    //       console.log("6.1.6");
+    //     }
+    //     console.log("6.1.7");
+
+    //     // 削除の完了を待機
+    //     // ■■■■■■ 待機スタックのリスク ■■■■■■
+    //     // await page.waitForNavigation({ waitUntil: "networkidle2" });
+    //     console.log("6.1.8");
+
+    //     await sleep(500);
+    //     // 強制的にページの状態を再評価（スクロールで）
+    //     await page.evaluate(() => {
+    //       window.scrollTo(0, 100);
+    //     });
+    //     await sleep(500);
+    //     await page.evaluate(() => {
+    //       window.scrollTo(0, -100);
+    //     });
+
+    //     // 強制的にページの状態を再評価（コンテクスト内でのJS実行で）
+    //     const bodySelector =
+    //       "body.a-m-jp a-aui_72554-c a-aui_a11y_2_750578-c a-aui_a11y_6_837773-c a-aui_a11y_sr_678508-t1 a-aui_amzn_img_959719-c a-aui_amzn_img_gate_959718-c a-aui_killswitch_csa_logger_372963-c a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c a-meter-animate";
+    //     const bodyElement = await page.$(bodySelector);
+
+    //     if (bodyElement) {
+    //       await page.evaluate((selector) => {
+    //         const element = document.querySelector(selector);
+    //         if (element) {
+    //           // 必要な操作をここに記述
+    //           element.setAttribute("data-tmp", "update"); // 一時的な属性を追加
+    //           element.removeAttribute("data-tmp"); // 一時
+    //         }
+    //       }, bodySelector);
+    //     }
+
+    //     await sleep(2500);
+
+    //     items = await page.$$(
+    //       `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+    //     );
+    //     await sleep(1000);
+    //   }
+    // },
+
+    clearCart: async (page: Page) => {
+      console.log("6.0.0");
+      // クッキーを削除してカート状態をリフレッシュする
+      const client = await page.createCDPSession();
+      await client.send("Network.clearBrowserCookies");
+
+      console.log("6.0.1 Cart and session cleared.");
     },
 
     runScraping: async (ASIN: string) => {
@@ -488,20 +523,26 @@ const scrapePromise = (async () => {
       const page = await scrape.launchPage(browser);
       await scrape.accessProductPage(ASIN, page);
       await scrape.openSellerDrawer(page);
-      await scrape.scrollToBottom(page);
+      await scrape.scrollOnDrawer(page);
       await scrape.getSellerInfo(page);
       await scrape.addToCart(page);
       await scrape.closeDrawer(page);
       await scrape.goToCart(page);
+
       // ガート画面の各商品コンテナを全取得
       const items = await page.$$(
         `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
       );
+
       for (const item of items) {
         await scrape.setQuantity(page, ASIN, item);
         await scrape.getStockCount(page);
       }
-      await scrape.emptyCart(page, items);
+      await scrape.scrollOnCartPage(page);
+      console.log("emptyCart start");
+      // await scrape.emptyCart(page, ASIN);
+      await scrape.clearCart(page);
+      console.log("emptyCart end");
     },
   };
 })();
