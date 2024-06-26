@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld("myAPI", {
     shell.openExternal(url);
     return null;
   },
+
   // ipcRenderer.invoke は、
   // レンダラープロセスからメインプロセスに
   // 非同期でリクエストを送信し、
@@ -30,4 +31,6 @@ contextBridge.exposeInMainWorld("myAPI", {
   // .invokeは、呼び出す意味のメソッド
   runScraping: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("runScraping", asinDataList),
+
+  scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
 });

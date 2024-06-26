@@ -49,6 +49,34 @@ function Top() {
     }
   };
 
+  // useEffectの応答関数の中で以下2つの処理を宣言します。
+  // ・ handleScrapingResult関数（リスナーの応答関数）の定義
+  // ・ リスナーの配置
+  useEffect(() => {
+    // 'handleScrapingResult' という関数を定義します。
+    // この関数はイベント 'scraping-result' が
+    // 発生したときに呼び出されます。
+    const handleScrapingResult = (
+      event: Electron.IpcRendererEvent,
+      data: AsinData
+    ) => {
+      // // 'dispatch' 関数を使用して、
+      // // ストアの状態変数を更新します。
+      // dispatch(状態関数);
+
+      console.log("取得データ =", data);
+    };
+
+    // 'ipcRenderer'オブジェクトを使用している
+    // "scrapingResult"関数で
+    // 'scraping-result'イベントのリスナーを設定します。
+    window.myAPI.scrapingResult(handleScrapingResult);
+
+    return () => {
+      // コンポーネント削除時にトリガーされるdispose関数を記述
+    };
+  }, [dispatch]);
+
   return (
     <div className="App">
       {/* タブ部分 */}

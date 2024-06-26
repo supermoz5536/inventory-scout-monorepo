@@ -1,10 +1,12 @@
 declare global {
-  // export declare global {
   interface Window {
     myAPI: {
       counter: (count: number) => number;
       openExternal: (url: string) => void | null;
-      runScraping: (asinDataList: AsinData[]) => void | null;
+      runScraping: (asinDataList: AsinData[]) => void;
+      scrapingResult: (
+        callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
+      ) => void;
     };
   }
 
@@ -34,17 +36,20 @@ declare global {
     fetchLatestDate: string;
     fetchCurrentStatus: string;
     asinParent: string;
-    fbasellerDatas: FbaSellerList;
-  }
-
-  interface FbaSellerList {
-    fbaSellerData: FbaSellerData[];
+    fbaSellerDatas: FbaSellerData[];
   }
 
   interface FbaSellerData {
-    date: string;
-    stockCount;
+    sellerId: number;
+    sellerName: string;
+    stockCount: number;
+    updateDate: string;
   }
+}
+
+/// key が日付 value が在庫数の型定義です。
+interface StockCount {
+  [date: string]: number;
 }
 
 // tsの構文では

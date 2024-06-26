@@ -1,4 +1,5 @@
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
+import { ipcMain } from "electron";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
@@ -59,9 +60,9 @@ const scrapePromise = (async () => {
     // networkidle2: puppeteerのオプションで
     // ネットワーク接続が2本以下になるまで
     // ページの読み込みを安全に待機します。
-    accessProductPage: async (ASIN: string, page: Page) => {
+    accessProductPage: async (asinData: AsinData, page: Page) => {
       console.log("3.1");
-      await page.goto(`https://www.amazon.co.jp/dp/${ASIN}`, {
+      await page.goto(`https://www.amazon.co.jp/dp/${asinData.asin}`, {
         waitUntil: "networkidle2",
       });
       console.log("3.2");
@@ -279,11 +280,7 @@ const scrapePromise = (async () => {
       console.log("3.9.2");
     },
 
-    setQuantity: async (
-      page: Page,
-      ASIN: string,
-      item: ElementHandle<HTMLDivElement>
-    ) => {
+    setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
       console.log("4.1.0");
 
       // ページの完全な読み込みを待つ
@@ -520,7 +517,10 @@ const scrapePromise = (async () => {
       console.log("6.0.1 Cart and session cleared.");
     },
 
-    runScraping: async (asinDataList: AsinData[]) => {
+    runScraping: async (
+      event: Electron.IpcMainInvokeEvent,
+      asinDataList: AsinData[]
+    ) => {
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
       const scrape = await scrapePromise;
@@ -528,7 +528,7 @@ const scrapePromise = (async () => {
       const page = await scrape.launchPage(browser);
 
       for (const asinData of asinDataList) {
-        await scrape.accessProductPage(asinData.asin, page);
+        await scrape.accessProductPage(asinData, page);
         await scrape.openSellerDrawer(page);
         await scrape.scrollOnDrawer(page);
         await scrape.fetchSellerInfo(page);
@@ -542,9 +542,17 @@ const scrapePromise = (async () => {
         );
 
         for (const item of items) {
-          await scrape.setQuantity(page, asinData.asin, item);
+          await scrape.setQuantity(page, item);
           await scrape.getStockCount(page);
         }
+
+        // レンダラープロセスにデータを送信する
+        // メインプロセスでのみ使用可能なメソッド。
+        // scrapePromiseオブジェクトは、
+        // 前提としてメインプロセス上にインポートされた上で
+        // 実行されるので、エラーにならない。
+        event.sender.send("scraping-result", asinData);
+        console.log("send完了", asinData);
 
         await scrape.clearCart(page);
       }

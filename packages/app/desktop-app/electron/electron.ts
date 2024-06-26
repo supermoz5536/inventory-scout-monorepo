@@ -40,7 +40,7 @@ const createWindow = () => {
 ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
   try {
     const scrape = await scrapePromis;
-    scrape.runScraping(asinDataList);
+    scrape.runScraping(event, asinDataList);
   } catch (error) {
     console.error("MyAPI scrape ERROR", error);
     return "MyAPI scrape ERROR"; // エラーメッセージを返す
