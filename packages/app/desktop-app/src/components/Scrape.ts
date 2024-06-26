@@ -280,6 +280,40 @@ const scrapePromise = (async () => {
       console.log("3.9.2");
     },
 
+    fetchSellerId: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
+      // セラーID情報を含む要素のセレクターの定義
+      const sellerIdSelector = 'a[href*="smid="]';
+      // 要素を取得
+      const sellerIdElement = await item.$(sellerIdSelector);
+      // 要素からセラーIDのテキストデータを抽出
+      const sellerId = sellerIdElement
+        ? // セラーIDのタグが見つかった場合
+          // .evaluate: ページ内でJavaScriptを実行するメソッド
+          // 第一引数に、ページ内で実行する関数を指定
+          // 第二引数に、第一引数の関数に渡す引数を指定（ここではsellerIdElement）。
+          await page.evaluate(
+            // 引数として受け取ったel（要素）から
+            // href属性の値を取得し、
+            // 正規表現を使用してセラーIDを抽出します。
+            // []内の^は否定を意味し、
+            // [^&]+ は & 以外の文字が1回以上続く部分にマッチし、
+            // & が出現した時点でマッチが終了します。
+
+            // 第一引数の関数
+            (el) => {
+              const href = el.getAttribute("href");
+              const match = href ? href.match(/seller=([^&]+)/) : null;
+              return match ? match[1] : null;
+            },
+            // 第二引数
+            sellerIdElement
+          )
+        : // セラーIDのタグが見つからなかった場合
+          null;
+
+      return sellerId;
+    },
+
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
       console.log("4.1.0");
 
@@ -390,7 +424,7 @@ const scrapePromise = (async () => {
       await sleep(750);
     },
 
-    getStockCount: async (page: Page) => {
+    fetchStockCount: async (page: Page) => {
       console.log("5.1.1");
       const stockText = await page.evaluate(() => {
         // document: DOMのルートオブジェクト、HTMLドキュメント全体を表します。
@@ -414,25 +448,52 @@ const scrapePromise = (async () => {
       console.log("5.1.4");
 
       if (stockCountStr) {
+        const stockCountNum = parseInt(stockCountStr[1], 10);
+        return stockCountNum;
+      } else {
+        return null;
+      }
+    },
+
+    pushStockCount: async (
+      asinData: AsinData,
+      sellerId: string | null,
+      stockCount: number | null
+    ) => {
+      // 追加する該当のセラーデータを探す。
+      // asinData > fbaSellerDatas
+      // 上記のFbaSellerData[]型オブジェクトの中から
+      // セラーIDが一致するオブジェクトを検索する
+      const foundFbaSellerData = asinData.fbaSellerDatas.find((seller) => {
+        seller.sellerId === sellerId;
+      });
+
+      // 在庫数の取得ができた場合
+      if (stockCount) {
         console.log("5.1.5");
 
-        // stockCount[1]は文字列なので、数値に変換する必要があります
-        // parseInt 関数で、10進数（10）を指定して
-        // 文字列から数値に変換します。
-        const stockCountNum = parseInt(stockCountStr[1], 10);
-        console.log("5.1.6 stockCountNum =", stockCountNum);
-        return stockCountNum;
+        // StockCount型のオブジェクトを作成する。
+        const stockCountAndDate: any = { "2024-5-24": stockCount };
+
+        // そのオブジェクトのstockCountプロパティに
+        // 作成したStockCountをpushする。
+        foundFbaSellerData?.stockCountDatas.push(stockCountAndDate);
+
+        // 在庫数を取得できない場合は
+        // エラーフラグ（-100）で
+        // 該当オブジェクトを更新
+      } else if (stockCount === null) {
+        const stockCountAndDate: any = { "2024-5-24": -100 };
+        foundFbaSellerData?.stockCountDatas.push(stockCountAndDate);
       }
-      console.log("5.1.7 stockCountNum = N");
-      return "N/A";
     },
 
-    scrollOnCartPage: async (page: Page) => {
-      await page.evaluate(() => {
-        // ページを一番上までスクロール
-        window.scrollTo(0, 0);
-      });
-    },
+    // scrollOnCartPage: async (page: Page) => {
+    //   await page.evaluate(() => {
+    //     // ページを一番上までスクロール
+    //     window.scrollTo(0, 0);
+    //   });
+    // },
 
     // emptyCart: async (page: Page, ASIN: string) => {
     //   // ガート画面の各商品コンテナの最新データを再び全取得
@@ -529,6 +590,14 @@ const scrapePromise = (async () => {
 
       for (const asinData of asinDataList) {
         await scrape.accessProductPage(asinData, page);
+        // 商品ページトップでカート取得してるセラー情報も取得
+        // 「Amazonの他の出品者」が存在確認関数
+        // ■ ある場合は、以下をifでラップ
+        // openSellerDrawer - goToGart
+        // ■ ない場合は、以下の2つの関数をif elseでラップ
+        // elseなのは後から条件式を追加する可能性もあるため。
+        // 「商品ページトップ」で「カートに追加」
+        // 「カートの小計算ページ」で「カートに追加」
         await scrape.openSellerDrawer(page);
         await scrape.scrollOnDrawer(page);
         await scrape.fetchSellerInfo(page);
@@ -542,8 +611,10 @@ const scrapePromise = (async () => {
         );
 
         for (const item of items) {
+          const sellerId = await scrape.fetchSellerId(page, item);
           await scrape.setQuantity(page, item);
-          await scrape.getStockCount(page);
+          const stockCount = await scrape.fetchStockCount(page);
+          await scrape.pushStockCount(asinData, sellerId, stockCount);
         }
 
         // レンダラープロセスにデータを送信する
@@ -552,7 +623,10 @@ const scrapePromise = (async () => {
         // 前提としてメインプロセス上にインポートされた上で
         // 実行されるので、エラーにならない。
         event.sender.send("scraping-result", asinData);
-        console.log("send完了", asinData);
+        console.log(
+          "send完了 在庫数 = ",
+          asinData.fbaSellerDatas[0].stockCountDatas[0]["2024-5-24"]
+        );
 
         await scrape.clearCart(page);
       }

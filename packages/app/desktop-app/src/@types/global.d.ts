@@ -40,10 +40,9 @@ declare global {
   }
 
   interface FbaSellerData {
-    sellerId: number;
+    sellerId: string;
     sellerName: string;
-    stockCount: number;
-    updateDate: string;
+    stockCountDatas: StockCount[];
   }
 }
 

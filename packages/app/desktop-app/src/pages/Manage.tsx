@@ -119,7 +119,7 @@ function Manage() {
         fetchLatestDate: "",
         fetchCurrentStatus: "",
         asinParent: "",
-        fbasellerDatas: { fbaSellerData: [] },
+        fbaSellerDatas: [],
       }));
 
       // 入力したASINリストにfilterメソッドを適用して
