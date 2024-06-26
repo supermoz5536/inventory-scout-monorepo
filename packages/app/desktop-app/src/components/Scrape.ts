@@ -536,7 +536,7 @@ const scrapePromise = (async () => {
         await scrape.closeDrawer(page);
         await scrape.goToCart(page);
 
-        // ガート画面の各商品コンテナを全取得
+        // カート画面の各商品コンテナを全取得
         const items = await page.$$(
           `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
         );
