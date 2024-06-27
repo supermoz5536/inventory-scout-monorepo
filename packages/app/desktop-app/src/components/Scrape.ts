@@ -4,6 +4,11 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import UserAgent from "user-agents";
 
+/// key が日付 value が在庫数の型定義です。
+interface StockCount {
+  [date: string]: number;
+}
+
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
 // 擬似的なオブジェクト指向となり
@@ -55,12 +60,12 @@ const scrapePromise = (async () => {
       const page = await browser.newPage();
       console.log("2.2");
 
-      console.log("2.3");
-      // ランダムなユーザーエージェントを設定
-      const userAgent = new UserAgent().toString();
-      console.log("2.4 userAgent = ", userAgent);
-      await page.setUserAgent(userAgent);
-      console.log("2.5");
+      // console.log("2.3");
+      // // ランダムなユーザーエージェントを設定
+      // const userAgent = new UserAgent().toString();
+      // console.log("2.4 userAgent = ", userAgent);
+      // await page.setUserAgent(userAgent);
+      // console.log("2.5");
 
       // ビューポートのサイズを指定
       await page.setViewport({ width: 1280, height: 960 });
@@ -127,14 +132,11 @@ const scrapePromise = (async () => {
     },
 
     // Drawer内のセラーID、出荷元、販売者データを取得
-    fetchSellerInfo: async (page: Page) => {
+    fetchAndUpdateSellerData: async (page: Page, asinData: AsinData) => {
       // 各コンテナ情報を取得
       // .$は指定したCSSセレクタと一致する「最初の要素」を取得
       // .$$は指定したCSSセレクタと一致する「全ての要素」を取得するメソッド
       const offers = await page.$$("#aod-pinned-offer, #aod-offer");
-
-      // 取得した情報を格納するための空の配列を用意
-      const sellerInfos = [];
 
       // 各コンテナをループで処理
       for (const offer of offers) {
@@ -146,10 +148,10 @@ const scrapePromise = (async () => {
         // <a>タグ（アンカータグ）で、href属性に"/gp/aag/main"を含む要素を指定します。
         const sellerIdElement = await offer.$('a[href*="/gp/aag/main"]');
 
-        // 出荷元の名前が含まれる要素の参照を取得
-        const shippingSourceElement = await offer.$(
-          "#aod-offer-shipsFrom .a-size-small.a-color-base"
-        );
+        // // 出荷元の名前が含まれる要素の参照を取得
+        // const shippingSourceElement = await offer.$(
+        //   "#aod-offer-shipsFrom .a-size-small.a-color-base"
+        // );
 
         // 販売元の名前が含まれる要素の参照を取得
         const sellerNameElement = await offer.$(
@@ -182,15 +184,15 @@ const scrapePromise = (async () => {
           : // セラーIDのタグが見つからなかった場合
             null;
 
-        // 出荷元名の抽出処理
-        // 要素が存在する場合は
-        // そのテキストを取得しトリムする
-        const shippingSource = shippingSourceElement
-          ? await page.evaluate((el) => {
-              const textContent = el.textContent;
-              return textContent ? textContent.trim() : null;
-            }, shippingSourceElement)
-          : null;
+        // // 出荷元名の抽出処理
+        // // 要素が存在する場合は
+        // // そのテキストを取得しトリムする
+        // const shippingSource = shippingSourceElement
+        //   ? await page.evaluate((el) => {
+        //       const textContent = el.textContent;
+        //       return textContent ? textContent.trim() : null;
+        //     }, shippingSourceElement)
+        //   : null;
 
         // 販売元の名前を抽出
         // テキストコンテンツを取得しトリムする
@@ -201,12 +203,31 @@ const scrapePromise = (async () => {
             }, sellerNameElement)
           : null;
 
-        // 取得した情報をオブジェクトとして配列に追加
-        sellerInfos.push({ sellerId, shippingSource, sellerName });
-      }
+        // 既存のリスト内に、fetchしたセラーIdがあるかを確認する
+        const foundSellerData = asinData.fbaSellerDatas.find(
+          (asinData) => asinData.sellerId === sellerId
+        );
 
-      // すべてのオファーから取得した情報が入った配列を返す
-      return sellerInfos;
+        // 既存のリストに含まれてるセラーで
+        // かつ
+        // 最新の出品者名の取得が成功した場合
+        if (foundSellerData && sellerName) {
+          // 取得したデータの出品者名を上書きする
+          foundSellerData.sellerName = sellerName;
+
+          // 既存のリストに含まれない新規のセラーの場合
+          // かつ
+          // 最新の出品者名の取得が成功した場合
+        } else if (!foundSellerData && sellerId && sellerName) {
+          // FbaSellerData型オブジェクト（出品者）を追加する。
+          const newSellerData: FbaSellerData = {
+            sellerId: sellerId,
+            sellerName: sellerName,
+            stockCountDatas: [],
+          };
+          asinData.fbaSellerDatas.push(newSellerData);
+        }
+      }
     },
 
     /// Drawer内の各セラーの「カートに入れる」をクリック
@@ -297,6 +318,8 @@ const scrapePromise = (async () => {
       const sellerIdSelector = 'a[href*="smid="]';
       // 要素を取得
       const sellerIdElement = await item.$(sellerIdSelector);
+      console.log("sellerIdElement = ", sellerIdElement);
+
       // 要素からセラーIDのテキストデータを抽出
       const sellerId = sellerIdElement
         ? // セラーIDのタグが見つかった場合
@@ -314,7 +337,7 @@ const scrapePromise = (async () => {
             // 第一引数の関数
             (el) => {
               const href = el.getAttribute("href");
-              const match = href ? href.match(/seller=([^&]+)/) : null;
+              const match = href ? href.match(/smid=([^&]+)/) : null;
               return match ? match[1] : null;
             },
             // 第二引数
@@ -322,6 +345,8 @@ const scrapePromise = (async () => {
           )
         : // セラーIDのタグが見つからなかった場合
           null;
+
+      console.log("fetchSellerId関数 sellerId = ", sellerId);
 
       return sellerId;
     },
@@ -477,27 +502,32 @@ const scrapePromise = (async () => {
       // 上記のFbaSellerData[]型オブジェクトの中から
       // セラーIDが一致するオブジェクトを検索する
       const foundFbaSellerData = asinData.fbaSellerDatas.find((seller) => {
-        seller.sellerId === sellerId;
+        return seller.sellerId === sellerId;
       });
 
       // 在庫数の取得ができた場合
-      if (stockCount) {
-        console.log("5.1.5");
+      if (foundFbaSellerData && stockCount) {
+        console.log("6.0.0");
 
         // StockCount型のオブジェクトを作成する。
-        const stockCountAndDate: any = { "2024-5-24": stockCount };
+        const stockCountAndDate: StockCount = { "2024-5-24": stockCount };
+        console.log("6.0.1");
 
         // そのオブジェクトのstockCountプロパティに
         // 作成したStockCountをpushする。
-        foundFbaSellerData?.stockCountDatas.push(stockCountAndDate);
+        foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
 
         // 在庫数を取得できない場合は
         // エラーフラグ（-100）で
         // 該当オブジェクトを更新
-      } else if (stockCount === null) {
-        const stockCountAndDate: any = { "2024-5-24": -100 };
-        foundFbaSellerData?.stockCountDatas.push(stockCountAndDate);
+      } else if (foundFbaSellerData && stockCount === null) {
+        console.log("6.0.3");
+        const stockCountAndDate = { "2024-5-24": -100 };
+        console.log("6.0.4");
+        foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
+        console.log("6.0.5 after push", foundFbaSellerData.stockCountDatas);
       }
+      console.log("6.0.6");
     },
 
     // scrollOnCartPage: async (page: Page) => {
@@ -582,12 +612,12 @@ const scrapePromise = (async () => {
     // },
 
     clearCart: async (page: Page) => {
-      console.log("6.0.0");
+      console.log("7.0.0");
       // クッキーを削除してカート状態をリフレッシュする
       const client = await page.createCDPSession();
       await client.send("Network.clearBrowserCookies");
 
-      console.log("6.0.1 Cart and session cleared.");
+      console.log("7.0.1 Cart and session cleared.");
     },
 
     runScraping: async (
@@ -600,7 +630,7 @@ const scrapePromise = (async () => {
       const browser = await scrape.launchBrowser();
       const page = await scrape.launchPage(browser);
 
-      for (const asinData of asinDataList) {
+      for (let asinData of asinDataList) {
         await scrape.accessProductPage(asinData, page);
         // 商品ページトップでカート取得してるセラー情報も取得
         // 「Amazonの他の出品者」が存在確認関数
@@ -612,7 +642,7 @@ const scrapePromise = (async () => {
         // 「カートの小計算ページ」で「カートに追加」
         await scrape.openSellerDrawer(page);
         await scrape.scrollOnDrawer(page);
-        await scrape.fetchSellerInfo(page);
+        await scrape.fetchAndUpdateSellerData(page, asinData);
         await scrape.addToCart(page);
         await scrape.closeDrawer(page);
         await scrape.goToCart(page);
@@ -635,10 +665,7 @@ const scrapePromise = (async () => {
         // 前提としてメインプロセス上にインポートされた上で
         // 実行されるので、エラーにならない。
         event.sender.send("scraping-result", asinData);
-        console.log(
-          "send完了 在庫数 = ",
-          asinData.fbaSellerDatas[0].stockCountDatas[0]["2024-5-24"]
-        );
+        console.log("send完了");
 
         await scrape.clearCart(page);
       }
