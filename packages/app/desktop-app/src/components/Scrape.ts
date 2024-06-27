@@ -2,6 +2,7 @@ import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { ipcMain } from "electron";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import UserAgent from "user-agents";
 
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
@@ -56,12 +57,14 @@ const scrapePromise = (async () => {
 
       console.log("2.3");
       // ランダムなユーザーエージェントを設定
-      // ここに記述
-      console.log("2.4");
+      const userAgent = new UserAgent().toString();
+      console.log("2.4 userAgent = ", userAgent);
+      await page.setUserAgent(userAgent);
+      console.log("2.5");
 
       // ビューポートのサイズを指定
       await page.setViewport({ width: 1280, height: 960 });
-      console.log("2.5");
+      console.log("2.6");
       return page;
     },
 
