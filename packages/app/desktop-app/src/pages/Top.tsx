@@ -44,7 +44,7 @@ function Top() {
   }, [asinDataList.length]);
 
   const handleRunScraping = async (asinDataList: AsinData[]) => {
-    if (asinDataList) {
+    if (asinDataList.length > 0) {
       window.myAPI.runScraping(asinDataList);
     }
   };

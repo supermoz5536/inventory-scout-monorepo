@@ -50,9 +50,18 @@ const scrapePromise = (async () => {
     },
 
     launchPage: async (browser: Browser) => {
+      console.log("2.1");
       const page = await browser.newPage();
-      await page.setViewport({ width: 1280, height: 960 }); // ビューポートのサイズを指定
-      console.log("2");
+      console.log("2.2");
+
+      console.log("2.3");
+      // ランダムなユーザーエージェントを設定
+      // ここに記述
+      console.log("2.4");
+
+      // ビューポートのサイズを指定
+      await page.setViewport({ width: 1280, height: 960 });
+      console.log("2.5");
       return page;
     },
 
