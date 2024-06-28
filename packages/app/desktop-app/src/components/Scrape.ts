@@ -565,6 +565,15 @@ const scrapePromise = (async () => {
       sellerId: string | null,
       stockCount: number | null
     ) => {
+      // 当日の日付の値を取得
+      const today = new Date();
+      // 日付を YYYY-MM-DD 形式にフォーマット
+      // getMonth() + 1: 月を取得（0から始まるため1を加算）
+      // padStart(2, '0'): 月と日が一桁の場合、前に0を追加して二桁にする
+      const todayFormatted = `${today.getFullYear()}-${String(
+        today.getMonth() + 1
+      ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
       // 追加する該当のセラーデータを探す。
       // asinData > fbaSellerDatas
       // 上記のFbaSellerData[]型オブジェクトの中から
@@ -578,7 +587,7 @@ const scrapePromise = (async () => {
         console.log("6.0.0");
 
         // StockCount型のオブジェクトを作成する。
-        const stockCountAndDate = { "2024-5-24": stockCount };
+        const stockCountAndDate = { todayFormatted: stockCount };
         console.log("6.0.1");
 
         // そのオブジェクトのstockCountプロパティに
@@ -590,7 +599,7 @@ const scrapePromise = (async () => {
         // 該当オブジェクトを更新
       } else if (foundFbaSellerData && stockCount === null) {
         console.log("6.0.3");
-        const stockCountAndDate = { "2024-5-24": -100 };
+        const stockCountAndDate = { todayFormatted: -100 };
         console.log("6.0.4");
         foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
         console.log("6.0.5 after push", foundFbaSellerData.stockCountDatas);
@@ -679,6 +688,12 @@ const scrapePromise = (async () => {
     //   }
     // },
 
+    updateTotalStock(asinData: AsinData, stockCount: number | null) {
+      if (stockCount) {
+        asinData.totalStock = asinData.totalStock! + stockCount;
+      }
+    },
+
     clearCart: async (page: Page) => {
       console.log("7.0.0");
       // クッキーを削除してカート状態をリフレッシュする
@@ -725,14 +740,12 @@ const scrapePromise = (async () => {
           const sellerId = await scrape.fetchSellerId(page, item);
           await scrape.setQuantity(page, item);
           const stockCount = await scrape.fetchStockCount(page);
+          await scrape.updateTotalStock(asinData, stockCount);
           await scrape.pushStockCount(asinData, sellerId, stockCount);
         }
 
         // レンダラープロセスにデータを送信する
         // メインプロセスでのみ使用可能なメソッド。
-        // scrapePromiseオブジェクトは、
-        // 前提としてメインプロセス上にインポートされた上で
-        // 実行されるので、エラーにならない。
         event.sender.send("scraping-result", asinData);
         console.log("send完了");
 

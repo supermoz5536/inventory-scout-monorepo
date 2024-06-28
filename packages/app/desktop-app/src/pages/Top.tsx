@@ -261,7 +261,7 @@ function Top() {
 
               {/* 要素7 合計在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.totalStock == -1 ? "" : asinData.totalStock}</p>
+                <p>{asinData.totalStock}</p>
               </div>
 
               {/* 要素8 カート価格 */}

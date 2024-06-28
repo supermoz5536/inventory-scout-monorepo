@@ -32,7 +32,7 @@ declare global {
     name: string;
     amazonStock: number;
     fbaSellerNOP: number;
-    totalStock: number;
+    totalStock: number | null;
     cartPrice: string;
     decrease1: number;
     decrease2: number;
