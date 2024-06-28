@@ -95,9 +95,28 @@ const scrapePromise = (async () => {
     },
 
     fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
+      // 商品画像URLのセレクタを定義
+      const imageURLSelector = `span[data-action="main-image-click"] img.a-dynamic-image`;
+      // 商品画像URLの要素を取得
+      const imageURLElement = await page.$(imageURLSelector);
+      // 商品画像URLの要素からURLを抽出
+      const imageURLText = await page.evaluate(
+        // 第一引数の関数
+        (el) => {
+          if (el) {
+            return el.getAttribute("src");
+          }
+        },
+        // 第二引数
+        imageURLElement
+      );
+      // 取得したデータに更新
+      asinData.imageURL = imageURLText ?? "";
+
+      // 商品名の取得
+      // カート価格の取得
+      //
       asinData.name = "スケーター (skater) 弁当箱 すみっコぐらし";
-      asinData.imageUrl =
-        "https://m.media-amazon.com/images/I/51DTY4jEkwL._AC_SX569_.jpg";
     },
 
     scrollOnDrawer: async (page: Page) => {
@@ -129,7 +148,7 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1750);
+            await sleep(1500);
           }
         }
       }
@@ -648,6 +667,7 @@ const scrapePromise = (async () => {
 
       for (let asinData of asinDataList) {
         await scrape.accessProductPage(asinData, page);
+        await scrape.fetchAndUpdateProductData(page, asinData);
         // 商品ページトップでカート取得してるセラー情報も取得
         // 「Amazonの他の出品者」が存在確認関数
         // ■ ある場合は、以下をifでラップ
@@ -657,7 +677,6 @@ const scrapePromise = (async () => {
         // 「商品ページトップ」で「カートに追加」
         // 「カートの小計算ページ」で「カートに追加」
         await scrape.openSellerDrawer(page);
-        await scrape.fetchAndUpdateProductData(page, asinData);
         await scrape.scrollOnDrawer(page);
         await scrape.fetchAndUpdateSellerData(page, asinData);
         await scrape.addToCart(page);

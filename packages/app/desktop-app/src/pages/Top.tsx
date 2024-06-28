@@ -239,7 +239,7 @@ function Top() {
 
               {/* 要素3 画像 */}
               <div className="top-square-space-img">
-                <img src={asinData.imageUrl} alt="" />
+                <img src={asinData.imageURL} alt="" />
               </div>
 
               {/* 要素4 商品名 */}

@@ -65,11 +65,6 @@ export const asinSlice = createSlice({
     /// 一致するオブジェクトを検索して更新する関数
     updateAsinData: (state, action: PayloadAction<AsinData>) => {
       // 既存のasinDataのリストの中で、.asinが一致するオブジェクトをfind
-
-      console.log("state.value.length = ", state.value.length);
-      console.log("state.value.[0] = ", state.value[0]);
-      console.log("state.value.[0].asin = ", state.value[0].asin);
-
       // findIndex メソッドは、検索条件に一致する要素が見つかった場合、
       // その要素のインデックスを返します。
       // 一致する要素が見つからなかった場合は -1 を返します。

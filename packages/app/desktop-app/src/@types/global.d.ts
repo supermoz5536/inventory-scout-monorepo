@@ -28,7 +28,7 @@ declare global {
     id: string;
     deleteCheck: boolean;
     asin: string;
-    imageUrl: string;
+    imageURL: string;
     name: string;
     amazonStock: number;
     fbaSellerNOP: number;

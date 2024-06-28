@@ -108,7 +108,7 @@ function Manage() {
         id: uuidv4(),
         deleteCheck: false,
         asin,
-        imageUrl: "",
+        imageURL: "",
         name: "",
         amazonStock: -1,
         fbaSellerNOP: -1,
