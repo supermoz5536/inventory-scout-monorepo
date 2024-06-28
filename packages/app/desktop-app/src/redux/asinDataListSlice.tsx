@@ -60,6 +60,30 @@ export const asinSlice = createSlice({
 
       // removedelete;
     },
+
+    /// メインプロセスから受信したAsinDataオブジェクトと
+    /// 一致するオブジェクトを検索して更新する関数
+    updateAsinData: (state, action: PayloadAction<AsinData>) => {
+      // 既存のasinDataのリストの中で、.asinが一致するオブジェクトをfind
+
+      console.log("state.value.length = ", state.value.length);
+      console.log("state.value.[0] = ", state.value[0]);
+      console.log("state.value.[0].asin = ", state.value[0].asin);
+
+      // findIndex メソッドは、検索条件に一致する要素が見つかった場合、
+      // その要素のインデックスを返します。
+      // 一致する要素が見つからなかった場合は -1 を返します。
+      const index = state.value.findIndex(
+        (asinData: AsinData) => asinData.asin === action.payload.asin
+      );
+
+      if (index !== -1) {
+        // そのasinDataオブジェクトを、引数のasinDataオブジェクトに上書きする
+        state.value[index] = action.payload;
+      } else {
+        console.warn(`AsinData with ASIN ${action.payload.asin} not found`);
+      }
+    },
   },
 });
 
@@ -67,7 +91,8 @@ export const asinSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { addAsin, removeAsin, switchRemoveCheck } = asinSlice.actions;
+export const { addAsin, removeAsin, switchRemoveCheck, updateAsinData } =
+  asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。

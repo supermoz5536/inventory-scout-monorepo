@@ -33,4 +33,7 @@ contextBridge.exposeInMainWorld("myAPI", {
     ipcRenderer.invoke("runScraping", asinDataList),
 
   scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
+
+  removeScrapingResult: (callback) =>
+    ipcRenderer.removeListener("scraping-result", callback),
 });

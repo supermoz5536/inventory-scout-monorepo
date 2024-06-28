@@ -4,11 +4,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import UserAgent from "user-agents";
 
-/// key が日付 value が在庫数の型定義です。
-interface StockCount {
-  [date: string]: number;
-}
-
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
 // 擬似的なオブジェクト指向となり
@@ -60,12 +55,15 @@ const scrapePromise = (async () => {
       const page = await browser.newPage();
       console.log("2.2");
 
-      // console.log("2.3");
-      // // ランダムなユーザーエージェントを設定
-      // const userAgent = new UserAgent().toString();
-      // console.log("2.4 userAgent = ", userAgent);
-      // await page.setUserAgent(userAgent);
-      // console.log("2.5");
+      // ランダムなユーザーエージェントを設定
+      // 生成されるエージェント情報をdesuktopのみに限定する。
+      const userAgentOptions = {
+        deviceCategory: "desktop",
+      };
+      const userAgent = new UserAgent(userAgentOptions).toString();
+      console.log("2.4 userAgent = ", userAgent);
+      await page.setUserAgent(userAgent);
+      console.log("2.5");
 
       // ビューポートのサイズを指定
       await page.setViewport({ width: 1280, height: 960 });
@@ -94,6 +92,12 @@ const scrapePromise = (async () => {
       // 出品者一覧ページへの画面遷移を待機します。
       await page.waitForNavigation({ waitUntil: "networkidle2" });
       console.log("3.4");
+    },
+
+    fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
+      asinData.name = "スケーター (skater) 弁当箱 すみっコぐらし";
+      asinData.imageUrl =
+        "https://m.media-amazon.com/images/I/51DTY4jEkwL._AC_SX569_.jpg";
     },
 
     scrollOnDrawer: async (page: Page) => {
@@ -125,7 +129,7 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1500);
+            await sleep(1750);
           }
         }
       }
@@ -148,10 +152,10 @@ const scrapePromise = (async () => {
         // <a>タグ（アンカータグ）で、href属性に"/gp/aag/main"を含む要素を指定します。
         const sellerIdElement = await offer.$('a[href*="/gp/aag/main"]');
 
-        // // 出荷元の名前が含まれる要素の参照を取得
-        // const shippingSourceElement = await offer.$(
-        //   "#aod-offer-shipsFrom .a-size-small.a-color-base"
-        // );
+        // 出荷元の名前が含まれる要素の参照を取得
+        const shippingSourceElement = await offer.$(
+          "#aod-offer-shipsFrom .a-size-small.a-color-base"
+        );
 
         // 販売元の名前が含まれる要素の参照を取得
         const sellerNameElement = await offer.$(
@@ -184,15 +188,15 @@ const scrapePromise = (async () => {
           : // セラーIDのタグが見つからなかった場合
             null;
 
-        // // 出荷元名の抽出処理
-        // // 要素が存在する場合は
-        // // そのテキストを取得しトリムする
-        // const shippingSource = shippingSourceElement
-        //   ? await page.evaluate((el) => {
-        //       const textContent = el.textContent;
-        //       return textContent ? textContent.trim() : null;
-        //     }, shippingSourceElement)
-        //   : null;
+        // 出荷元名の抽出処理
+        // 要素が存在する場合は
+        // そのテキストを取得しトリムする
+        const shippingSource = shippingSourceElement
+          ? await page.evaluate((el) => {
+              const textContent = el.textContent;
+              return textContent ? textContent.trim() : null;
+            }, shippingSourceElement)
+          : null;
 
         // 販売元の名前を抽出
         // テキストコンテンツを取得しトリムする
@@ -211,14 +215,26 @@ const scrapePromise = (async () => {
         // 既存のリストに含まれてるセラーで
         // かつ
         // 最新の出品者名の取得が成功した場合
-        if (foundSellerData && sellerName) {
+        if (
+          (foundSellerData && sellerName && shippingSource == "Amazon") ||
+          (foundSellerData && sellerName && shippingSource == "Amazon.co.jp")
+        ) {
           // 取得したデータの出品者名を上書きする
           foundSellerData.sellerName = sellerName;
 
           // 既存のリストに含まれない新規のセラーの場合
           // かつ
           // 最新の出品者名の取得が成功した場合
-        } else if (!foundSellerData && sellerId && sellerName) {
+        } else if (
+          (!foundSellerData &&
+            sellerId &&
+            sellerName &&
+            shippingSource == "Amazon") ||
+          (!foundSellerData &&
+            sellerId &&
+            sellerName &&
+            shippingSource == "Amazon.co.jp")
+        ) {
           // FbaSellerData型オブジェクト（出品者）を追加する。
           const newSellerData: FbaSellerData = {
             sellerId: sellerId,
@@ -510,7 +526,7 @@ const scrapePromise = (async () => {
         console.log("6.0.0");
 
         // StockCount型のオブジェクトを作成する。
-        const stockCountAndDate: StockCount = { "2024-5-24": stockCount };
+        const stockCountAndDate = { "2024-5-24": stockCount };
         console.log("6.0.1");
 
         // そのオブジェクトのstockCountプロパティに
@@ -641,6 +657,7 @@ const scrapePromise = (async () => {
         // 「商品ページトップ」で「カートに追加」
         // 「カートの小計算ページ」で「カートに追加」
         await scrape.openSellerDrawer(page);
+        await scrape.fetchAndUpdateProductData(page, asinData);
         await scrape.scrollOnDrawer(page);
         await scrape.fetchAndUpdateSellerData(page, asinData);
         await scrape.addToCart(page);

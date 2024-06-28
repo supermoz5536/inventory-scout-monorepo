@@ -7,6 +7,9 @@ declare global {
       scrapingResult: (
         callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
       ) => void;
+      removeScrapingResult: (
+        callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
+      ) => void;
     };
   }
 
