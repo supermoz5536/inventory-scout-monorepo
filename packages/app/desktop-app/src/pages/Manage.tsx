@@ -117,9 +117,10 @@ function Manage() {
         decrease1: -1,
         decrease2: -1,
         fetchLatestDate: "",
-        fetchCurrentStatus: "",
+        fetchLatestTime: "",
         asinParent: "",
         fbaSellerDatas: [],
+        isScraping: null,
       }));
 
       // 入力したASINリストにfilterメソッドを適用して

@@ -2,7 +2,11 @@ import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
+import {
+  removeAsin,
+  switchRemoveCheck,
+  updateIsScrapingTrue,
+} from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
 
 function Top() {
@@ -45,6 +49,8 @@ function Top() {
 
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     if (asinDataList.length > 0) {
+      // 全ての取得状況をTrue（取得中）に更新
+      dispatch(updateIsScrapingTrue());
       window.myAPI.runScraping(asinDataList);
     }
   };
@@ -280,12 +286,18 @@ function Top() {
               {/* 要素11 最新取得 */}
               <div className="top-square-space-update-latest">
                 <p>{asinData.fetchLatestDate}</p>
-                <p></p>
+                <p>{asinData.fetchLatestTime}</p>
               </div>
 
               {/* 要素12 取得状況 */}
               <div className="top-square-space-update-state">
-                <p>{asinData.fetchCurrentStatus}</p>
+                <p>
+                  {asinData.isScraping === null
+                    ? ""
+                    : asinData.isScraping === true
+                    ? "取得中"
+                    : "取得完了"}
+                </p>
               </div>
 
               {/* 要素13 親ASIN */}

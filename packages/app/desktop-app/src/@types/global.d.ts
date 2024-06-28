@@ -37,9 +37,10 @@ declare global {
     decrease1: number;
     decrease2: number;
     fetchLatestDate: string;
-    fetchCurrentStatus: string;
+    fetchLatestTime: string;
     asinParent: string;
     fbaSellerDatas: FbaSellerData[];
+    isScraping: boolean | null;
   }
 
   interface FbaSellerData {

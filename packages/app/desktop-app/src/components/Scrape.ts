@@ -646,6 +646,28 @@ const scrapePromise = (async () => {
       console.log("6.0.6");
     },
 
+    updateFetchLatestDate: async (asinData: AsinData) => {
+      const today = new Date();
+      const todayFormatted = `${today.getFullYear()}-${String(
+        today.getMonth() + 1
+      ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+      asinData.fetchLatestDate = todayFormatted;
+    },
+
+    updateFetchLatestTime: async (asinData: AsinData) => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const currentTimeFormatted = `${hours}:${minutes}`;
+
+      asinData.fetchLatestTime = currentTimeFormatted;
+    },
+
+    updateIsScarapingFalse: async (asinData: AsinData) => {
+      asinData.isScraping = false;
+    },
+
     clearCart: async (page: Page) => {
       console.log("7.0.0");
       // クッキーを削除してカート状態をリフレッシュする
@@ -698,7 +720,12 @@ const scrapePromise = (async () => {
           await scrape.pushStockCount(asinData, stockCount, sellerId);
         }
 
-        console.log("asinData.fbaSellerNOP", asinData.fbaSellerNOP);
+        // asinData.fetchLatestDateの更新
+        await scrape.updateFetchLatestDate(asinData);
+        // asinData.fetchLatestTimeの更新
+        await scrape.updateFetchLatestTime(asinData);
+        // asinData.isScrapingを更新
+        await scrape.updateIsScarapingFalse(asinData);
 
         // レンダラープロセスにデータを送信する
         // メインプロセスでのみ使用可能なメソッド。
