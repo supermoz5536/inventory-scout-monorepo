@@ -95,12 +95,31 @@ const scrapePromise = (async () => {
     },
 
     fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
-      // 商品画像URLのセレクタを定義
+      // ■ 商品名のセレクタを定義
+      const productNameSelector = `span#productTitle`;
+      // 商品名の要素を取得
+      const productNameElement = await page.$(productNameSelector);
+      // 商品名の要素からURLを抽出
+      const productName = await page.evaluate(
+        // 第一引数の関数
+        (el) => {
+          if (el) {
+            const textContent = el.textContent;
+            return textContent ? textContent.trim() : null;
+          }
+        },
+        // 第二引数
+        productNameElement
+      );
+      // 取得したデータに更新
+      asinData.name = productName ?? "";
+
+      // ■ 商品画像URLのセレクタを定義
       const imageURLSelector = `span[data-action="main-image-click"] img.a-dynamic-image`;
       // 商品画像URLの要素を取得
       const imageURLElement = await page.$(imageURLSelector);
       // 商品画像URLの要素からURLを抽出
-      const imageURLText = await page.evaluate(
+      const imageURL = await page.evaluate(
         // 第一引数の関数
         (el) => {
           if (el) {
@@ -111,12 +130,26 @@ const scrapePromise = (async () => {
         imageURLElement
       );
       // 取得したデータに更新
-      asinData.imageURL = imageURLText ?? "";
+      asinData.imageURL = imageURL ?? "";
 
-      // 商品名の取得
-      // カート価格の取得
-      //
-      asinData.name = "スケーター (skater) 弁当箱 すみっコぐらし";
+      // カート価格のセレクタを定義
+      const cartPriceSelector = `div#centerCol.centerColAlign span.a-price-whole`;
+      // カート価格の要素を取得
+      const cartPriceElement = await page.$(cartPriceSelector);
+      // カート価格の要素から価格文字列を抽出
+      const cartPrice = await page.evaluate(
+        // 第一引数の関数
+        (el) => {
+          if (el) {
+            const textContent = el.textContent;
+            return textContent ? textContent.trim() : null;
+          }
+        },
+        // 第二引数
+        cartPriceElement
+      );
+      // 取得したデータに更新
+      asinData.cartPrice = cartPrice ?? "";
     },
 
     scrollOnDrawer: async (page: Page) => {

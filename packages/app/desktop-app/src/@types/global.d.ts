@@ -33,7 +33,7 @@ declare global {
     amazonStock: number;
     fbaSellerNOP: number;
     totalStock: number;
-    cartPrice: number;
+    cartPrice: string;
     decrease1: number;
     decrease2: number;
     fetchLatestDate: string;

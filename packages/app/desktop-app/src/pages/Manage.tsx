@@ -113,7 +113,7 @@ function Manage() {
         amazonStock: -1,
         fbaSellerNOP: -1,
         totalStock: -1,
-        cartPrice: -1,
+        cartPrice: "",
         decrease1: -1,
         decrease2: -1,
         fetchLatestDate: "",

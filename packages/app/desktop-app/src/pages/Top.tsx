@@ -266,7 +266,7 @@ function Top() {
 
               {/* 要素8 カート価格 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.cartPrice == -1 ? "" : asinData.cartPrice}</p>
+                <p>{asinData.cartPrice}</p>
               </div>
 
               {/* 要素9 本日の減少数 */}
