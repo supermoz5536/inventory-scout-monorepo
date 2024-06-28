@@ -31,7 +31,7 @@ declare global {
     imageURL: string;
     name: string;
     amazonStock: number | null;
-    fbaSellerNOP: number;
+    fbaSellerNOP: number | null;
     totalStock: number | null;
     cartPrice: string;
     decrease1: number;

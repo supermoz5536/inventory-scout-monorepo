@@ -274,6 +274,18 @@ const scrapePromise = (async () => {
           // 取得したデータの出品者名を上書きする
           foundSellerData.sellerName = sellerName;
 
+          // Amazon本体以外のFBAセラーの場合に
+          // fbaSellerNOPにカウント
+          if (shippingSource !== "Amazon.co.jp") {
+            if (asinData.fbaSellerNOP === null) {
+              // 初期値nullの場合は
+              // インクリメント捜査を行うために
+              // 0で最初期化
+              asinData.fbaSellerNOP = 0;
+            }
+            ++asinData.fbaSellerNOP;
+          }
+
           // 既存のリストに含まれない新規のセラーの場合
           // かつ
           // 最新の出品者名の取得が成功した場合
@@ -294,6 +306,18 @@ const scrapePromise = (async () => {
             stockCountDatas: [],
           };
           asinData.fbaSellerDatas.push(newSellerData);
+
+          // Amazon本体以外のFBAセラーの場合に
+          // fbaSellerNOPにカウント
+          if (shippingSource !== "Amazon.co.jp") {
+            if (asinData.fbaSellerNOP === null) {
+              // 初期値nullの場合は
+              // インクリメント捜査を行うために
+              // 0で最初期化
+              asinData.fbaSellerNOP = 0;
+            }
+            ++asinData.fbaSellerNOP;
+          }
         }
       }
     },
@@ -673,6 +697,8 @@ const scrapePromise = (async () => {
           await scrape.updateAmazonStock(asinData, stockCount, sellerId);
           await scrape.pushStockCount(asinData, stockCount, sellerId);
         }
+
+        console.log("asinData.fbaSellerNOP", asinData.fbaSellerNOP);
 
         // レンダラープロセスにデータを送信する
         // メインプロセスでのみ使用可能なメソッド。

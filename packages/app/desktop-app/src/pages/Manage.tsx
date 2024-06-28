@@ -111,7 +111,7 @@ function Manage() {
         imageURL: "",
         name: "",
         amazonStock: null,
-        fbaSellerNOP: -1,
+        fbaSellerNOP: null,
         totalStock: null,
         cartPrice: "",
         decrease1: -1,

@@ -254,9 +254,7 @@ function Top() {
 
               {/* 要素6 FBAセラー数 */}
               <div className="top-square-space-amazon-num">
-                <p>
-                  {asinData.fbaSellerNOP == -1 ? "" : asinData.fbaSellerNOP}
-                </p>
+                <p>{asinData.fbaSellerNOP}</p>
               </div>
 
               {/* 要素7 合計在庫数 */}
