@@ -381,49 +381,10 @@ const scrapePromise = (async () => {
       console.log("3.9.2");
     },
 
-    fetchSellerId: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
-      // セラーID情報を含む要素のセレクターの定義
-      const sellerIdSelector = 'a[href*="smid="]';
-      // 要素を取得
-      const sellerIdElement = await item.$(sellerIdSelector);
-      console.log("sellerIdElement = ", sellerIdElement);
-
-      // 要素からセラーIDのテキストデータを抽出
-      const sellerId = sellerIdElement
-        ? // セラーIDのタグが見つかった場合
-          // .evaluate: ページ内でJavaScriptを実行するメソッド
-          // 第一引数に、ページ内で実行する関数を指定
-          // 第二引数に、第一引数の関数に渡す引数を指定（ここではsellerIdElement）。
-          await page.evaluate(
-            // 引数として受け取ったel（要素）から
-            // href属性の値を取得し、
-            // 正規表現を使用してセラーIDを抽出します。
-            // []内の^は否定を意味し、
-            // [^&]+ は & 以外の文字が1回以上続く部分にマッチし、
-            // & が出現した時点でマッチが終了します。
-
-            // 第一引数の関数
-            (el) => {
-              const href = el.getAttribute("href");
-              const match = href ? href.match(/smid=([^&]+)/) : null;
-              return match ? match[1] : null;
-            },
-            // 第二引数
-            sellerIdElement
-          )
-        : // セラーIDのタグが見つからなかった場合
-          null;
-
-      console.log("fetchSellerId関数 sellerId = ", sellerId);
-
-      return sellerId;
-    },
-
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
       console.log("4.1.0");
 
       // ページの完全な読み込みを待つ
-
       await page.waitForSelector("body", { timeout: 10000 });
 
       console.log("4.1.1");
@@ -560,10 +521,64 @@ const scrapePromise = (async () => {
       }
     },
 
+    updateTotalStock(asinData: AsinData, stockCount: number | null) {
+      if (stockCount) {
+        asinData.totalStock = asinData.totalStock! + stockCount;
+      }
+    },
+
+    fetchSellerId: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
+      // セラーID情報を含む要素のセレクターの定義
+      const sellerIdSelector = 'a[href*="smid="]';
+      // 要素を取得
+      const sellerIdElement = await item.$(sellerIdSelector);
+      console.log("sellerIdElement = ", sellerIdElement);
+
+      // 要素からセラーIDのテキストデータを抽出
+      const sellerId = sellerIdElement
+        ? // セラーIDのタグが見つかった場合
+          // .evaluate: ページ内でJavaScriptを実行するメソッド
+          // 第一引数に、ページ内で実行する関数を指定
+          // 第二引数に、第一引数の関数に渡す引数を指定（ここではsellerIdElement）。
+          await page.evaluate(
+            // 引数として受け取ったel（要素）から
+            // href属性の値を取得し、
+            // 正規表現を使用してセラーIDを抽出します。
+            // []内の^は否定を意味し、
+            // [^&]+ は & 以外の文字が1回以上続く部分にマッチし、
+            // & が出現した時点でマッチが終了します。
+
+            // 第一引数の関数
+            (el) => {
+              const href = el.getAttribute("href");
+              const match = href ? href.match(/smid=([^&]+)/) : null;
+              return match ? match[1] : null;
+            },
+            // 第二引数
+            sellerIdElement
+          )
+        : // セラーIDのタグが見つからなかった場合
+          null;
+
+      console.log("fetchSellerId関数 sellerId = ", sellerId);
+
+      return sellerId;
+    },
+
+    updateAmazonStock(
+      asinData: AsinData,
+      stockCount: number | null,
+      sellerId: string | null
+    ) {
+      if (sellerId === "AN1VRQENFRJN5" && stockCount) {
+        asinData.amazonStock = stockCount;
+      }
+    },
+
     pushStockCount: async (
       asinData: AsinData,
-      sellerId: string | null,
-      stockCount: number | null
+      stockCount: number | null,
+      sellerId: string | null
     ) => {
       // 当日の日付の値を取得
       const today = new Date();
@@ -607,93 +622,6 @@ const scrapePromise = (async () => {
       console.log("6.0.6");
     },
 
-    // scrollOnCartPage: async (page: Page) => {
-    //   await page.evaluate(() => {
-    //     // ページを一番上までスクロール
-    //     window.scrollTo(0, 0);
-    //   });
-    // },
-
-    // emptyCart: async (page: Page, ASIN: string) => {
-    //   // ガート画面の各商品コンテナの最新データを再び全取得
-    //   let items = await page.$$(
-    //     `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-    //   );
-
-    //   while (items.length > 0) {
-    //     console.log("6.1.1 現在のitem数 =", items.length);
-    //     console.log("6.1.1 現在のitem[0] =", items[0]);
-
-    //     // 削除ボタンの要素のセレクタを定義
-    //     const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
-    //     console.log("6.1.2");
-
-    //     // 削除ボタンの要素の表示を待機
-    //     await items[0].waitForSelector(deleteButtonSelector);
-
-    //     console.log("6.1.3");
-
-    //     // 削除ボタンの要素を取得
-    //     const deleteButton = await items[0].$(deleteButtonSelector);
-    //     console.log("6.1.4", deleteButton);
-
-    //     // 削除ボタンをクリック
-    //     if (deleteButton) {
-    //       console.log("6.1.5");
-
-    //       await page.evaluate((deleteButton) => {
-    //         deleteButton.click();
-    //       }, deleteButton);
-    //       console.log("6.1.6");
-    //     }
-    //     console.log("6.1.7");
-
-    //     // 削除の完了を待機
-    //     // ■■■■■■ 待機スタックのリスク ■■■■■■
-    //     // await page.waitForNavigation({ waitUntil: "networkidle2" });
-    //     console.log("6.1.8");
-
-    //     await sleep(500);
-    //     // 強制的にページの状態を再評価（スクロールで）
-    //     await page.evaluate(() => {
-    //       window.scrollTo(0, 100);
-    //     });
-    //     await sleep(500);
-    //     await page.evaluate(() => {
-    //       window.scrollTo(0, -100);
-    //     });
-
-    //     // 強制的にページの状態を再評価（コンテクスト内でのJS実行で）
-    //     const bodySelector =
-    //       "body.a-m-jp a-aui_72554-c a-aui_a11y_2_750578-c a-aui_a11y_6_837773-c a-aui_a11y_sr_678508-t1 a-aui_amzn_img_959719-c a-aui_amzn_img_gate_959718-c a-aui_killswitch_csa_logger_372963-c a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c a-meter-animate";
-    //     const bodyElement = await page.$(bodySelector);
-
-    //     if (bodyElement) {
-    //       await page.evaluate((selector) => {
-    //         const element = document.querySelector(selector);
-    //         if (element) {
-    //           // 必要な操作をここに記述
-    //           element.setAttribute("data-tmp", "update"); // 一時的な属性を追加
-    //           element.removeAttribute("data-tmp"); // 一時
-    //         }
-    //       }, bodySelector);
-    //     }
-
-    //     await sleep(2500);
-
-    //     items = await page.$$(
-    //       `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-    //     );
-    //     await sleep(1000);
-    //   }
-    // },
-
-    updateTotalStock(asinData: AsinData, stockCount: number | null) {
-      if (stockCount) {
-        asinData.totalStock = asinData.totalStock! + stockCount;
-      }
-    },
-
     clearCart: async (page: Page) => {
       console.log("7.0.0");
       // クッキーを削除してカート状態をリフレッシュする
@@ -714,6 +642,7 @@ const scrapePromise = (async () => {
       const page = await scrape.launchPage(browser);
 
       for (let asinData of asinDataList) {
+        // ■ 商品ページ画面の処理
         await scrape.accessProductPage(asinData, page);
         await scrape.fetchAndUpdateProductData(page, asinData);
         // 商品ページトップでカート取得してるセラー情報も取得
@@ -731,17 +660,18 @@ const scrapePromise = (async () => {
         await scrape.closeDrawer(page);
         await scrape.goToCart(page);
 
-        // カート画面の各商品コンテナを全取得
+        // ■ カート画面の処理
+        // 各商品コンテナを全取得
         const items = await page.$$(
           `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
         );
-
         for (const item of items) {
-          const sellerId = await scrape.fetchSellerId(page, item);
           await scrape.setQuantity(page, item);
           const stockCount = await scrape.fetchStockCount(page);
           await scrape.updateTotalStock(asinData, stockCount);
-          await scrape.pushStockCount(asinData, sellerId, stockCount);
+          const sellerId = await scrape.fetchSellerId(page, item);
+          await scrape.updateAmazonStock(asinData, stockCount, sellerId);
+          await scrape.pushStockCount(asinData, stockCount, sellerId);
         }
 
         // レンダラープロセスにデータを送信する
@@ -756,3 +686,84 @@ const scrapePromise = (async () => {
 })();
 
 export default scrapePromise;
+
+// scrollOnCartPage: async (page: Page) => {
+//   await page.evaluate(() => {
+//     // ページを一番上までスクロール
+//     window.scrollTo(0, 0);
+//   });
+// },
+
+// emptyCart: async (page: Page, ASIN: string) => {
+//   // ガート画面の各商品コンテナの最新データを再び全取得
+//   let items = await page.$$(
+//     `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+//   );
+
+//   while (items.length > 0) {
+//     console.log("6.1.1 現在のitem数 =", items.length);
+//     console.log("6.1.1 現在のitem[0] =", items[0]);
+
+//     // 削除ボタンの要素のセレクタを定義
+//     const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
+//     console.log("6.1.2");
+
+//     // 削除ボタンの要素の表示を待機
+//     await items[0].waitForSelector(deleteButtonSelector);
+
+//     console.log("6.1.3");
+
+//     // 削除ボタンの要素を取得
+//     const deleteButton = await items[0].$(deleteButtonSelector);
+//     console.log("6.1.4", deleteButton);
+
+//     // 削除ボタンをクリック
+//     if (deleteButton) {
+//       console.log("6.1.5");
+
+//       await page.evaluate((deleteButton) => {
+//         deleteButton.click();
+//       }, deleteButton);
+//       console.log("6.1.6");
+//     }
+//     console.log("6.1.7");
+
+//     // 削除の完了を待機
+//     // ■■■■■■ 待機スタックのリスク ■■■■■■
+//     // await page.waitForNavigation({ waitUntil: "networkidle2" });
+//     console.log("6.1.8");
+
+//     await sleep(500);
+//     // 強制的にページの状態を再評価（スクロールで）
+//     await page.evaluate(() => {
+//       window.scrollTo(0, 100);
+//     });
+//     await sleep(500);
+//     await page.evaluate(() => {
+//       window.scrollTo(0, -100);
+//     });
+
+//     // 強制的にページの状態を再評価（コンテクスト内でのJS実行で）
+//     const bodySelector =
+//       "body.a-m-jp a-aui_72554-c a-aui_a11y_2_750578-c a-aui_a11y_6_837773-c a-aui_a11y_sr_678508-t1 a-aui_amzn_img_959719-c a-aui_amzn_img_gate_959718-c a-aui_killswitch_csa_logger_372963-c a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c a-meter-animate";
+//     const bodyElement = await page.$(bodySelector);
+
+//     if (bodyElement) {
+//       await page.evaluate((selector) => {
+//         const element = document.querySelector(selector);
+//         if (element) {
+//           // 必要な操作をここに記述
+//           element.setAttribute("data-tmp", "update"); // 一時的な属性を追加
+//           element.removeAttribute("data-tmp"); // 一時
+//         }
+//       }, bodySelector);
+//     }
+
+//     await sleep(2500);
+
+//     items = await page.$$(
+//       `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
+//     );
+//     await sleep(1000);
+//   }
+// },

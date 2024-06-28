@@ -249,7 +249,7 @@ function Top() {
 
               {/* 要素5 Amazon在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.amazonStock == -1 ? "" : asinData.amazonStock}</p>
+                <p>{asinData.amazonStock}</p>
               </div>
 
               {/* 要素6 FBAセラー数 */}

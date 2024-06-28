@@ -110,7 +110,7 @@ function Manage() {
         asin,
         imageURL: "",
         name: "",
-        amazonStock: -1,
+        amazonStock: null,
         fbaSellerNOP: -1,
         totalStock: null,
         cartPrice: "",
