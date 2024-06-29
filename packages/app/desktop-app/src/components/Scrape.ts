@@ -712,60 +712,94 @@ const scrapePromise = (async () => {
       event: Electron.IpcMainInvokeEvent,
       asinDataList: AsinData[]
     ) => {
+      // 次の条件を満たすasinDataのみスクレイピングします。
+      // ・取得履歴のない
+      // ・取得履歴はあるが「当日に取得されていない」 or 「最後の取得から8時間以上経過」
+      const filteredAsinDataList = asinDataList.filter((asinData) => {
+        const now = new Date();
+        const lastFetchDate = new Date(asinData.fetchLatestDate);
+        // 36e5は1時間のms単位の秒数 3600000 を意味します。
+        // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
+        const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
+
+        return (
+          // toDateSringで日付の値をString型で取得します。
+          (now.toDateString() !== lastFetchDate.toDateString() &&
+            hoursDiff > 8) ||
+          asinData.fetchLatestDate === ""
+        );
+      });
+
+      console.log(
+        "filteredAsinDataList length = ",
+        filteredAsinDataList.length
+      );
+
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
       const scrape = await scrapePromise;
       const browser = await scrape.launchBrowser();
       const page = await scrape.launchPage(browser);
 
-      for (let asinData of asinDataList) {
-        // ■ 商品ページ画面の処理
-        await scrape.accessProductPage(asinData, page);
-        await scrape.fetchAndUpdateProductData(page, asinData);
-        // 商品ページトップでカート取得してるセラー情報も取得
-        // 「Amazonの他の出品者」が存在確認関数
-        // ■ ある場合は、以下をifでラップ
-        // openSellerDrawer - goToGart
-        // ■ ない場合は、以下の2つの関数をif elseでラップ
-        // elseなのは後から条件式を追加する可能性もあるため。
-        // 「商品ページトップ」で「カートに追加」
-        // 「カートの小計算ページ」で「カートに追加」
-        await scrape.openSellerDrawer(page);
-        await scrape.scrollOnDrawer(page);
-        await scrape.fetchAndUpdateSellerData(page, asinData);
-        await scrape.addToCart(page);
-        await scrape.closeDrawer(page);
-        await scrape.goToCart(page);
+      try {
+        for (let asinData of filteredAsinDataList) {
+          // ■ 商品ページ画面の処理
+          await scrape.accessProductPage(asinData, page);
+          await scrape.fetchAndUpdateProductData(page, asinData);
+          // 商品ページトップでカート取得してるセラー情報も取得
+          // 「Amazonの他の出品者」が存在確認関数
+          // ■ ある場合は、以下をifでラップ
+          // openSellerDrawer - goToGart
+          // ■ ない場合は、以下の2つの関数をif elseでラップ
+          // elseなのは後から条件式を追加する可能性もあるため。
+          // 「商品ページトップ」で「カートに追加」
+          // 「カートの小計算ページ」で「カートに追加」
+          await scrape.openSellerDrawer(page);
+          await scrape.scrollOnDrawer(page);
+          await scrape.fetchAndUpdateSellerData(page, asinData);
+          await scrape.addToCart(page);
+          await scrape.closeDrawer(page);
+          await scrape.goToCart(page);
 
-        // ■ カート画面の処理
-        // 各商品コンテナを全取得
-        const items = await page.$$(
-          `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
-        );
-        for (const item of items) {
-          await scrape.setQuantity(page, item);
-          const stockCount = await scrape.fetchStockCount(page);
-          await scrape.updateTotalStock(asinData, stockCount);
-          const sellerId = await scrape.fetchSellerId(page, item);
-          await scrape.updateAmazonStock(asinData, stockCount, sellerId);
-          await scrape.pushStockCount(asinData, stockCount, sellerId);
+          // ■ カート画面の処理
+          // 各商品コンテナを全取得
+          const items = await page.$$(
+            `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
+          );
+          for (const item of items) {
+            await scrape.setQuantity(page, item);
+            const stockCount = await scrape.fetchStockCount(page);
+            await scrape.updateTotalStock(asinData, stockCount);
+            const sellerId = await scrape.fetchSellerId(page, item);
+            await scrape.updateAmazonStock(asinData, stockCount, sellerId);
+            await scrape.pushStockCount(asinData, stockCount, sellerId);
+          }
+
+          // asinData.fetchLatestDateの更新
+          await scrape.updateFetchLatestDate(asinData);
+          // asinData.fetchLatestTimeの更新
+          await scrape.updateFetchLatestTime(asinData);
+          // asinData.isScrapingを更新
+          await scrape.updateIsScarapingFalse(asinData);
+
+          // レンダラープロセスにデータを送信する
+          // メインプロセスでのみ使用可能なメソッド。
+          event.sender.send("scraping-result", asinData);
+          console.log("send完了");
+
+          await scrape.clearCart(page);
         }
-
-        // asinData.fetchLatestDateの更新
-        await scrape.updateFetchLatestDate(asinData);
-        // asinData.fetchLatestTimeの更新
-        await scrape.updateFetchLatestTime(asinData);
-        // asinData.isScrapingを更新
-        await scrape.updateIsScarapingFalse(asinData);
-
-        // レンダラープロセスにデータを送信する
-        // メインプロセスでのみ使用可能なメソッド。
-        event.sender.send("scraping-result", asinData);
-        console.log("send完了");
-
-        await scrape.clearCart(page);
+        await browser.close();
+      } catch (error) {
+        console.log("try-catch エラー:", error);
+        console.log("try-catch: runScrapingを最実行します");
+        await browser.close();
+        // この引数のasinDataListは、複製されたオブジェクトだが
+        // 各イテレートな処理で、
+        // レンダラープロセスの状態変数と同期してるので
+        // 問題なく途中再開できる。
+        await scrape.runScraping(event, asinDataList);
       }
-      await browser.close();
     },
   };
 })();
