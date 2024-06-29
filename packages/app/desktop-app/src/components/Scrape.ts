@@ -46,14 +46,11 @@ const scrapePromise = (async () => {
           "--window-size=1280,960",
         ],
       });
-      console.log("1");
       return browser;
     },
 
     launchPage: async (browser: Browser) => {
-      console.log("2.1");
       const page = await browser.newPage();
-      console.log("2.2");
 
       // ランダムなユーザーエージェントを設定
       // 生成されるエージェント情報をdesuktopのみに限定する。
@@ -61,13 +58,10 @@ const scrapePromise = (async () => {
         deviceCategory: "desktop",
       };
       const userAgent = new UserAgent(userAgentOptions).toString();
-      console.log("2.4 userAgent = ", userAgent);
       await page.setUserAgent(userAgent);
-      console.log("2.5");
 
       // ビューポートのサイズを指定
       await page.setViewport({ width: 1280, height: 960 });
-      console.log("2.6");
       return page;
     },
 
@@ -81,6 +75,16 @@ const scrapePromise = (async () => {
         waitUntil: "networkidle2",
       });
       console.log("3.2");
+    },
+
+    checkDrawer: async (page: Page) => {
+      // drawerのセレクタを定義
+      const drawerSelector = `a[href*="/gp/offer-listing/"][href*="condition=NEW"]`;
+      // drawerの要素を取得
+      const drawerElement = await page.$(drawerSelector);
+      // 要素が取得したらTrue
+      // 要素が取得できなかったらfalse
+      return drawerElement ? true : false;
     },
 
     /// 新品の出品リンクをクリックして
@@ -219,7 +223,7 @@ const scrapePromise = (async () => {
     },
 
     // Drawer内のセラーID、出荷元、販売者データを取得
-    fetchAndUpdateSellerData: async (page: Page, asinData: AsinData) => {
+    fetchAndCountSellerOnDrawer: async (page: Page, asinData: AsinData) => {
       // 各コンテナ情報を取得
       // .$は指定したCSSセレクタと一致する「最初の要素」を取得
       // .$$は指定したCSSセレクタと一致する「全ての要素」を取得するメソッド
@@ -354,9 +358,8 @@ const scrapePromise = (async () => {
     },
 
     /// Drawer内の各セラーの「カートに入れる」をクリック
-    addToCart: async (page: Page) => {
+    addToCartOnDrawer: async (page: Page) => {
       console.log("3.8.0.1");
-      // const offers = await page.$$("#aod-pinned-offer");
       const offers = await page.$$("#aod-pinned-offer, #aod-offer");
       console.log("3.8.0.2");
 
@@ -434,6 +437,165 @@ const scrapePromise = (async () => {
       // await page.waitForNavigation({ waitUntil: "networkidle2" });
       await sleep(2000);
       console.log("3.9.2");
+    },
+
+    fetchAndCountSellerOnTop: async (page: Page, asinData: AsinData) => {
+      console.log("B 0.0.0");
+      // セラーIDが含まれる要素を取得
+      const sellerIdElement = await page.$('a[href*="seller=');
+      console.log("B 0.0.1");
+      // 出荷元の名前が含まれる要素を取得
+      const shippingSourceElement = await page.$(
+        `div.offer-display-features-container span.a-size-small.offer-display-feature-text-message`
+      );
+      console.log("B 0.0.2");
+      // 販売元の名前が含まれる要素を取得
+      const sellerNameElement = await page.$(
+        `div.offer-display-features-container a#sellerProfileTriggerId`
+      );
+      console.log("B 0.0.3");
+      // セラーIDの抽出処理
+      const sellerId = sellerIdElement
+        ? // セラーIDのタグが見つかった場合
+          // .evaluate: ページ内でJavaScriptを実行するメソッド
+          // 第一引数に、ページ内で実行する関数を指定
+          // 第二引数に、第一引数の関数に渡す引数を指定（ここではsellerIdElement）。
+          await page.evaluate(
+            // 引数として受け取ったel（要素）から
+            // href属性の値を取得し、
+            // 正規表現を使用してセラーIDを抽出します。
+            // []内の^は否定を意味し、
+            // [^&]+ は & 以外の文字が1回以上続く部分にマッチし、
+            // & が出現した時点でマッチが終了します。
+
+            // 第一引数の関数
+            (el) => {
+              const href = el.getAttribute("href");
+              const match = href ? href.match(/seller=([^&]+)/) : null;
+              return match ? match[1] : null;
+            },
+            // 第二引数
+            sellerIdElement
+          )
+        : // セラーIDのタグが見つからなかった場合
+          null;
+      console.log("B 0.0.4");
+      // 出荷元名の抽出処理
+      // 要素が存在する場合は
+      // そのテキストを取得しトリムする
+      const shippingSource = shippingSourceElement
+        ? await page.evaluate((el) => {
+            const textContent = el.textContent;
+            return textContent ? textContent.trim() : null;
+          }, shippingSourceElement)
+        : null;
+      console.log("B 0.0.5");
+      // 販売元の名前を抽出
+      // テキストコンテンツを取得しトリムする
+      const sellerName = sellerNameElement
+        ? await page.evaluate((el) => {
+            const textContent = el.textContent;
+            return textContent ? textContent.trim() : null;
+          }, sellerNameElement)
+        : null;
+      console.log("B 0.0.6");
+      // 既存のリスト内に、fetchしたセラーIdがあるかを確認する
+      const foundSellerData = asinData.fbaSellerDatas.find(
+        (asinData) => asinData.sellerId === sellerId
+      );
+      console.log("B 0.0.7");
+      // 既存のリストに含まれてるセラーで
+      // かつ
+      // 最新の出品者名の取得が成功した場合
+      if (
+        (foundSellerData && sellerName && shippingSource == "Amazon") ||
+        (foundSellerData && sellerName && shippingSource == "Amazon.co.jp")
+      ) {
+        console.log("B 0.0.8");
+        // 取得したデータの出品者名を上書きする
+        foundSellerData.sellerName = sellerName;
+        console.log("B 0.0.9");
+        // Amazon本体以外のFBAセラーの場合に
+        // fbaSellerNOPにカウント
+        if (shippingSource !== "Amazon.co.jp") {
+          if (asinData.fbaSellerNOP === null) {
+            // 初期値nullの場合は
+            // インクリメント捜査を行うために
+            // 0で最初期化
+            asinData.fbaSellerNOP = 0;
+          }
+          ++asinData.fbaSellerNOP;
+        }
+
+        // 既存のリストに含まれない新規のセラーの場合
+        // かつ
+        // 最新の出品者名の取得が成功した場合
+      } else if (
+        (!foundSellerData &&
+          sellerId &&
+          sellerName &&
+          shippingSource == "Amazon") ||
+        (!foundSellerData &&
+          sellerId &&
+          sellerName &&
+          shippingSource == "Amazon.co.jp")
+      ) {
+        // FbaSellerData型オブジェクト（出品者）を追加する。
+        const newSellerData: FbaSellerData = {
+          sellerId: sellerId,
+          sellerName: sellerName,
+          stockCountDatas: [],
+        };
+        asinData.fbaSellerDatas.push(newSellerData);
+
+        // Amazon本体以外のFBAセラーの場合に
+        // fbaSellerNOPにカウント
+        if (shippingSource !== "Amazon.co.jp") {
+          if (asinData.fbaSellerNOP === null) {
+            // 初期値nullの場合は
+            // インクリメント捜査を行うために
+            // 0で最初期化
+            asinData.fbaSellerNOP = 0;
+          }
+          ++asinData.fbaSellerNOP;
+        }
+      }
+
+      console.log("B 0.0.10 sellerId = ", sellerId);
+      console.log("B 0.0.10 sellerName = ", sellerName);
+      console.log("B 0.0.10 shippingSource = ", shippingSource);
+      console.log("B 0.0.10 asinData.fbaSellerNOP = ", asinData.fbaSellerNOP);
+    },
+
+    reloadPage: async (page: Page) => {
+      // ページをリロードする
+      await page.reload({ waitUntil: ["networkidle2", "domcontentloaded"] });
+      console.log("Page reloaded successfully.");
+    },
+
+    addToCartOnTop: async (page: Page) => {
+      // console.log("C 1");
+      // await page.click("span#submit.add-to-cart > .a-button-input");
+      // console.log("C 2");
+
+      console.log("C 1");
+      // セレクタを定義
+      const addCartButtonSelector = `input#add-to-cart-button`;
+
+      console.log("C 2");
+      // 要素を取得
+      const addCartButton = await page.$(addCartButtonSelector);
+      // 要素をクリック
+
+      console.log("C 3 addCartButton =", addCartButton);
+      if (addCartButton) {
+        await page.evaluate((addCartButton) => {
+          addCartButton.click();
+        }, addCartButton);
+      }
+
+      console.log("C 4");
+      await sleep(2000);
     },
 
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
@@ -712,6 +874,9 @@ const scrapePromise = (async () => {
       event: Electron.IpcMainInvokeEvent,
       asinDataList: AsinData[]
     ) => {
+      const maxRetries = 3;
+      let retryCount = 0;
+
       // 次の条件を満たすasinDataのみスクレイピングします。
       // ・取得履歴のない
       // ・取得履歴はあるが「当日に取得されていない」 or 「最後の取得から8時間以上経過」
@@ -730,11 +895,6 @@ const scrapePromise = (async () => {
         );
       });
 
-      console.log(
-        "filteredAsinDataList length = ",
-        filteredAsinDataList.length
-      );
-
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
       const scrape = await scrapePromise;
@@ -746,20 +906,33 @@ const scrapePromise = (async () => {
           // ■ 商品ページ画面の処理
           await scrape.accessProductPage(asinData, page);
           await scrape.fetchAndUpdateProductData(page, asinData);
+          const hadDrawer: boolean = await scrape.checkDrawer(page);
           // 商品ページトップでカート取得してるセラー情報も取得
           // 「Amazonの他の出品者」が存在確認関数
           // ■ ある場合は、以下をifでラップ
           // openSellerDrawer - goToGart
-          // ■ ない場合は、以下の2つの関数をif elseでラップ
-          // elseなのは後から条件式を追加する可能性もあるため。
+          // ■ ない場合は、以下の3つの関数をif elseでラップ
+          // 「商品ページトップ」で「sellerDataを取得」
           // 「商品ページトップ」で「カートに追加」
           // 「カートの小計算ページ」で「カートに追加」
-          await scrape.openSellerDrawer(page);
-          await scrape.scrollOnDrawer(page);
-          await scrape.fetchAndUpdateSellerData(page, asinData);
-          await scrape.addToCart(page);
-          await scrape.closeDrawer(page);
-          await scrape.goToCart(page);
+          if (hadDrawer) {
+            await scrape.openSellerDrawer(page);
+            await scrape.scrollOnDrawer(page);
+            await scrape.fetchAndCountSellerOnDrawer(page, asinData);
+            await scrape.addToCartOnDrawer(page);
+            await scrape.closeDrawer(page);
+            await scrape.goToCart(page);
+          } else {
+            console.log("A 1");
+            await scrape.fetchAndCountSellerOnTop(page, asinData);
+            console.log("A 2");
+            await scrape.reloadPage(page);
+            console.log("A 3");
+            await scrape.addToCartOnTop(page);
+            console.log("A 4");
+            await scrape.goToCart(page);
+            console.log("A 4");
+          }
 
           // ■ カート画面の処理
           // 各商品コンテナを全取得
@@ -791,98 +964,19 @@ const scrapePromise = (async () => {
         }
         await browser.close();
       } catch (error) {
-        console.log("try-catch エラー:", error);
-        console.log("try-catch: runScrapingを最実行します");
-        await browser.close();
-        // この引数のasinDataListは、複製されたオブジェクトだが
-        // 各イテレートな処理で、
-        // レンダラープロセスの状態変数と同期してるので
-        // 問題なく途中再開できる。
-        await scrape.runScraping(event, asinDataList);
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log("try-catch エラー:", error);
+          await sleep(2000);
+          await browser.close();
+          await scrape.runScraping(event, asinDataList);
+        } else {
+          console.log("最大リトライ回数に達しました。処理を終了します。");
+          await browser.close();
+        }
       }
     },
   };
 })();
 
 export default scrapePromise;
-
-// scrollOnCartPage: async (page: Page) => {
-//   await page.evaluate(() => {
-//     // ページを一番上までスクロール
-//     window.scrollTo(0, 0);
-//   });
-// },
-
-// emptyCart: async (page: Page, ASIN: string) => {
-//   // ガート画面の各商品コンテナの最新データを再び全取得
-//   let items = await page.$$(
-//     `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-//   );
-
-//   while (items.length > 0) {
-//     console.log("6.1.1 現在のitem数 =", items.length);
-//     console.log("6.1.1 現在のitem[0] =", items[0]);
-
-//     // 削除ボタンの要素のセレクタを定義
-//     const deleteButtonSelector = `input[value="削除"][data-action="delete"]`;
-//     console.log("6.1.2");
-
-//     // 削除ボタンの要素の表示を待機
-//     await items[0].waitForSelector(deleteButtonSelector);
-
-//     console.log("6.1.3");
-
-//     // 削除ボタンの要素を取得
-//     const deleteButton = await items[0].$(deleteButtonSelector);
-//     console.log("6.1.4", deleteButton);
-
-//     // 削除ボタンをクリック
-//     if (deleteButton) {
-//       console.log("6.1.5");
-
-//       await page.evaluate((deleteButton) => {
-//         deleteButton.click();
-//       }, deleteButton);
-//       console.log("6.1.6");
-//     }
-//     console.log("6.1.7");
-
-//     // 削除の完了を待機
-//     // ■■■■■■ 待機スタックのリスク ■■■■■■
-//     // await page.waitForNavigation({ waitUntil: "networkidle2" });
-//     console.log("6.1.8");
-
-//     await sleep(500);
-//     // 強制的にページの状態を再評価（スクロールで）
-//     await page.evaluate(() => {
-//       window.scrollTo(0, 100);
-//     });
-//     await sleep(500);
-//     await page.evaluate(() => {
-//       window.scrollTo(0, -100);
-//     });
-
-//     // 強制的にページの状態を再評価（コンテクスト内でのJS実行で）
-//     const bodySelector =
-//       "body.a-m-jp a-aui_72554-c a-aui_a11y_2_750578-c a-aui_a11y_6_837773-c a-aui_a11y_sr_678508-t1 a-aui_amzn_img_959719-c a-aui_amzn_img_gate_959718-c a-aui_killswitch_csa_logger_372963-c a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c a-meter-animate";
-//     const bodyElement = await page.$(bodySelector);
-
-//     if (bodyElement) {
-//       await page.evaluate((selector) => {
-//         const element = document.querySelector(selector);
-//         if (element) {
-//           // 必要な操作をここに記述
-//           element.setAttribute("data-tmp", "update"); // 一時的な属性を追加
-//           element.removeAttribute("data-tmp"); // 一時
-//         }
-//       }, bodySelector);
-//     }
-
-//     await sleep(2500);
-
-//     items = await page.$$(
-//       `div[data-name="Active Items"] div[data-asin="${ASIN}"]`
-//     );
-//     await sleep(1000);
-//   }
-// },
