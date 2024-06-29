@@ -48,9 +48,6 @@ function Manage() {
     "B0C4SR7V7R",
   ];
 
-  const productName: string =
-    "コモライフ ビューナ うねりケアトリーうねりケアトリーうねりケアトリーうねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
-
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
   const [inputAsinCount, setInputAsinCount] = useState<number>(0);
@@ -277,22 +274,29 @@ function Manage() {
 
                   {/* 要素4 商品名 */}
                   <div className="manage-square-space-name">
-                    {<p>{productName}</p>}
+                    {<p>{asinData.name}</p>}
                   </div>
 
                   {/* 要素5 st-code */}
                   <div className="manage-square-space-st-code">
-                    <p>取得完了</p>
+                    <p>
+                      {" "}
+                      {asinData.isScraping === null
+                        ? ""
+                        : asinData.isScraping === true
+                        ? "取得中"
+                        : "取得完了"}
+                    </p>
                   </div>
 
                   {/* 要素6 lock-flag */}
                   <div className="manage-square-space-lock-flag">
-                    <p>0</p>
+                    <p></p>
                   </div>
 
                   {/* 要素7 親ASIN */}
                   <div className="manage-square-space-asin">
-                    <p>B0C4SR7V7R</p>
+                    <p>{asinData.asinParent}</p>
                   </div>
                 </div>
               ))}
