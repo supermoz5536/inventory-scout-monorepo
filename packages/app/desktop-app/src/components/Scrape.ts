@@ -150,6 +150,49 @@ const scrapePromise = (async () => {
       );
       // 取得したデータに更新
       asinData.cartPrice = cartPrice ?? "";
+
+      console.log("A 1");
+
+      // ■ 親ASINのタグ(script)を取得（scriptタグ全てが親ASINを含んでる可能性がある）
+      const scriptElements = await page.$$("script");
+
+      console.log("A 2 scriptElements =", scriptElements);
+      // 各scriptタグのテキスト内容を抽出
+      // Promise.allは、複数のプロミス（非同期操作）を並列に実行し、
+      // すべてが完了するまで待機します。
+      const scriptContents = await Promise.all(
+        scriptElements.map(async (scriptElement) => {
+          return await page.evaluate(
+            (scriptElement) => scriptElement.textContent,
+            scriptElement
+          );
+        })
+      );
+
+      console.log(
+        "A 3 scriptContents = ",
+        scriptContents !== null && scriptContents !== undefined
+      );
+
+      // 親ASINを含むscriptタグを見つける
+      const targetScript = scriptContents.find((script) => {
+        return script && script.includes("twister-js-init-mason-data");
+      });
+
+      console.log("A 4 targetScript =", targetScript);
+      // 親ASINの抽出処理
+
+      // ターゲットスクリプから該当部分の文字列を正規表現で抽出
+      const match = targetScript
+        ? targetScript.match(/parentAsin=([^&]+)/)
+        : null;
+
+      console.log("A 5 match = ", match);
+      const asinParent = match ? match[1] : null;
+      console.log("A 6 asinParent = ", asinParent);
+      // 抽出できた場合のみオリジナルのasinDataに書き込み
+      if (asinParent) asinData.asinParent = asinParent;
+      console.log("A 7 asinData.asinParent = ", asinData.asinParent);
     },
 
     scrollOnDrawer: async (page: Page) => {
