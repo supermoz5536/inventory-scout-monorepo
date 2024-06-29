@@ -24,16 +24,20 @@ const createWindow = () => {
 
   const appURL = app.isPackaged
     ? url.format({
-        pathname: path.join(__dirname, "../index.html"),
+        pathname: path.resolve(app.getAppPath(), "build/index.html"),
         protocol: "file:",
         slashes: true,
       })
     : "http://localhost:3000";
 
+  console.log(`Loading URL: ${appURL}`); // URLをログに出力
+
   win.loadURL(appURL);
 
   if (!app.isPackaged) {
     win.webContents.openDevTools();
+  } else {
+    win.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 };
 

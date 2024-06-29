@@ -10,6 +10,8 @@ import {
 import { useEffect, useState } from "react";
 
 function Top() {
+  console.log("Top.tsx called");
+
   // 開発用ハードコードのオブジェクト群
   const asinArray: Array<string> = ["B0C4SR7V7R", "B0C4SR7V7R", "B0C4SR7V7R"];
   const productURL: string =
