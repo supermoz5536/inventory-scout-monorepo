@@ -46,12 +46,12 @@ declare global {
   interface FbaSellerData {
     sellerId: string;
     sellerName: string;
-    stockCountDatas: StockCount[];
+    stockCountDatas: StockCountData[];
   }
 }
 
 /// key が日付 value が在庫数の型定義です。
-interface StockCount {
+interface StockCountData {
   [date: string]: number;
 }
 

@@ -67,10 +67,12 @@ const scrapePromise = (async () => {
     ]).finally(() => clearTimeout(timer));
   };
 
+  /// 次の条件を満たすasinDataのみスクレイピングします。
+  /// ・「当日の取得履歴がある」かつ「最後の取得から8時間以上経過」
+  /// ・「別日の取得履歴がある」 かつ 「最後の取得から8時間以上経過」
+  /// ・取得履歴がない（初期状態）
+
   const getFilteredAsinDataList = (asinDataList: AsinData[]) => {
-    // 次の条件を満たすasinDataのみスクレイピングします。
-    // ・取得履歴のない
-    // ・取得履歴はあるが「当日に取得されていない」 or 「最後の取得から8時間以上経過」
     return asinDataList.filter((asinData) => {
       const now = new Date();
       const lastFetchDate = new Date(asinData.fetchLatestDate);
@@ -80,8 +82,8 @@ const scrapePromise = (async () => {
 
       return (
         // toDateSringで日付の値をString型で取得します。
-        (now.toDateString() !== lastFetchDate.toDateString() &&
-          hoursDiff > 8) ||
+        now.toDateString() !== lastFetchDate.toDateString() ||
+        hoursDiff > 8 ||
         asinData.fetchLatestDate === ""
       );
     });
@@ -838,7 +840,7 @@ const scrapePromise = (async () => {
       }
     },
 
-    pushStockCount: async (
+    updateStockCount: async (
       asinData: AsinData,
       stockCount: number | null,
       sellerId: string | null
@@ -860,7 +862,7 @@ const scrapePromise = (async () => {
         return seller.sellerId === sellerId;
       });
 
-      // 在庫数の取得ができた場合
+      // 在庫数の取得とセラーデータが見つかった場合
       if (foundFbaSellerData && stockCount) {
         console.log("6.0.0");
 
@@ -868,8 +870,19 @@ const scrapePromise = (async () => {
         const stockCountAndDate = { todayFormatted: stockCount };
         console.log("6.0.1");
 
-        // そのオブジェクトのstockCountプロパティに
-        // 作成したStockCountをpushする。
+        // 今日の日付と一致するStackCountDataを削除します
+        foundFbaSellerData.stockCountDatas =
+          foundFbaSellerData.stockCountDatas.filter(
+            // Object.key()メソッドは
+            // 引数のオブジェクトのkeyを配列で出力し
+            // 今日の日付と一致 "しない" 要素のみで構成される配列を生成します。
+            // つまり 今日の日付のオブジェクトを
+            // 元の配列から削除するのと同じ結果になります。
+            (stockCountData) =>
+              !Object.keys(stockCountData).includes(todayFormatted)
+          );
+
+        // 新規のStockCountDataを追加します。
         foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
 
         // 在庫数を取得できない場合は
@@ -915,8 +928,6 @@ const scrapePromise = (async () => {
 
       console.log("7.0.1 Cart and session cleared.");
     },
-
-    processScraping: async (page: Page, asinData: AsinData) => {},
 
     runScraping: async (
       event: Electron.IpcMainInvokeEvent,
@@ -969,7 +980,7 @@ const scrapePromise = (async () => {
                 await scrape.updateTotalStock(asinData, stockCount);
                 const sellerId = await scrape.fetchSellerId(page, item);
                 await scrape.updateAmazonStock(asinData, stockCount, sellerId);
-                await scrape.pushStockCount(asinData, stockCount, sellerId);
+                await scrape.updateStockCount(asinData, stockCount, sellerId);
               }
 
               // asinData.fetchLatestDateの更新
