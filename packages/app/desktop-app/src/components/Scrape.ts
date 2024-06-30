@@ -11,7 +11,7 @@ import UserAgent from "user-agents";
 const scrapePromise = (async () => {
   // 即時関数で立ち上げ直後に読み込まれる初期化処理
 
-  /// 指定された時間だけ処理を遅延させる関数の宣言
+  /// ■ 指定された時間だけ処理を遅延させる関数の宣言
   const sleep = (time: number) =>
     // new Promiseは、コンストラクタ関数で
     // Promise(非同期)オブジェクトを生成します。
@@ -27,6 +27,65 @@ const scrapePromise = (async () => {
     // setTimeoutが指定された時間後にresolveを呼び出し、
     // Promiseを完了します。
     new Promise((resolve) => setTimeout(resolve, time));
+
+  // ■ タイムアウトを設定する関数
+  const withTimeout = (
+    promise: Promise<any>,
+    timeout: number,
+    errorMessage: string
+    // この関数は、Promiseを返すことを示しています。
+  ): Promise<any> => {
+    let timer: any;
+    return Promise.race([
+      // 配列で渡した2つのプロミスを同時起動して
+      // 先に解決or失敗がリターンされたプロミスの結果で出力する
+
+      // 非同期処理用のプロミス
+      // scrapingProcessの解決を期待します。
+      promise,
+
+      // timeout用のプロミスオブジェクトを生成します。
+      // 時限爆弾のようなものです。
+      // ・第1引数: プロミス成功時にトリガーされる関数
+      // ・第2引数: プロミス失敗時にトリガーされる関数
+      // タイムアウトエラーを期待するので
+      // 第2引数のみ使用します。
+      new Promise((_, reject) => {
+        // setTimeout関数は、
+        // 指定時間（ミリ秒）後に関数を着火します。
+        // ・第1引数: 時間後にトリガーされる関数
+        // ・第2引数: 遅延時間(ms)
+
+        // reject 関数は Promise を失敗させます。
+        // mew Error(errorMessage) は新規オブジェクトを生成します。
+        timer = setTimeout(() => reject(new Error(errorMessage)), timeout);
+      }),
+      // setTimeoutの戻り値はタイマーIDであり、
+      // このIDでタイマーをキャンセルできます。
+      // 非同期処理が成功した場合のために
+      // コールバックで、事前にタイマーをキャンセルします。
+    ]).finally(() => clearTimeout(timer));
+  };
+
+  const getFilteredAsinDataList = (asinDataList: AsinData[]) => {
+    // 次の条件を満たすasinDataのみスクレイピングします。
+    // ・取得履歴のない
+    // ・取得履歴はあるが「当日に取得されていない」 or 「最後の取得から8時間以上経過」
+    return asinDataList.filter((asinData) => {
+      const now = new Date();
+      const lastFetchDate = new Date(asinData.fetchLatestDate);
+      // 36e5は1時間のms単位の秒数 3600000 を意味します。
+      // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
+      const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
+
+      return (
+        // toDateSringで日付の値をString型で取得します。
+        (now.toDateString() !== lastFetchDate.toDateString() &&
+          hoursDiff > 8) ||
+        asinData.fetchLatestDate === ""
+      );
+    });
+  };
 
   // 各メソッドの定義
   return {
@@ -96,6 +155,16 @@ const scrapePromise = (async () => {
       // 出品者一覧ページへの画面遷移を待機します。
       await page.waitForNavigation({ waitUntil: "networkidle2" });
       console.log("3.4");
+    },
+
+    avoidPopupClick: async (page: Page) => {
+      // ページの完全な読み込みを待つ
+      console.log("4.1.1");
+      await page.waitForSelector("body", { timeout: 10000 });
+      console.log("4.1.2");
+      await page.mouse.click(10, 10);
+      console.log("4.1.3");
+      await sleep(1000);
     },
 
     fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
@@ -574,46 +643,23 @@ const scrapePromise = (async () => {
     },
 
     addToCartOnTop: async (page: Page) => {
-      // console.log("C 1");
-      // await page.click("span#submit.add-to-cart > .a-button-input");
-      // console.log("C 2");
-
-      console.log("C 1");
       // セレクタを定義
       const addCartButtonSelector = `input#add-to-cart-button`;
 
-      console.log("C 2");
       // 要素を取得
       const addCartButton = await page.$(addCartButtonSelector);
-      // 要素をクリック
 
-      console.log("C 3 addCartButton =", addCartButton);
+      // 要素をクリック
       if (addCartButton) {
         await page.evaluate((addCartButton) => {
           addCartButton.click();
         }, addCartButton);
       }
 
-      console.log("C 4");
       await sleep(2000);
     },
 
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
-      console.log("4.1.0");
-
-      // ページの完全な読み込みを待つ
-      await page.waitForSelector("body", { timeout: 10000 });
-
-      console.log("4.1.1");
-
-      await page.mouse.click(10, 10);
-
-      console.log("4.1.２");
-
-      console.log("4.2.1");
-
-      await sleep(500);
-
       // プルダウンボタンの要素を取得
       const pulldownButton = await item.$(
         "span.a-button-inner > span.a-button-text.a-declarative"
@@ -870,30 +916,17 @@ const scrapePromise = (async () => {
       console.log("7.0.1 Cart and session cleared.");
     },
 
+    processScraping: async (page: Page, asinData: AsinData) => {},
+
     runScraping: async (
       event: Electron.IpcMainInvokeEvent,
       asinDataList: AsinData[]
     ) => {
+      // try-catchのリトライ用変数
       const maxRetries = 3;
       let retryCount = 0;
-
-      // 次の条件を満たすasinDataのみスクレイピングします。
-      // ・取得履歴のない
-      // ・取得履歴はあるが「当日に取得されていない」 or 「最後の取得から8時間以上経過」
-      const filteredAsinDataList = asinDataList.filter((asinData) => {
-        const now = new Date();
-        const lastFetchDate = new Date(asinData.fetchLatestDate);
-        // 36e5は1時間のms単位の秒数 3600000 を意味します。
-        // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
-        const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
-
-        return (
-          // toDateSringで日付の値をString型で取得します。
-          (now.toDateString() !== lastFetchDate.toDateString() &&
-            hoursDiff > 8) ||
-          asinData.fetchLatestDate === ""
-        );
-      });
+      // スクレイプの必要のあるasinDataのみを抽出
+      const filteredAsinDataList = getFilteredAsinDataList(asinDataList);
 
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
@@ -903,71 +936,68 @@ const scrapePromise = (async () => {
 
       try {
         for (let asinData of filteredAsinDataList) {
-          // ■ 商品ページ画面の処理
-          await scrape.accessProductPage(asinData, page);
-          await scrape.fetchAndUpdateProductData(page, asinData);
-          const hadDrawer: boolean = await scrape.checkDrawer(page);
-          // 商品ページトップでカート取得してるセラー情報も取得
-          // 「Amazonの他の出品者」が存在確認関数
-          // ■ ある場合は、以下をifでラップ
-          // openSellerDrawer - goToGart
-          // ■ ない場合は、以下の3つの関数をif elseでラップ
-          // 「商品ページトップ」で「sellerDataを取得」
-          // 「商品ページトップ」で「カートに追加」
-          // 「カートの小計算ページ」で「カートに追加」
-          if (hadDrawer) {
-            await scrape.openSellerDrawer(page);
-            await scrape.scrollOnDrawer(page);
-            await scrape.fetchAndCountSellerOnDrawer(page, asinData);
-            await scrape.addToCartOnDrawer(page);
-            await scrape.closeDrawer(page);
-            await scrape.goToCart(page);
-          } else {
-            console.log("A 1");
-            await scrape.fetchAndCountSellerOnTop(page, asinData);
-            console.log("A 2");
-            await scrape.reloadPage(page);
-            console.log("A 3");
-            await scrape.addToCartOnTop(page);
-            console.log("A 4");
-            await scrape.goToCart(page);
-            console.log("A 4");
-          }
+          await withTimeout(
+            (async () => {
+              // ■ 商品ページ画面の処理
+              await scrape.accessProductPage(asinData, page);
+              await scrape.fetchAndUpdateProductData(page, asinData);
+              const hadDrawer: boolean = await scrape.checkDrawer(page);
+              if (hadDrawer) {
+                await scrape.avoidPopupClick(page);
+                await scrape.openSellerDrawer(page);
+                await scrape.scrollOnDrawer(page);
+                await scrape.fetchAndCountSellerOnDrawer(page, asinData);
+                await scrape.addToCartOnDrawer(page);
+                await scrape.closeDrawer(page);
+                await scrape.goToCart(page);
+              } else {
+                await scrape.fetchAndCountSellerOnTop(page, asinData);
+                await scrape.reloadPage(page);
+                await scrape.avoidPopupClick(page);
+                await scrape.addToCartOnTop(page);
+                await scrape.goToCart(page);
+              }
 
-          // ■ カート画面の処理
-          // 各商品コンテナを全取得
-          const items = await page.$$(
-            `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
+              // ■ カート画面の処理
+              const items = await page.$$(
+                `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
+              );
+              for (const item of items) {
+                await scrape.avoidPopupClick(page);
+                await scrape.setQuantity(page, item);
+                const stockCount = await scrape.fetchStockCount(page);
+                await scrape.updateTotalStock(asinData, stockCount);
+                const sellerId = await scrape.fetchSellerId(page, item);
+                await scrape.updateAmazonStock(asinData, stockCount, sellerId);
+                await scrape.pushStockCount(asinData, stockCount, sellerId);
+              }
+
+              // asinData.fetchLatestDateの更新
+              await scrape.updateFetchLatestDate(asinData);
+              // asinData.fetchLatestTimeの更新
+              await scrape.updateFetchLatestTime(asinData);
+              // asinData.isScrapingを更新
+              await scrape.updateIsScarapingFalse(asinData);
+              // レンダラープロセスにデータを送信
+              event.sender.send("scraping-result", asinData);
+              // Cookie削除でカートをリフレッシュ
+              await scrape.clearCart(page);
+            })(),
+            120000,
+            "Timeout"
           );
-          for (const item of items) {
-            await scrape.setQuantity(page, item);
-            const stockCount = await scrape.fetchStockCount(page);
-            await scrape.updateTotalStock(asinData, stockCount);
-            const sellerId = await scrape.fetchSellerId(page, item);
-            await scrape.updateAmazonStock(asinData, stockCount, sellerId);
-            await scrape.pushStockCount(asinData, stockCount, sellerId);
-          }
-
-          // asinData.fetchLatestDateの更新
-          await scrape.updateFetchLatestDate(asinData);
-          // asinData.fetchLatestTimeの更新
-          await scrape.updateFetchLatestTime(asinData);
-          // asinData.isScrapingを更新
-          await scrape.updateIsScarapingFalse(asinData);
-
-          // レンダラープロセスにデータを送信する
-          // メインプロセスでのみ使用可能なメソッド。
-          event.sender.send("scraping-result", asinData);
-          console.log("send完了");
-
-          await scrape.clearCart(page);
         }
         await browser.close();
-      } catch (error) {
-        if (retryCount < maxRetries) {
+      } catch (error: any) {
+        console.log("Error message:", error.message);
+
+        if (
+          error.message.includes("Timeout") ||
+          (error.message.includes("No element found") &&
+            retryCount < maxRetries)
+        ) {
           retryCount++;
-          console.log("try-catch エラー:", error);
-          await sleep(2000);
+          await sleep(3000);
           await browser.close();
           await scrape.runScraping(event, asinDataList);
         } else {

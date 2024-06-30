@@ -7,8 +7,6 @@ import { useDispatch } from "react-redux";
 import { updateAsinData } from "./redux/asinDataListSlice";
 
 const App: React.FC = () => {
-  console.log("App.tsx called");
-
   const dispatch = useDispatch<AppDispatch>();
 
   // useCallbackを使用して関数の参照を安定させる
