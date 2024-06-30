@@ -74,17 +74,18 @@ const scrapePromise = (async () => {
 
   const getFilteredAsinDataList = (asinDataList: AsinData[]) => {
     return asinDataList.filter((asinData) => {
-      const now = new Date();
-      const lastFetchDate = new Date(asinData.fetchLatestDate);
-      // 36e5は1時間のms単位の秒数 3600000 を意味します。
-      // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
-      const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
+      // const now = new Date();
+      // const lastFetchDate = new Date(asinData.fetchLatestDate);
+      // // 36e5は1時間のms単位の秒数 3600000 を意味します。
+      // // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
+      // const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
 
       return (
-        // toDateSringで日付の値をString型で取得します。
-        now.toDateString() !== lastFetchDate.toDateString() ||
-        hoursDiff > 8 ||
-        asinData.fetchLatestDate === ""
+        // // toDateSringで日付の値をString型で取得します。
+        // now.toDateString() !== lastFetchDate.toDateString() ||
+        // hoursDiff > 8 ||
+        // asinData.fetchLatestDate === ""
+        asinData.isScraping === true || asinData.fetchLatestDate === ""
       );
     });
   };
@@ -843,10 +844,9 @@ const scrapePromise = (async () => {
     updateStockCount: async (
       asinData: AsinData,
       stockCount: number | null,
-      sellerId: string | null
+      sellerId: string | null,
+      today: Date
     ) => {
-      // 当日の日付の値を取得
-      const today = new Date();
       // 日付を YYYY-MM-DD 形式にフォーマット
       // getMonth() + 1: 月を取得（0から始まるため1を加算）
       // padStart(2, '0'): 月と日が一桁の場合、前に0を追加して二桁にする
@@ -931,13 +931,18 @@ const scrapePromise = (async () => {
 
     runScraping: async (
       event: Electron.IpcMainInvokeEvent,
-      asinDataList: AsinData[]
+      asinDataList: AsinData[],
+      today?: Date // ? はデフォルト値の設定がないことを意味します
     ) => {
       // try-catchのリトライ用変数
       const maxRetries = 3;
       let retryCount = 0;
       // スクレイプの必要のあるasinDataのみを抽出
       const filteredAsinDataList = getFilteredAsinDataList(asinDataList);
+      // 引数が渡されていない場合にのみ、todayを新たに生成
+      if (!today) {
+        today = new Date();
+      }
 
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
@@ -980,7 +985,12 @@ const scrapePromise = (async () => {
                 await scrape.updateTotalStock(asinData, stockCount);
                 const sellerId = await scrape.fetchSellerId(page, item);
                 await scrape.updateAmazonStock(asinData, stockCount, sellerId);
-                await scrape.updateStockCount(asinData, stockCount, sellerId);
+                await scrape.updateStockCount(
+                  asinData,
+                  stockCount,
+                  sellerId,
+                  today
+                );
               }
 
               // asinData.fetchLatestDateの更新
@@ -1010,7 +1020,7 @@ const scrapePromise = (async () => {
           retryCount++;
           await sleep(3000);
           await browser.close();
-          await scrape.runScraping(event, asinDataList);
+          await scrape.runScraping(event, asinDataList, today);
         } else {
           console.log("最大リトライ回数に達しました。処理を終了します。");
           await browser.close();
