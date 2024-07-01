@@ -5,20 +5,12 @@ import { AppDispatch, RootState } from "../redux/store";
 import {
   removeAsin,
   switchRemoveCheck,
-  updateIsScrapingTrue,
+  updateIsScrapingTrueAll,
+  switchIsDeleteCheckAll,
 } from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
 
 function Top() {
-  // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = ["B0C4SR7V7R", "B0C4SR7V7R", "B0C4SR7V7R"];
-  const productURL: string =
-    "https://m.media-amazon.com/images/I/41sEsXPy8QL._AC_SL1000_.jpg";
-  const amazonURL: string = "https://www.amazon.co.jp/dp/B0C4SR7V7R/ ";
-
-  const productName: string =
-    "コモライフ ビューナ うねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
-
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
 
   // dispatch: storeへのreducer起動のお知らせ役
@@ -27,8 +19,10 @@ function Top() {
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
 
-  const gotoURL = (url: string) => {
-    window.myAPI.openExternal(url);
+  const gotoURL = (asin: string) => {
+    const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
+
+    window.myAPI.openExternal(amazonURL);
   };
 
   const navigate = useNavigate();
@@ -50,7 +44,7 @@ function Top() {
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     if (asinDataList.length > 0) {
       // 全ての取得状況をTrue（取得中）に更新
-      dispatch(updateIsScrapingTrue());
+      dispatch(updateIsScrapingTrueAll());
       window.myAPI.runScraping(asinDataList);
     }
   };
@@ -92,6 +86,9 @@ function Top() {
           <input
             type="checkbox"
             className="top-square-space-menu-container-left-check"
+            onChange={(event) =>
+              dispatch(switchIsDeleteCheckAll(event.target.checked))
+            }
           />
           {/* ASIN検索入力欄 */}
           <input
@@ -213,7 +210,7 @@ function Top() {
                     onChange={() => {
                       handleDeleteCheck(asinData.id);
                     }}
-                    checked={asinData.deleteCheck}
+                    checked={asinData.isDeleteCheck}
                   />
                 </label>
               </div>
@@ -226,13 +223,13 @@ function Top() {
               {/* 要素2 3ボタン */}
               <div className="top-square-space-3button">
                 <div className="top-square-space-3buttonp-elements">
-                  <button className="top-square-space-each-button">
+                  {/* <button className="top-square-space-each-button">
                     出品者一覧
-                  </button>
+                  </button> */}
                   <button
                     className="top-square-space-each-button"
                     onClick={() => {
-                      gotoURL(amazonURL);
+                      gotoURL(asinData.asin);
                     }}
                   >
                     商品URL

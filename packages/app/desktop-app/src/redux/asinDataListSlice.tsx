@@ -34,7 +34,7 @@ export const asinSlice = createSlice({
       // 返り値で取得して新たに配列を生成し、
       // 状態を更新します。
       state.value = state.value.filter(
-        (asinData: AsinData) => asinData.deleteCheck == false
+        (asinData: AsinData) => asinData.isDeleteCheck == false
       );
     },
 
@@ -55,7 +55,7 @@ export const asinSlice = createSlice({
       );
 
       if (asinDataChecked) {
-        asinDataChecked.deleteCheck = !asinDataChecked.deleteCheck;
+        asinDataChecked.isDeleteCheck = !asinDataChecked.isDeleteCheck;
       }
 
       // removedelete;
@@ -80,10 +80,21 @@ export const asinSlice = createSlice({
       }
     },
 
-    updateIsScrapingTrue: (state) => {
+    /// runScrapingを起動する直前に
+    /// 全てのasinData要素のisScrapingを
+    /// Trueにする関数
+    updateIsScrapingTrueAll: (state) => {
       const arrayLength = state.value.length;
       for (let index = 0; index < arrayLength; ++index) {
         state.value[index].isScraping = true;
+      }
+    },
+
+    /// 全ての削除用のCheckBoxの値を反転させる関数
+    switchIsDeleteCheckAll: (state, action: PayloadAction<boolean>) => {
+      const arrayLength = state.value.length;
+      for (let index = 0; index < arrayLength; ++index) {
+        state.value[index].isDeleteCheck = action.payload;
       }
     },
   },
@@ -98,7 +109,8 @@ export const {
   removeAsin,
   switchRemoveCheck,
   updateAsinData,
-  updateIsScrapingTrue,
+  updateIsScrapingTrueAll,
+  switchIsDeleteCheckAll,
 } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので

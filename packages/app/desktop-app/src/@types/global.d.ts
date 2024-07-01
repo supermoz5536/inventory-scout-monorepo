@@ -26,7 +26,7 @@ declare global {
   // 持つことを定義している。
   interface AsinData {
     id: string;
-    deleteCheck: boolean;
+    isDeleteCheck: boolean;
     asin: string;
     imageURL: string;
     name: string;

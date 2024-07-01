@@ -103,7 +103,7 @@ function Manage() {
       // プロパティの値: 各map処理で変数asin代入されるASIN番号
       const inputAsinDatas: AsinData[] = inputAsinLines.map((asin) => ({
         id: uuidv4(),
-        deleteCheck: false,
+        isDeleteCheck: false,
         asin,
         imageURL: "",
         name: "",
@@ -263,7 +263,7 @@ function Manage() {
                         onChange={() => {
                           handleDeleteCheck(asinData.id);
                         }}
-                        checked={asinData.deleteCheck}
+                        checked={asinData.isDeleteCheck}
                       />
                     </label>
                   </div>
