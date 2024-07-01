@@ -2,35 +2,15 @@ import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { removeAsin, switchRemoveCheck } from "../redux/asinDataListSlice";
+import {
+  removeAsin,
+  switchRemoveCheck,
+  updateIsScrapingTrueAll,
+  switchIsDeleteCheckAll,
+} from "../redux/asinDataListSlice";
 import { useEffect, useState } from "react";
 
 function Top() {
-  // 開発用ハードコードのオブジェクト群
-  const asinArray: Array<string> = [
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-  ];
-  const productURL: string =
-    "https://m.media-amazon.com/images/I/7141kPbAYsL._AC_SL1200_.jpg";
-  const amazonURL: string = "https://www.amazon.co.jp/dp/B0C4SR7V7R/ ";
-
-  const productName: string =
-    "コモライフ ビューナ うねりケアトリートメント くせ うねり ケア 酸熱 【日本製】";
-
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
 
   // dispatch: storeへのreducer起動のお知らせ役
@@ -39,8 +19,10 @@ function Top() {
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
 
-  const gotoURL = (url: string) => {
-    window.myAPI.openExternal(url);
+  const gotoURL = (asin: string) => {
+    const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
+
+    window.myAPI.openExternal(amazonURL);
   };
 
   const navigate = useNavigate();
@@ -58,6 +40,14 @@ function Top() {
     const asinDataListCount = asinDataList.length;
     setAsinDataListCount(asinDataListCount);
   }, [asinDataList.length]);
+
+  const handleRunScraping = async (asinDataList: AsinData[]) => {
+    if (asinDataList.length > 0) {
+      // 全ての取得状況をTrue（取得中）に更新
+      dispatch(updateIsScrapingTrueAll());
+      window.myAPI.runScraping(asinDataList);
+    }
+  };
 
   return (
     <div className="App">
@@ -85,10 +75,22 @@ function Top() {
       {/* メニュー部分 */}
       <div className="top-square-space-menu">
         <div className="top-square-space-menu-container-left">
+          {/* Scraperコンポーネントの実行ボタン */}
+          <button
+            className="top-square-space-menu-container-left-update"
+            onClick={() => handleRunScraping(asinDataList)}
+          >
+            更新
+          </button>
+          {/* 全選択チェック */}
           <input
             type="checkbox"
             className="top-square-space-menu-container-left-check"
+            onChange={(event) =>
+              dispatch(switchIsDeleteCheckAll(event.target.checked))
+            }
           />
+          {/* ASIN検索入力欄 */}
           <input
             type="text"
             className="top-square-space-menu-container-left-input"
@@ -208,7 +210,7 @@ function Top() {
                     onChange={() => {
                       handleDeleteCheck(asinData.id);
                     }}
-                    checked={asinData.deleteCheck}
+                    checked={asinData.isDeleteCheck}
                   />
                 </label>
               </div>
@@ -221,13 +223,13 @@ function Top() {
               {/* 要素2 3ボタン */}
               <div className="top-square-space-3button">
                 <div className="top-square-space-3buttonp-elements">
-                  <button className="top-square-space-each-button">
+                  {/* <button className="top-square-space-each-button">
                     出品者一覧
-                  </button>
+                  </button> */}
                   <button
                     className="top-square-space-each-button"
                     onClick={() => {
-                      gotoURL(amazonURL);
+                      gotoURL(asinData.asin);
                     }}
                   >
                     商品URL
@@ -240,57 +242,65 @@ function Top() {
 
               {/* 要素3 画像 */}
               <div className="top-square-space-img">
-                <img src={productURL} alt="" />
+                <img src={asinData.imageURL} alt="" />
               </div>
 
               {/* 要素4 商品名 */}
               <div className="top-square-space-name">
-                {<p>{productName}</p>}
+                {<p>{asinData.name}</p>}
               </div>
 
               {/* 要素5 Amazon在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.amazonStock}</p>
               </div>
 
               {/* 要素6 FBAセラー数 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.fbaSellerNOP}</p>
               </div>
 
               {/* 要素7 合計在庫数 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.totalStock}</p>
               </div>
 
               {/* 要素8 カート価格 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.cartPrice}</p>
               </div>
 
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.decrease1 == -1 ? "" : asinData.decrease1}</p>
               </div>
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>0</p>
+                <p>{asinData.decrease2 == -1 ? "" : asinData.decrease2}</p>
               </div>
 
               {/* 要素11 最新取得 */}
               <div className="top-square-space-update-latest">
-                <p>24/04/25</p>
-                <p>15:34</p>
+                <p>{asinData.fetchLatestDate}</p>
+                <p>{asinData.fetchLatestTime}</p>
               </div>
 
               {/* 要素12 取得状況 */}
               <div className="top-square-space-update-state">
-                <p>取得完了</p>
+                <p>
+                  {asinData.isScraping === null
+                    ? ""
+                    : asinData.isScraping === true
+                    ? "取得中"
+                    : "取得完了"}
+                </p>
               </div>
 
               {/* 要素13 親ASIN */}
-              <div className="top-square-space-asin">{<p>B0C4SR7V7R</p>}</div>
+              <div className="top-square-space-asin">
+                {<p>{asinData.asinParent}</p>}
+              </div>
             </div>
           ))}
         </div>

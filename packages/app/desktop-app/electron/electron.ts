@@ -1,6 +1,13 @@
-import { app, BrowserWindow } from "electron";
+// レンダラープロセスのグローバル型定義を明示的に参照します
+// 一度グローバルな型定義ファイルが参照されると、
+// その型定義はプロジェクト（メインプロセス）全体に適用されます。
+// なので、自動的にpreload.tsでも参照が反映されます。
+/// <reference path="../src/@types/global.d.ts" />
+
+import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import * as url from "url";
+import scrapePromis from "../src/components/Scrape";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -17,18 +24,32 @@ const createWindow = () => {
 
   const appURL = app.isPackaged
     ? url.format({
-        pathname: path.join(__dirname, "../index.html"),
+        pathname: path.resolve(app.getAppPath(), "build/index.html"),
         protocol: "file:",
         slashes: true,
       })
     : "http://localhost:3000";
 
+  console.log(`Loading URL: ${appURL}`); // URLをログに出力
+
   win.loadURL(appURL);
 
   if (!app.isPackaged) {
     win.webContents.openDevTools();
+  } else {
+    win.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 };
+
+ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
+  try {
+    const scrape = await scrapePromis;
+    scrape.runScraping(event, asinDataList);
+  } catch (error) {
+    console.error("MyAPI scrape ERROR", error);
+    return "MyAPI scrape ERROR"; // エラーメッセージを返す
+  }
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

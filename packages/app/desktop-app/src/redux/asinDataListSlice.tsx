@@ -34,7 +34,7 @@ export const asinSlice = createSlice({
       // 返り値で取得して新たに配列を生成し、
       // 状態を更新します。
       state.value = state.value.filter(
-        (asinData: AsinData) => asinData.deleteCheck == false
+        (asinData: AsinData) => asinData.isDeleteCheck == false
       );
     },
 
@@ -55,10 +55,47 @@ export const asinSlice = createSlice({
       );
 
       if (asinDataChecked) {
-        asinDataChecked.deleteCheck = !asinDataChecked.deleteCheck;
+        asinDataChecked.isDeleteCheck = !asinDataChecked.isDeleteCheck;
       }
 
       // removedelete;
+    },
+
+    /// メインプロセスから受信したAsinDataオブジェクトと
+    /// 一致するオブジェクトを検索して更新する関数
+    updateAsinData: (state, action: PayloadAction<AsinData>) => {
+      // 既存のasinDataのリストの中で、.asinが一致するオブジェクトをfind
+      // findIndex メソッドは、検索条件に一致する要素が見つかった場合、
+      // その要素のインデックスを返します。
+      // 一致する要素が見つからなかった場合は -1 を返します。
+      const index = state.value.findIndex(
+        (asinData: AsinData) => asinData.asin === action.payload.asin
+      );
+
+      if (index !== -1) {
+        // そのasinDataオブジェクトを、引数のasinDataオブジェクトに上書きする
+        state.value[index] = action.payload;
+      } else {
+        console.warn(`AsinData with ASIN ${action.payload.asin} not found`);
+      }
+    },
+
+    /// runScrapingを起動する直前に
+    /// 全てのasinData要素のisScrapingを
+    /// Trueにする関数
+    updateIsScrapingTrueAll: (state) => {
+      const arrayLength = state.value.length;
+      for (let index = 0; index < arrayLength; ++index) {
+        state.value[index].isScraping = true;
+      }
+    },
+
+    /// 全ての削除用のCheckBoxの値を反転させる関数
+    switchIsDeleteCheckAll: (state, action: PayloadAction<boolean>) => {
+      const arrayLength = state.value.length;
+      for (let index = 0; index < arrayLength; ++index) {
+        state.value[index].isDeleteCheck = action.payload;
+      }
     },
   },
 });
@@ -67,7 +104,14 @@ export const asinSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { addAsin, removeAsin, switchRemoveCheck } = asinSlice.actions;
+export const {
+  addAsin,
+  removeAsin,
+  switchRemoveCheck,
+  updateAsinData,
+  updateIsScrapingTrueAll,
+  switchIsDeleteCheckAll,
+} = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。

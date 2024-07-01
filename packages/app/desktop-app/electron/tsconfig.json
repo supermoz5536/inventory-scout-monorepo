@@ -4,7 +4,14 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "../build",
-    "rootDir": "../"
+    "rootDir": "../",
+    "baseUrl": "../",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@types/*": ["src/@types/*"]
+    },
+    "jsx": "react"
   },
   "include": ["*"]
 }
