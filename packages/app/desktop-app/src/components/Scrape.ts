@@ -263,7 +263,6 @@ const scrapePromise = (async () => {
       await sleep(750);
       const drawerSelector = "#all-offers-display";
       const drawerElement = await page.$(drawerSelector);
-      console.log("drawerElement", drawerElement);
 
       if (drawerElement) {
         const boundingBox = await drawerElement.boundingBox();
@@ -632,11 +631,6 @@ const scrapePromise = (async () => {
           ++asinData.fbaSellerNOP;
         }
       }
-
-      console.log("B 0.0.10 sellerId = ", sellerId);
-      console.log("B 0.0.10 sellerName = ", sellerName);
-      console.log("B 0.0.10 shippingSource = ", shippingSource);
-      console.log("B 0.0.10 asinData.fbaSellerNOP = ", asinData.fbaSellerNOP);
     },
 
     reloadPage: async (page: Page) => {
@@ -798,7 +792,6 @@ const scrapePromise = (async () => {
       const sellerIdSelector = 'a[href*="smid="]';
       // 要素を取得
       const sellerIdElement = await item.$(sellerIdSelector);
-      console.log("sellerIdElement = ", sellerIdElement);
 
       // 要素からセラーIDのテキストデータを抽出
       const sellerId = sellerIdElement
@@ -825,8 +818,6 @@ const scrapePromise = (async () => {
           )
         : // セラーIDのタグが見つからなかった場合
           null;
-
-      console.log("fetchSellerId関数 sellerId = ", sellerId);
 
       return sellerId;
     },
@@ -867,7 +858,9 @@ const scrapePromise = (async () => {
         console.log("6.0.0");
 
         // StockCount型のオブジェクトを作成する。
-        const stockCountAndDate = { todayFormatted: stockCount };
+        const stockCountAndDate = {
+          [todayFormatted]: stockCount,
+        };
         console.log("6.0.1");
 
         // 今日の日付と一致するStackCountDataを削除します
