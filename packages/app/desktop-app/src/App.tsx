@@ -83,33 +83,32 @@ const App: React.FC = () => {
         const loadedData = await window.myAPI.loadData();
         dispatch(updateWithLoadedData(loadedData));
 
-        // // ③
-        // if (asinDataListRef.current.length > 0) {
-        //   const today = new Date();
-        //   const todayFormatted = `${today.getFullYear()}-${String(
-        //     today.getMonth() + 1
-        //   ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        // ③
+        if (asinDataListRef.current.length > 0) {
+          const today = new Date();
+          const todayFormatted = `${today.getFullYear()}-${String(
+            today.getMonth() + 1
+          ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-        //   const checkArray = asinDataListRef.current.find((asinData) => {
-        //     // 以下２点を満たすとTrue
-        //     // ・スクレイピングが取得中
-        //     // ・今日の日付のStockCountDataが存在してる
-        //     return (
-        //       asinData.isScraping === true
-        //       //  &&
-        //       // asinData.fbaSellerDatas.some((fbaSellerData) =>
-        //       //   fbaSellerData.stockCountDatas.some((stockCountData) =>
-        //       //     Object.keys(stockCountData).includes(todayFormatted)
-        //       //   )
-        //       // )
-        //     );
-        //   });
+          const checkArray = asinDataListRef.current.find((asinData) => {
+            // 以下２点を満たすとTrue
+            // ・スクレイピングが取得中
+            // ・今日の日付のStockCountDataが存在してる
+            return (
+              asinData.isScraping === true &&
+              asinData.fbaSellerDatas.some((fbaSellerData) =>
+                fbaSellerData.stockCountDatas.some((stockCountData) =>
+                  Object.keys(stockCountData).includes(todayFormatted)
+                )
+              )
+            );
+          });
 
-        //   if (checkArray) {
-        //     console.log("in checkArray");
-        //     window.myAPI.runScraping(asinDataListRef.current);
-        //   }
-        // }
+          if (checkArray) {
+            console.log("アプリ中断後のフォローアップ処理実行");
+            window.myAPI.runScraping(asinDataListRef.current);
+          }
+        }
 
         return () => {
           // ①
@@ -117,7 +116,7 @@ const App: React.FC = () => {
           window.myAPI.removeScrapingResult(handleScrapingResult);
         };
       } catch (error) {
-        console.log("初期化処理エラー:", error);
+        console.log("アプリ立ち上げの初期化処理エラー:", error);
       }
     })();
   }, [handleScrapingResult]);
