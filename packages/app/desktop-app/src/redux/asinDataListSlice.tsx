@@ -80,6 +80,11 @@ export const asinSlice = createSlice({
       }
     },
 
+    /// ローカルストレージからロードしたデータで初期化処理を行う関数です。
+    updateWithLoadedData: (state, action: PayloadAction<AsinData[]>) => {
+      state.value = action.payload;
+    },
+
     /// runScrapingを起動する直前に
     /// 全てのasinData要素のisScrapingを
     /// Trueにする関数
@@ -111,6 +116,7 @@ export const {
   updateAsinData,
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
+  updateWithLoadedData,
 } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので

@@ -11,13 +11,18 @@ import {
 import { useEffect, useState } from "react";
 
 function Top() {
-  const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
+  // グローバル変数のASINリストの値を取得
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
   // その型をAppDispatchとして指定することで
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
+
+  const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
 
   const gotoURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -26,11 +31,6 @@ function Top() {
   };
 
   const navigate = useNavigate();
-
-  // グローバル変数のASINリストの値を取得
-  const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
-  );
 
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
