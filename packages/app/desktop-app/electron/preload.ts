@@ -40,5 +40,5 @@ contextBridge.exposeInMainWorld("myAPI", {
   saveData: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("save-data", asinDataList),
 
-  loadData: () => ipcRenderer.invoke("save-data"),
+  loadData: () => ipcRenderer.invoke("load-data"),
 });

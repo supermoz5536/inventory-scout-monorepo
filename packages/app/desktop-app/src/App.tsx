@@ -4,7 +4,10 @@ import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import { AppDispatch, RootState } from "./redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { updateAsinData } from "./redux/asinDataListSlice";
+import {
+  updateAsinData,
+  updateWithLoadedData,
+} from "./redux/asinDataListSlice";
 
 const App: React.FC = () => {
   // ストアから asinDataList の現在の値を取得し、
@@ -17,40 +20,50 @@ const App: React.FC = () => {
   // asinDataListの変更のみに依存して
   // 最新のデータを参照できるようにします。
   const asinDataListRef = useRef(asinDataList);
-  const dispatch = useDispatch<AppDispatch>();
-
   useEffect(() => {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
+  const dispatch = useDispatch<AppDispatch>();
+
   /// useCallbackを使用して関数の参照を安定させる
   const handleScrapingResult = useCallback(
     (event: Electron.IpcRendererEvent, data: AsinData) => {
-      console.log("取得データ =", data);
-      // グローバル変数のASINリストの
-      // 取得したasinDataと合致するオブジェクトを
-      // 取得したデータに更新
-      dispatch(updateAsinData(data));
-      // 更新したasinDataListの最新データに
-      // ローカルデータを更新
-      // 最新の参照を利用してるので
-      // 依存関係に指定する必要はない
-      window.myAPI.saveData(asinDataListRef.current);
+      (async () => {
+        console.log("取得データ =", data);
+        // グローバル変数のASINリストの
+        // 取得したasinDataと合致するオブジェクトを
+        // 取得したデータに更新
+        dispatch(updateAsinData(data));
+        // 更新したasinDataListの最新データに
+        // ローカルデータを更新
+        // 最新の参照を利用してるので
+        // 依存関係に指定する必要はない
+        await window.myAPI.saveData(asinDataListRef.current);
+      })();
     },
     [dispatch]
   );
 
-  /// アプリ立ち上げの初期化処理として
-  ///  メインプロセスでのスクレイピング結果の取得する
-  ///  リスナーを配置します。
+  /// アプリ立ち上げの初期化処理
+  /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
+  /// ② ローカルストレージデータのロード
   useEffect(() => {
-    console.log("scrapingResult called");
-    window.myAPI.scrapingResult(handleScrapingResult);
+    (async () => {
+      // ①
+      console.log("scrapingResult called");
+      window.myAPI.scrapingResult(handleScrapingResult);
 
-    return () => {
-      console.log("scrapingResult disposed ");
-      window.myAPI.removeScrapingResult(handleScrapingResult);
-    };
+      // ②
+      const loadedData = await window.myAPI.loadData();
+      dispatch(updateWithLoadedData(loadedData));
+
+      return () => {
+        // ①
+        console.log("scrapingResult disposed ");
+        window.myAPI.removeScrapingResult(handleScrapingResult);
+      };
+    })();
   }, [handleScrapingResult]);
 
   /// アプリ終了によるスクレイピングの中断があった場合に

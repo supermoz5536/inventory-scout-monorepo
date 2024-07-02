@@ -60,22 +60,24 @@ ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
 
 ipcMain.handle("save-data", (event, data) => {
   // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "scrapingData.json");
+  const storagePath = path.join(__dirname, "asinDataList.json");
   return new Promise<void>((resolve, reject) => {
     // fs.writeFile: node.jsのファイル書き込みメソッド
     // 構文: fs.writeFile(path, data, callback)
     // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
     fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
       if (err) {
+        console.error("Failed to save data:");
         return reject(err);
       }
+      console.log("Data saved successfully:", data);
       resolve();
     });
   });
 });
 
 ipcMain.handle("load-data", () => {
-  const storagePath = path.join(__dirname, "scrapingData.json");
+  const storagePath = path.join(__dirname, "asinDataList.json");
   return new Promise((resolve, reject) => {
     // fs.readFile メソッドで "utf8" を指定すると
     // ファイルの内容をUTF-8エンコーディングとして読み取ります。
@@ -94,10 +96,12 @@ ipcMain.handle("load-data", () => {
           // ファイルがまだ作成されていない場合に発生するため、
           // 重大なエラーではないとみなし、
           // 空の配列を返して通常の処理を続行する
+          console.warn("No data file found, returning empty array");
           return resolve([]);
         }
         // その他のエラーは、システムエラーの可能性があるため、
         // rejectして、適切に処理できるようにする
+        console.error("Failed to load data:");
         return reject(err);
       }
       // JSON.parse は、
@@ -109,8 +113,10 @@ ipcMain.handle("load-data", () => {
         // jsで扱えるように .parse で
         // JavaScriptオブジェクトに変換します。
         const parsedData = JSON.parse(data);
+        console.log("Data loaded successfully:", parsedData);
         resolve(parsedData);
       } catch (error) {
+        console.error("Failed to parse data:");
         reject(error);
       }
     });
