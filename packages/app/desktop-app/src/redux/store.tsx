@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import asinDataListSlice from "./asinDataListSlice";
+import systemStatusSlice from "./systemStatusSlice";
 
 // store: 状態(=state)と、状態変更関数のreducer(=Notifier)をまとめて、各sliceを格納したコンテナ
 // このstoreというコンテナ内の情報を安全にグローバルに公開するのがProvider
@@ -8,9 +9,10 @@ import asinDataListSlice from "./asinDataListSlice";
 // configureStore: storeを簡単に作ることのできる関数
 export const store = configureStore({
   reducer: {
-    // プロパティ名はSlice名（＝グローバル管理する値の関連名）
-    // riverpodのproviderの.dartファイルにつける名前と同じと考えて良い
+    // 左側の asinDataList はプロパティ名でスライスの名前（キー）です。
+    // 右側の asinDataListSlice はそのスライスからインポートしたリデューサー関数です。
     asinDataList: asinDataListSlice,
+    systemStatus: systemStatusSlice,
   },
 });
 
