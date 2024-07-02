@@ -1,20 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../redux/store";
+import { AppDispatch, RootState, store } from "../redux/store";
 import {
   removeAsin,
   switchRemoveCheck,
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
 } from "../redux/asinDataListSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function Top() {
   // グローバル変数のASINリストの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
+  const asinDataListRef = useRef(asinDataList);
+
+  useEffect(() => {
+    asinDataListRef.current = asinDataList;
+  }, [asinDataList]);
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -47,6 +52,14 @@ function Top() {
       dispatch(updateIsScrapingTrueAll());
       window.myAPI.runScraping(asinDataList);
     }
+  };
+
+  const handleRemoveAsin = async () => {
+    dispatch(removeAsin());
+    // 状態変数の更新が完了するまで200ms待機
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    // ストレージに最新のasinDataListを保存
+    await window.myAPI.saveData(asinDataListRef.current);
   };
 
   return (
@@ -113,7 +126,7 @@ function Top() {
           <button
             className="top-square-space-menu-container-right-delete-button"
             onClick={() => {
-              dispatch(removeAsin());
+              handleRemoveAsin();
             }}
           >
             チェックしたASINを削除

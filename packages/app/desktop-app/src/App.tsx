@@ -36,29 +36,8 @@ const App: React.FC = () => {
         // 取得したasinDataと合致するオブジェクトを
         // 取得したデータに更新
         dispatch(updateAsinData(data));
-
-        // await new Promise((resolve) => setTimeout(resolve, 0));
-
-        // 状態の更新を確実に待機するためのPromiseオブジェクトを作成。
-        // resolveはPromiseを完了させるためのコールバック関数です。
-        const waitForUpdate = new Promise<void>((resolve) => {
-          // store.subscribeは、
-          // Reduxストアの状態が変更されるたびに
-          // 呼び出されるリスナー関数を登録します
-          const unsubscribe = store.subscribe(() => {
-            // 変更の通知をリスンしたら、
-            // resolveでPromiseを解決して
-            // 次の行のコードが実行されるようにします。
-            resolve();
-            // メモリリークを防ぐため、
-            // リスナーをdisposeします。
-            unsubscribe();
-          });
-        });
-
-        // 状態の更新を確実に待機
-        await waitForUpdate;
-
+        // 状態変数の更新が完了するまで200ms待機
+        await new Promise((resolve) => setTimeout(resolve, 200));
         // ローカルストレージへasinDataListを保存
         // 最新の参照を利用してるので
         // 依存関係の指定は必要ない

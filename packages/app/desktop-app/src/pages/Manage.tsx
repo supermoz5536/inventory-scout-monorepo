@@ -7,46 +7,19 @@ import {
   removeAsin,
   switchRemoveCheck,
 } from "../redux/asinDataListSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 function Manage() {
-  // 開発用ハードコードのオブジェクト群
-  const asinHardCodeArray: Array<string> = [
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-    "B0C4SR7V7R",
-  ];
+  // グローバル変数のASINリストの値を取得
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
+  const asinDataListRef = useRef(asinDataList);
+
+  useEffect(() => {
+    asinDataListRef.current = asinDataList;
+  }, [asinDataList]);
 
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
@@ -59,11 +32,6 @@ function Manage() {
 
   // タブ切り替えのフック
   const navigate = useNavigate();
-
-  // グローバル変数のASINリストの値を取得
-  const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
-  );
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -157,10 +125,13 @@ function Manage() {
     setInputAsinCount(inputAsinLinesLength);
   }, [inputAsin]);
 
-  // useEffectを使用して、状態が変更されたときにログを出力する
-  useEffect(() => {
-    console.log("asinList after state update:", asinDataList);
-  }, [asinDataList]);
+  const handleRemoveAsin = async () => {
+    dispatch(removeAsin());
+    // 状態変数の更新が完了するまで200ms待機
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    // ストレージに最新のasinDataListを保存
+    await window.myAPI.saveData(asinDataListRef.current);
+  };
 
   return (
     <div className="App">
@@ -307,7 +278,7 @@ function Manage() {
             <button
               className="manage-delete-selected-asin-button"
               onClick={() => {
-                dispatch(removeAsin());
+                handleRemoveAsin();
               }}
             >
               選択したASINを削除

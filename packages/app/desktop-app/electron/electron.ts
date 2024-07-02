@@ -113,7 +113,7 @@ ipcMain.handle("load-data", () => {
         // jsで扱えるように .parse で
         // JavaScriptオブジェクトに変換します。
         const parsedData = JSON.parse(data);
-        console.log("Data loaded successfully:", parsedData);
+        console.log("Data loaded successfully");
         resolve(parsedData);
       } catch (error) {
         console.error("Failed to parse data:");
