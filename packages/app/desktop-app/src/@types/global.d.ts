@@ -11,7 +11,7 @@ declare global {
         callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
       ) => void;
       saveData: (asinDataList: AsinData[]) => void;
-      loadData: () => asinData[];
+      loadData: () => AsinData[];
     };
   }
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Top from "./pages/Top";
 import Manage from "./pages/Manage";
@@ -7,15 +7,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateAsinData } from "./redux/asinDataListSlice";
 
 const App: React.FC = () => {
+  // ストアから asinDataList の現在の値を取得し、
+  // コンポーネントのレンダリングサイクル内で使用できるようにします。
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
+  // asinDataList の初期値を保持する ref オブジェクトを作成し、
+  // コンポーネントの再レンダリングに影響されず
+  // asinDataListの変更のみに依存して
+  // 最新のデータを参照できるようにします。
+  const asinDataListRef = useRef(asinDataList);
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    asinDataListRef.current = asinDataList;
+  }, [asinDataList]);
 
   /// useCallbackを使用して関数の参照を安定させる
   const handleScrapingResult = useCallback(
     (event: Electron.IpcRendererEvent, data: AsinData) => {
       console.log("取得データ =", data);
+      // グローバル変数のASINリストの
+      // 取得したasinDataと合致するオブジェクトを
+      // 取得したデータに更新
       dispatch(updateAsinData(data));
+      // 更新したasinDataListの最新データに
+      // ローカルデータを更新
+      // 最新の参照を利用してるので
+      // 依存関係に指定する必要はない
+      window.myAPI.saveData(asinDataListRef.current);
     },
-    []
+    [dispatch]
   );
 
   /// アプリ立ち上げの初期化処理として
@@ -30,11 +52,6 @@ const App: React.FC = () => {
       window.myAPI.removeScrapingResult(handleScrapingResult);
     };
   }, [handleScrapingResult]);
-
-  // グローバル変数のASINリストの値を取得
-  const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
-  );
 
   /// アプリ終了によるスクレイピングの中断があった場合に
   /// 中断したところから取得処理を再開する
