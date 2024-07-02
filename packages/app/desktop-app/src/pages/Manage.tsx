@@ -40,7 +40,7 @@ function Manage() {
   const dispatch = useDispatch<AppDispatch>();
 
   // ボタンをクリックしたときにアクションをディスパッチする関数
-  const handleAddAsin = () => {
+  const handleAddAsin = async () => {
     // まず、入力されたASINコードが
     // 空でないか（または空白だけでないか）を確認します。
     if (inputAsin.trim()) {
@@ -110,6 +110,10 @@ function Manage() {
       // アクションとしてディスパッチしています。
       dispatch(addAsin(inputAsinDatasFilterd));
       setInputAsin(""); // 入力フィールドをクリア
+      // 状態変数の更新が完了するまで200ms待機
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      // ストレージに最新のasinDataListを保存
+      await window.myAPI.saveData(asinDataListRef.current);
     }
   };
 
