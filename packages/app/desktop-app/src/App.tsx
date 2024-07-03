@@ -8,6 +8,7 @@ import {
   updateAsinData,
   updateWithLoadedData,
 } from "./redux/asinDataListSlice";
+import { switchSystemStatus } from "./redux/systemStatusSlice";
 
 const App: React.FC = () => {
   // ストアから asinDataList の現在の値を取得し、
@@ -29,19 +30,27 @@ const App: React.FC = () => {
 
   /// useCallbackを使用して関数の参照を安定させる
   const handleScrapingResult = useCallback(
-    (event: Electron.IpcRendererEvent, data: AsinData) => {
+    (
+      event: Electron.IpcRendererEvent,
+      asinData: AsinData | null,
+      isEnd: boolean | null
+    ) => {
       (async () => {
-        console.log("取得データ =", data);
-        // グローバル変数のASINリストの
-        // 取得したasinDataと合致するオブジェクトを
-        // 取得したデータに更新
-        dispatch(updateAsinData(data));
-        // 状態変数の更新が完了するまで200ms待機
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        // ローカルストレージへasinDataListを保存
-        // 最新の参照を利用してるので
-        // 依存関係の指定は必要ない
-        await window.myAPI.saveData(asinDataListRef.current);
+        if (isEnd) {
+          console.log("isEndを受信");
+          dispatch(switchSystemStatus(3));
+        } else if (asinData) {
+          // グローバル変数のASINリストの
+          // 取得したasinDataと合致するオブジェクトを
+          // 取得したデータに更新
+          dispatch(updateAsinData(asinData));
+          // 状態変数の更新が完了するまで200ms待機
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          // ローカルストレージへasinDataListを保存
+          // 最新の参照を利用してるので
+          // 依存関係の指定は必要ない
+          await window.myAPI.saveData(asinDataListRef.current);
+        }
       })();
     },
     [dispatch]

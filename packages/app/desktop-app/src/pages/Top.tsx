@@ -325,13 +325,16 @@ function Top() {
         </div>
       </div>
       <div className="top-bottom-container">
-        {/* <p>{handleSystemMessage()}</p> */}
         <p>
           {systemStatus === 0
             ? ""
             : systemStatus === 1
             ? "データ取得中..."
-            : "アプリ終了で中断された取得処理を自動で再開しました。現在データ取得中..."}
+            : systemStatus === 2
+            ? "アプリ終了で中断された取得処理を自動で再開しました。現在データ取得中..."
+            : systemStatus === 3
+            ? "データ取得完了"
+            : "system code e"}
         </p>
       </div>
     </div>

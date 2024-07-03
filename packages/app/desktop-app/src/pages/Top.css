@@ -133,9 +133,10 @@
 
 .top-globalList {
   height: 750px;
-  width: 1410px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  width: 1393px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
   max-height: 750px; /* この縦幅以上にリストが増えたらスクロール開始 */
   max-width: 1410px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  background-color: aqua;
   display: flex;
   flex-direction: column;
   overflow-x: auto;

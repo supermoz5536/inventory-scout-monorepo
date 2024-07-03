@@ -12,8 +12,8 @@ import scrapePromis from "../src/components/Scrape";
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 1150,
-    height: 870,
+    width: 1400,
+    height: 975,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

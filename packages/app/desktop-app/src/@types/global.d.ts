@@ -5,10 +5,18 @@ declare global {
       openExternal: (url: string) => void | null;
       runScraping: (asinDataList: AsinData[]) => void;
       scrapingResult: (
-        callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
+        callback: (
+          event: Electron.IpcRendererEvent,
+          data: AsinData,
+          isEnd: boolean
+        ) => void
       ) => void;
       removeScrapingResult: (
-        callback: (event: Electron.IpcRendererEvent, data: AsinData) => void
+        callback: (
+          event: Electron.IpcRendererEvent,
+          data: AsinData,
+          isEnd: boolean
+        ) => void
       ) => void;
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;

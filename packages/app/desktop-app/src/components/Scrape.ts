@@ -1013,16 +1013,19 @@ const scrapePromise = (async () => {
               await scrape.updateFetchLatestTime(asinData);
               // asinData.isScrapingを更新
               await scrape.updateIsScarapingFalse(asinData);
-              // レンダラープロセスにデータを送信
-              event.sender.send("scraping-result", asinData);
               // Cookie削除でカートをリフレッシュ
               await scrape.clearCart(page);
+              // レンダラープロセスにデータを送信
+              event.sender.send("scraping-result", asinData);
             })(),
             120000,
             "Timeout"
           );
         }
         await browser.close();
+        // レンダラープロセスにスクレイピング終了を知らせるデータを送信
+        console.log("isEndを送信");
+        event.sender.send("scraping-result", null, true);
       } catch (error: any) {
         console.log("Error message:", error.message);
         if (
@@ -1037,6 +1040,9 @@ const scrapePromise = (async () => {
         } else {
           console.log("最大リトライ回数に達しました。処理を終了します。");
           await browser.close();
+          const isEnd: boolean | null = true;
+          console.log("isEndを送信");
+          event.sender.send("scraping-result", null, true);
         }
       }
     },
