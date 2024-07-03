@@ -99,7 +99,7 @@ const App: React.FC = () => {
             console.log("同日に前回処理が中断された際の自動フォローアップ起動");
             // システムメッセージ表示フラグ
             //「アプリ終了で中断された取得処理を自動で...」
-            dispatch(switchSystemStatus(3));
+            dispatch(switchSystemStatus(2));
             window.myAPI.runScraping(asinDataListRef.current);
           }
         }

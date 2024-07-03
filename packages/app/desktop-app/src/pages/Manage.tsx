@@ -7,6 +7,7 @@ import {
   removeAsin,
   switchRemoveCheck,
 } from "../redux/asinDataListSlice";
+import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -20,6 +21,11 @@ function Manage() {
   useEffect(() => {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
+
+  // グローバル変数のsystemStatusの値を取得
+  const systemStatus = useSelector(
+    (state: RootState) => state.systemStatus.value
+  );
 
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
@@ -136,6 +142,23 @@ function Manage() {
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
   };
+
+  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+
+  /// スクレイピング残り時間の表示を動的に変更します。
+  useEffect(() => {
+    // asinDataListRef.currentをイテレート処理
+    // isScraping === trueの要素の時に
+    // const remainingCount をインクリメント
+    // 要素1つにつき１分なのでそのまま表示
+    const remainingCount: number = asinDataListRef.current.reduce(
+      (totalCount, asinData) => {
+        return asinData.isScraping === true ? ++totalCount : totalCount;
+      },
+      0
+    );
+    setScrapeTimeLeft(remainingCount);
+  }, [asinDataList]);
 
   return (
     <div className="App">
@@ -297,7 +320,17 @@ function Manage() {
         </div>
       </div>
       <div className="manage-bottom-container">
-        <p>取得中・・・</p>
+        <p>
+          {systemStatus === 0
+            ? ""
+            : systemStatus === 1
+            ? `データ取得中...残り${scrapeTimeLeft}分`
+            : systemStatus === 2
+            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
+            : systemStatus === 3
+            ? `データ取得が完了しました。`
+            : "system code e"}
+        </p>
       </div>
     </div>
   );

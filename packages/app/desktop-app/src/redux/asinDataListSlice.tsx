@@ -102,6 +102,14 @@ export const asinSlice = createSlice({
         state.value[index].isDeleteCheck = action.payload;
       }
     },
+
+    setIsScrapingTrueForNewItems: (state) => {
+      state.value.forEach((asinData) => {
+        if (asinData.fetchLatestDate === "") {
+          asinData.isScraping = true;
+        }
+      });
+    },
   },
 });
 
@@ -117,6 +125,7 @@ export const {
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
   updateWithLoadedData,
+  setIsScrapingTrueForNewItems,
 } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので

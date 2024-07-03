@@ -7,8 +7,11 @@ import {
   switchRemoveCheck,
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
+  setIsScrapingTrueForNewItems,
 } from "../redux/asinDataListSlice";
-import { switchSystemStatus } from "../redux/systemStatusSlice";
+import systemStatusSlice, {
+  switchSystemStatus,
+} from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
@@ -55,40 +58,73 @@ function Top() {
 
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     if (asinDataListRef.current.length > 0) {
-      // ■ 同日に前回の処理が中断されている場合の処理
       const today = new Date();
       const todayFormatted = `${today.getFullYear()}-${String(
         today.getMonth() + 1
       ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-      const checkArray = asinDataListRef.current.find((asinData) => {
-        // 以下２点を満たすとTrue
-        // ・スクレイピングが取得中
-        // ・今日の日付のStockCountDataが存在してる
-        return (
-          asinData.isScraping === true &&
-          (asinData.fbaSellerDatas.some((fbaSellerData) =>
-            fbaSellerData.stockCountDatas.some((stockCountData) =>
-              Object.keys(stockCountData).includes(todayFormatted)
-            )
-          ) ||
-            asinData.fetchLatestDate === "")
+      // 全てのasinDataが取得完了の状態
+      const isScrapingFalseAll = asinDataListRef.current.every((asinData) => {
+        return asinData.isScraping === false;
+      });
+
+      // データ取得日が当日の要素を保持してるasinDataが
+      // 少なくとも1つ存在する。
+      const isDoneTodayAtLeast1 = asinDataListRef.current.find((asinData) => {
+        return asinData.fbaSellerDatas.some((fbaSellerData) =>
+          fbaSellerData.stockCountDatas.some((stockCountData) =>
+            Object.keys(stockCountData).includes(todayFormatted)
+          )
         );
       });
 
-      if (checkArray) {
-        console.log("同日に前回の処理が中断されている場合の処理");
-        // システムメッセージ表示フラグ
-        //「アプリ終了で中断された取得処理を自動で...」
-        dispatch(switchSystemStatus(2));
-        window.myAPI.runScraping(asinDataListRef.current);
+      // fetchLatestDateが空文字のアイテムが少なくとも1つ存在するかを確認
+      const hasNewItems = asinDataListRef.current.some((asinData) => {
+        return asinData.fetchLatestDate === "";
+      });
 
-        // ■ 同日に前回の処理が中断されてない場合の処理
+      if (isScrapingFalseAll && isDoneTodayAtLeast1) {
+        // 当日のデータ取得が完了してるので
+        // runScrapingを実行しない
+        console.log("当日のデータ取得が既に完了していて何もしない場合");
+        dispatch(switchSystemStatus(4));
       } else {
-        console.log("同日に前回の処理が中断されてない場合の処理");
-        dispatch(updateIsScrapingTrueAll());
-        dispatch(switchSystemStatus(1));
-        window.myAPI.runScraping(asinDataList);
+        // ■ 同日に前回の処理が中断されている場合の処理
+        // 以下２点を満たすとTrue
+        // ・スクレイピングが取得中
+        // ・今日の日付のStockCountDataが存在してる
+        const checkArray = asinDataListRef.current.find((asinData) => {
+          return (
+            asinData.isScraping === true &&
+            (isDoneTodayAtLeast1 || asinData.fetchLatestDate === "")
+          );
+        });
+
+        if (checkArray) {
+          console.log("同日に前回の処理が中断されている場合の処理");
+          // システムメッセージ表示フラグ
+          //「アプリ終了で中断された取得処理を自動で...」
+          window.myAPI.runScraping(asinDataListRef.current);
+          dispatch(switchSystemStatus(2));
+        } else if (hasNewItems) {
+          // ■ 同日にデータ取得が無事完了している && 新規アイテムの追加がある場合
+          // 新規アイテムのみを isScraping === trueに変更して引数に渡す
+
+          // fetchlatestdateが空文字のアイテムが少なくとも1つある場合
+          // trueの場合にisScraping = true;
+          console.log(
+            "同日データ取得が無事完了 && 新規アイテムの追加がある場合"
+          );
+          // 追加された新規ASINのみの
+          // isScrapingをTrueにするメソッド
+          dispatch(setIsScrapingTrueForNewItems());
+          window.myAPI.runScraping(asinDataListRef.current);
+          dispatch(switchSystemStatus(5));
+        } else {
+          dispatch(updateIsScrapingTrueAll());
+          window.myAPI.runScraping(asinDataList);
+          dispatch(switchSystemStatus(1));
+        }
       }
     }
   };
@@ -379,10 +415,14 @@ function Top() {
             : systemStatus === 1
             ? `データ取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 2
-            ? `前回のデータ取得処理が中断されています。続きのデータを取得中...残り${scrapeTimeLeft}分`
+            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 3
-            ? "データ取得完了"
-            : "system code e"}
+            ? `データ取得が完了しました。`
+            : systemStatus === 4
+            ? `本日分のデータ取得は既に完了しています。`
+            : systemStatus === 5
+            ? `追加されたASINのデータを取得しています`
+            : `System cord e`}
         </p>
       </div>
     </div>
