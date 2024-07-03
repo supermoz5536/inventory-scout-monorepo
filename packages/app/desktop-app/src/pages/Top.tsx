@@ -8,18 +8,23 @@ import {
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
 } from "../redux/asinDataListSlice";
+import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
-  // グローバル変数のASINリストの値を取得
+  // グローバル変数のasinDataListの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
   const asinDataListRef = useRef(asinDataList);
-
   useEffect(() => {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
+
+  // グローバル変数のsystemStatusの値を取得
+  const systemStatus = useSelector(
+    (state: RootState) => state.systemStatus.value
+  );
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -50,6 +55,7 @@ function Top() {
     if (asinDataList.length > 0) {
       // 全ての取得状況をTrue（取得中）に更新
       dispatch(updateIsScrapingTrueAll());
+      dispatch(switchSystemStatus(1));
       window.myAPI.runScraping(asinDataList);
     }
   };
@@ -319,7 +325,14 @@ function Top() {
         </div>
       </div>
       <div className="top-bottom-container">
-        <p>取得中・・・</p>
+        {/* <p>{handleSystemMessage()}</p> */}
+        <p>
+          {systemStatus === 0
+            ? ""
+            : systemStatus === 1
+            ? "データ取得中..."
+            : "アプリ終了で中断された取得処理を自動で再開しました。現在データ取得中..."}
+        </p>
       </div>
     </div>
   );

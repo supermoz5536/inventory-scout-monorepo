@@ -17,7 +17,7 @@ export const systemStatusSlice = createSlice({
       // 0 「""」
       // 1 「取得中...」
       // 2 「アプリ終了で中断された取得処理を自動で再開しました。現在取得中..」
-      state.value == action.payload;
+      state.value = action.payload;
     },
   },
 });
