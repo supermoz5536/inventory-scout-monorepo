@@ -73,6 +73,7 @@ const App: React.FC = () => {
         dispatch(updateWithLoadedData(loadedData));
 
         // ③
+        // ■ 同日に前回の処理が中断されている場合の自動処理
         if (asinDataListRef.current.length > 0) {
           const today = new Date();
           const todayFormatted = `${today.getFullYear()}-${String(
@@ -85,16 +86,17 @@ const App: React.FC = () => {
             // ・今日の日付のStockCountDataが存在してる
             return (
               asinData.isScraping === true &&
-              asinData.fbaSellerDatas.some((fbaSellerData) =>
+              (asinData.fbaSellerDatas.some((fbaSellerData) =>
                 fbaSellerData.stockCountDatas.some((stockCountData) =>
                   Object.keys(stockCountData).includes(todayFormatted)
                 )
-              )
+              ) ||
+                asinData.fetchLatestDate === "")
             );
           });
 
           if (checkArray) {
-            console.log("アプリ中断後のフォローアップ処理実行");
+            console.log("同日に前回処理が中断された際の自動フォローアップ起動");
             // システムメッセージ表示フラグ
             //「アプリ終了で中断された取得処理を自動で...」
             dispatch(switchSystemStatus(3));
