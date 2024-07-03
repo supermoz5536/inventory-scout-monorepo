@@ -318,6 +318,9 @@ function Top() {
           ))}
         </div>
       </div>
+      <div className="top-bottom-container">
+        <p>取得中・・・</p>
+      </div>
     </div>
   );
 }

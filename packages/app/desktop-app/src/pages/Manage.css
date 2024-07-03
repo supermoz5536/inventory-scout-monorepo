@@ -1,8 +1,8 @@
 .manage-square-space-tab {
   height: 30px;
-  width: 1390px;
-  min-width: 800px; /* 必要に応じて適切な最小幅を設定 */
+  width: 1382.5px;
   border: 0.5px solid #c0c0c0;
+  background-color: aquamarine;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -16,8 +16,8 @@
   justify-content: center;
 }
 .manage-body {
-  height: 760px;
-  width: 1390px;
+  height: 860px;
+  width: 1385px;
   background-color: aqua;
   display: flex;
 }
@@ -25,15 +25,15 @@
 .manage-input-asin {
   background-color: #ffffff;
   width: 190px;
-  height: 700px;
+  height: 800px;
   border: 0.5px solid #7a7a7a;
 }
 
 .manage-globalList {
-  height: 650px;
-  width: 1200px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
-  max-height: 650px; /* この縦幅以上にリストが増えたらスクロール開始 */
-  max-width: 1200px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  height: 750px;
+  width: 1210px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  max-height: 750px; /* この縦幅以上にリストが増えたらスクロール開始 */
+  max-width: 1210px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
   display: flex;
   flex-direction: column;
   overflow-x: auto;
@@ -153,7 +153,7 @@
 
 .manage-left-column {
   width: 190px;
-  height: 760px;
+  height: 860px;
   display: flex;
   flex-direction: column;
 }
@@ -189,14 +189,14 @@
 
 .manage-right-column {
   width: 100%;
-  height: 760px;
+  height: 860px;
   display: flex;
   flex-direction: column;
 }
 
 .manage-right-column-down-container {
   height: 100%;
-  width: 100%;
+  width: 1194px;
   background-color: chocolate;
   border: 0.5px solid #c0c0c0;
   position: relative;
@@ -240,7 +240,7 @@
 
 .manage-bottom-container {
   height: 40px;
-  width: 100%;
+  width: 1385px;
   background-color: darkkhaki;
   border: 0.5px solid #c0c0c0;
   position: relative;
