@@ -34,6 +34,8 @@ function Top() {
 
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
 
+  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+
   const gotoURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
 
@@ -67,6 +69,21 @@ function Top() {
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
   };
+
+  /// スクレイピング残り時間の表示を動的に変更します。
+  useEffect(() => {
+    // asinDataListRef.currentをイテレート処理
+    // isScraping === trueの要素の時に
+    // const remainingCount をインクリメント
+    // 要素1つにつき１分なのでそのまま表示
+    const remainingCount: number = asinDataListRef.current.reduce(
+      (totalCount, asinData) => {
+        return asinData.isScraping === true ? ++totalCount : totalCount;
+      },
+      0
+    );
+    setScrapeTimeLeft(remainingCount);
+  }, [asinDataList]);
 
   return (
     <div className="App">
@@ -329,9 +346,9 @@ function Top() {
           {systemStatus === 0
             ? ""
             : systemStatus === 1
-            ? "データ取得中..."
+            ? `データ取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 2
-            ? "アプリ終了で中断された取得処理を自動で再開しました。現在データ取得中..."
+            ? `アプリ終了で中断された取得処理を自動で再開しました。現在データ取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 3
             ? "データ取得完了"
             : "system code e"}

@@ -37,7 +37,8 @@ const App: React.FC = () => {
     ) => {
       (async () => {
         if (isEnd) {
-          console.log("isEndを受信");
+          // システムメッセージの表示フラグ
+          //「データ取得完了」
           dispatch(switchSystemStatus(3));
         } else if (asinData) {
           // グローバル変数のASINリストの
@@ -94,6 +95,9 @@ const App: React.FC = () => {
 
           if (checkArray) {
             console.log("アプリ中断後のフォローアップ処理実行");
+            // システムメッセージ表示フラグ
+            //「アプリ終了で中断された取得処理を自動で...」
+            dispatch(switchSystemStatus(3));
             window.myAPI.runScraping(asinDataListRef.current);
           }
         }
