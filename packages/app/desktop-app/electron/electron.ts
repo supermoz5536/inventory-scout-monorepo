@@ -4,13 +4,17 @@
 // なので、自動的にpreload.tsでも参照が反映されます。
 /// <reference path="../src/@types/global.d.ts" />
 
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 import scrapePromis from "../src/components/Scrape";
 
-const createWindow = () => {
+/// メインプロセスのグローバル変数です。
+let appURL: string;
+
+/// メイン画面を生成する関数です
+const createMainWindow = () => {
   const win = new BrowserWindow({
     width: 1400,
     height: 975,
@@ -23,15 +27,26 @@ const createWindow = () => {
     },
   });
 
-  const appURL = app.isPackaged
-    ? url.format({
+  // アプリケーションがパッケージ化された状態かどうかを判別します
+  appURL = app.isPackaged
+    ? // パッケージ化されてる場合
+      // url.format() を使用して、
+      // ローカルファイルシステム上に配置された
+      // build/index.html へのURLを生成します。
+      url.format({
+        // pathname には、
+        // app.getAppPath() で取得したアプリケーションのパスと、
+        // build/index.html が結合されます。
         pathname: path.resolve(app.getAppPath(), "build/index.html"),
+        // protocol: 'file:' と slashes: true は、
+        // ローカルファイルシステムの URL であることを示します。
         protocol: "file:",
         slashes: true,
       })
-    : "http://localhost:3000";
-
-  console.log(`Loading URL: ${appURL}`); // URLをログに出力
+    : // パッケージ化されていない場合、
+      // 開発用ローカルサーバー (localhost:3000) に
+      // アクセスするための URL を生成します。
+      "http://localhost:3000";
 
   win.loadURL(appURL);
 
@@ -41,6 +56,34 @@ const createWindow = () => {
     win.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 };
+
+// app.on メソッドは、
+// Electronのライフサイクルに関連するイベントリスナーを
+// 設定するために使用されます。
+// これにより、アプリケーションが特定のイベント
+// （例：起動、終了、ウィンドウが閉じられたときなど）
+// に対して特定のアクションを実行することができます。
+
+// macOS以外のプラットフォームでは
+// 窓を全部閉じたら、アプリケーションも終了させる関数です
+app.on("window-all-closed", () => {
+  // window-all-closedは、
+  // Electronのappオブジェクトのイベントの1つ。
+  // darwin は macOSのこと
+  if (process.platform !== "darwin") app.quit();
+});
+
+/// アプリ起動時にウインドウがない場合に
+/// 新しいウィンドウを生成する関数
+/// (Macだと表示されないことがあるので)
+app.whenReady().then(() => {
+  createMainWindow();
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+  });
+});
+
+//====================================================================
 
 // ipcMain.handle メソッドは、メインプロセスで
 // 特定のIPC (Inter-Process Communication) チャンネルを設定し、
@@ -123,26 +166,62 @@ ipcMain.handle("load-data", () => {
   });
 });
 
-// app.on メソッドは、
-// Electronのライフサイクルに関連するイベントリスナーを
-// 設定するために使用されます。
-// これにより、アプリケーションが特定のイベント
-// （例：起動、終了、ウィンドウが閉じられたときなど）
-// に対して特定のアクションを実行することができます。
-app.on("window-all-closed", () => {
-  // window-all-closed は、
-  // Electron の app オブジェクトのイベントの1つ。
-  // "darwin": macOS
-  // macOS以外のプラットフォームでは
-  // 窓を全部閉じたら、アプリケーションも終了させる
-  if (process.platform !== "darwin") app.quit();
+//====================================================================
+
+/// 初期化処理として
+/// 設定画面をコールするメニュー部分を生成する関数です。
+app.whenReady().then(() => {
+  // createWindow();
+
+  const isMac = process.platform === "darwin"; // macOSかどうかを判定
+
+  const template = [
+    // 三項演算子で記述
+    // macOSの場合、メニューオブジェクトを記述
+    // macOSでない場合、空のの配列
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              // macOS用のPreferences
+              { label: "Preferences", click: openPreferences },
+            ],
+          },
+        ]
+      : []),
+
+    // windowsの場合、ファイルメニュー
+    // windowsの場合、空の配列
+    ...(!isMac
+      ? [
+          {
+            label: "ファイル",
+            submenu: [
+              // Windows用のPreferences
+              { label: "Preferences", click: openPreferences },
+            ],
+          },
+        ]
+      : []),
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 });
 
-app.whenReady().then(() => {
-  // macOS では、ドックアイコンがクリックされてアプリがアクティブになったとき、
-  // 既存のウィンドウがない場合に新しいウィンドウを再作成する。
-  createWindow();
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+// Preferencesがクリックされた際の
+// 設定画面を生成する関数です
+function openPreferences() {
+  const prefWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
-});
+
+  // ローカルファイルを指定するパスを指定したいだけなので
+  // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
+  prefWindow.loadURL(`${appURL}#/Setting`);
+}
