@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "./Setting.css";
+import LoggedOutSetting from "../components/guest/LoggedOutSetting";
 
 const Setting = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
   // // onLogin関数の実装例
@@ -23,16 +24,11 @@ const Setting = () => {
       <h1>設定</h1>
       {isLoggedIn ? (
         <>
-          {/* ログイン設定のコンポーネント */}
-          {/* アカウント設定のコンポーネント */}
-          {/* 定期スクレイピング設定のコンポーネント */}
+          {/* ログアウトしてる場合のコンポーネント読み込み */}
+          <LoggedOutSetting />
         </>
       ) : (
-        <>
-          {/* ログイン設定のコンポーネント */}
-          {/* アカウント設定のコンポーネント */}
-          {/* 定期スクレイピング設定のコンポーネント */}
-        </>
+        <>{/* ログインしてる場合のコンポーネント読み込み */}</>
       )}
     </div>
   );
