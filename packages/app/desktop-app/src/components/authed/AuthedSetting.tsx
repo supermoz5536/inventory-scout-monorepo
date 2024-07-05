@@ -1,13 +1,13 @@
 import React from "react";
 import { AuthedLoginSection } from "./AuthedLoginSection";
-import AuthedEmailSection from "./AuthedEmailSection";
+import AuthedAccountSection from "./AuthedAccountSection";
 import AuthedScrapeSection from "./AuthedScrapeSection";
 
 const AuthedSetting = () => {
   return (
     <>
       <AuthedLoginSection />
-      <AuthedEmailSection />
+      <AuthedAccountSection />
       <AuthedScrapeSection />
     </>
   );

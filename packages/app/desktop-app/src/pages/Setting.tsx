@@ -22,16 +22,16 @@ const Setting = () => {
 
   return (
     <div>
-      <h1>設定</h1>
+      <h1 className="setting-h1">環境設定</h1>
       {isLoggedIn ? (
-        <>
-          {/* ログアウトしてる場合のコンポーネント読み込み */}
-          <GuestSetting />
-        </>
-      ) : (
         <>
           {/* ログインしてる場合のコンポーネント読み込み */}
           <AuthedSetting />
+        </>
+      ) : (
+        <>
+          {/* ログアウトしてる場合のコンポーネント読み込み */}
+          <GuestSetting />
         </>
       )}
     </div>

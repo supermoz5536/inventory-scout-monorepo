@@ -1,0 +1,7 @@
+.guest-setting-divider {
+  /* solidは実線 */
+  border: solid;
+  border-width: 1px;
+  color: rgb(237, 237, 237);
+  margin: 10px 10px;
+}
