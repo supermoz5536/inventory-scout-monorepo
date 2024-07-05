@@ -20,7 +20,7 @@ const AuthedScrapeSection = () => {
         </div>
         <div className="authed-scrape-section-item">
           <p>時刻の指定：</p>
-          <input className="authed-scrape-section-item-value-2" />
+          <input type="time" className="authed-scrape-section-item-value-2" />
         </div>
         <button>保存</button>
       </div>
