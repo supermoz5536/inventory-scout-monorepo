@@ -1,0 +1,12 @@
+.guest-account-section-h2 {
+  font-size: 22.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-account-section {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 15px;
+}

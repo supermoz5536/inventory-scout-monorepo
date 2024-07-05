@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Top from "./pages/Top";
-import Manage from "./pages/Manage";
 import { AppDispatch, RootState, store } from "./redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,6 +7,9 @@ import {
   updateWithLoadedData,
 } from "./redux/asinDataListSlice";
 import { switchSystemStatus } from "./redux/systemStatusSlice";
+import Top from "./pages/Top";
+import Manage from "./pages/Manage";
+import Setting from "./pages/Setting";
 
 const App: React.FC = () => {
   // ストアから asinDataList の現在の値を取得し、
@@ -124,6 +125,7 @@ const App: React.FC = () => {
         {/* 各ページのURLパスと対応するコンポーネントをルートをマッピングしてます。 */}
         <Route path="/Top" element={<Top />} />
         <Route path="/Manage" element={<Manage />} />
+        <Route path="/Setting" element={<Setting />} />
       </Routes>
     </div>
   );

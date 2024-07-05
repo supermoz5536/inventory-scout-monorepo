@@ -1,0 +1,64 @@
+.authed-account-section-h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authed-account-section {
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.authed-account-section button {
+  margin-top: 5px;
+  height: 22.5px;
+  width: 45px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authed-account-section-email {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.authed-account-section-email-item {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.authed-account-section-email-item-value {
+  margin-left: 20px;
+}
+
+.authed-account-section-email-item input {
+  width: 220px;
+}
+
+.authed-account-section-password {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.authed-account-section-password-item {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.authed-account-section-password-item input {
+  margin-left: 50px;
+  width: 220px;
+}

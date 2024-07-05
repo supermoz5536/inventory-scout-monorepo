@@ -1,0 +1,57 @@
+.guest-login-section-h2 {
+  font-size: 22.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-login-section {
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.guest-login-section-email {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: row;
+}
+
+.guest-login-section-email input {
+  margin-left: 10px;
+  height: 20px;
+  width: 220px;
+}
+
+.guest-login-section-password {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: row;
+}
+
+.guest-login-section-password input {
+  margin-left: 40px;
+  height: 20px;
+  width: 220px;
+}
+
+.guest-login-section-login-button {
+  margin-top: 5px;
+  height: 22.5px;
+  width: 70px;
+}
+
+.guest-login-section-auto-login {
+  margin-top: 7.5px;
+  display: flex;
+  flex-direction: row;
+}
+
+.guest-login-section-auto-login p {
+  font-size: 11px;
+  margin-left: 5px;
+}
