@@ -4,7 +4,7 @@ import GuestSetting from "../components/guest/GuestSetting";
 import AuthedSetting from "../components/authed/AuthedSetting";
 
 const Setting = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [userEmail, setUserEmail] = useState("");
 
   // // onLogin関数の実装例

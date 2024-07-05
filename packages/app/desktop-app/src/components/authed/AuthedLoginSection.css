@@ -1,0 +1,35 @@
+.authed-login-section-h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authed-login-section {
+  margin-top: 5px;
+  margin-left: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.authed-login-section-email {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.authed-login-section-email-adress {
+  margin-left: 100px;
+  height: 20px;
+  width: 220px;
+}
+
+.authed-login-section-login-button {
+  margin-top: 5px;
+  height: 22.5px;
+  width: 80px;
+}

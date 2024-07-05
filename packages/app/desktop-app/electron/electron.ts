@@ -214,8 +214,9 @@ app.whenReady().then(() => {
 // 設定画面を生成する関数です
 function openPreferences() {
   const prefWindow = new BrowserWindow({
-    width: 400,
-    height: 600,
+    width: 450,
+    height: 800,
+    resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       nodeIntegration: true,
     },

@@ -7,11 +7,11 @@ const GuestLoginSection = () => {
       <h2 className="guest-login-section-h2">ログイン設定</h2>
       <div className="guest-login-section">
         <div className="guest-login-section-email">
-          <p>メールアドレス</p>
+          <p>メールアドレス：</p>
           <input></input>
         </div>
         <div className="guest-login-section-password">
-          <p>パスワード</p>
+          <p>パスワード：</p>
           <input></input>
         </div>
         <button className="guest-login-section-login-button">ログイン</button>
