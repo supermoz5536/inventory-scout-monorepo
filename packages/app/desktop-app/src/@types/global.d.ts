@@ -65,6 +65,16 @@ interface StockCountData {
   [date: string]: number;
 }
 
+interface User {
+  uid: string;
+  email: string;
+  password: string;
+  isAuthed: boolean;
+  isAutoLogIn: boolean;
+  plan: string;
+  createdAt: Date;
+}
+
 // tsの構文では
 // declare global を使う場合は、
 // ファイルの最後に空の export {} を追加することで、
