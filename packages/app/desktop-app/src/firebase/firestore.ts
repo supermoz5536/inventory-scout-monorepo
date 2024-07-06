@@ -3,7 +3,7 @@
 // Firestore関連の機能を
 // インポートするためのモジュールパスです。
 import { collection, getDocs } from "firebase/firestore";
-import db from "./firebase";
+import { db } from "./firebase";
 
 export const getFirstUserEmail = async () => {
   try {
