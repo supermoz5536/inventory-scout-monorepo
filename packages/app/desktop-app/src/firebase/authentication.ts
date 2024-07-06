@@ -8,7 +8,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 // サインインが成功したら、
 // 状態変数のisLoggedInをtrueに更新する
 
-const handoleLogIn = async (email: string, password: string) => {
+const logInAndUpdateUser = async (email: string, password: string) => {
   await signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // ■■■■■■■ 状態変数のisLoggedInをtrueに更新する ■■■■■■■■
