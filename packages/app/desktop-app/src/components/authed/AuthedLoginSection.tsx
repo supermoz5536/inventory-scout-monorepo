@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./AuthedLoginSection.css";
-
-// テスト用ハードコード
-const email: string = "testadress@gmail.com";
+import { getFirstUserEmail } from "../../firebase/firestore";
 
 export const AuthedLoginSection = () => {
+  // テスト用ハードコード
+  const [email, setEmail] = useState("");
+
+  // ■■■■■■　ストア格納のuser変数から取得に変更すること　■■■■■■
+  useEffect(() => {
+    (async () => {
+      const fetchedEmail = await getFirstUserEmail();
+      setEmail(fetchedEmail);
+    })();
+  }, []);
+
   return (
     <>
       <h2 className="authed-login-section-h2">ログイン設定</h2>
