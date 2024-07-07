@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState, store } from "../redux/store";
 import {
   removeAsin,
   switchRemoveCheck,
@@ -9,9 +8,7 @@ import {
   switchIsDeleteCheckAll,
   setIsScrapingTrueForNewItems,
 } from "../redux/asinDataListSlice";
-import systemStatusSlice, {
-  switchSystemStatus,
-} from "../redux/systemStatusSlice";
+import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
@@ -64,22 +61,26 @@ function Top() {
       ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
       // 全てのasinDataが取得完了の状態
-      const isScrapingFalseAll = asinDataListRef.current.every((asinData) => {
-        return asinData.isScraping === false;
-      });
+      const isScrapingFalseAll = asinDataListRef.current.every(
+        (asinData: AsinData) => {
+          return asinData.isScraping === false;
+        }
+      );
 
       // データ取得日が当日の要素を保持してるasinDataが
       // 少なくとも1つ存在する。
-      const isDoneTodayAtLeast1 = asinDataListRef.current.find((asinData) => {
-        return asinData.fbaSellerDatas.some((fbaSellerData) =>
-          fbaSellerData.stockCountDatas.some((stockCountData) =>
-            Object.keys(stockCountData).includes(todayFormatted)
-          )
-        );
-      });
+      const isDoneTodayAtLeast1 = asinDataListRef.current.find(
+        (asinData: AsinData) => {
+          return asinData.fbaSellerDatas.some((fbaSellerData) =>
+            fbaSellerData.stockCountDatas.some((stockCountData) =>
+              Object.keys(stockCountData).includes(todayFormatted)
+            )
+          );
+        }
+      );
 
       // fetchLatestDateが空文字のアイテムが少なくとも1つ存在するかを確認
-      const hasNewItems = asinDataListRef.current.some((asinData) => {
+      const hasNewItems = asinDataListRef.current.some((asinData: AsinData) => {
         return asinData.fetchLatestDate === "";
       });
 
@@ -93,12 +94,14 @@ function Top() {
         // 以下２点を満たすとTrue
         // ・スクレイピングが取得中
         // ・今日の日付のStockCountDataが存在してる
-        const checkArray = asinDataListRef.current.find((asinData) => {
-          return (
-            asinData.isScraping === true &&
-            (isDoneTodayAtLeast1 || asinData.fetchLatestDate === "")
-          );
-        });
+        const checkArray = asinDataListRef.current.find(
+          (asinData: AsinData) => {
+            return (
+              asinData.isScraping === true &&
+              (isDoneTodayAtLeast1 || asinData.fetchLatestDate === "")
+            );
+          }
+        );
 
         if (checkArray) {
           console.log("同日に前回の処理が中断されている場合の処理");
@@ -144,7 +147,7 @@ function Top() {
     // const remainingCount をインクリメント
     // 要素1つにつき１分なのでそのまま表示
     const remainingCount: number = asinDataListRef.current.reduce(
-      (totalCount, asinData) => {
+      (totalCount: number, asinData: AsinData) => {
         return asinData.isScraping === true ? ++totalCount : totalCount;
       },
       0
@@ -303,7 +306,7 @@ function Top() {
 
         <div className="top-asinArray-map-wrapper-top-css">
           {/* リスト部分 */}
-          {asinDataList.map((asinData) => (
+          {asinDataList.map((asinData: AsinData) => (
             <div className="top-asin-list">
               {/* 要素0 チェック */}
               <div className="top-square-space-asin-delete">

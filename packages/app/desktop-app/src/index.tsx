@@ -6,8 +6,9 @@ import { HashRouter } from "react-router-dom";
 // Storeに格納された変数を
 // グローバルに呼び出せるようにProviderを使って
 // index.tsxからアプリ全体に共有している
-import { store } from "./redux/store";
+import { store, persistor } from "./redux/store";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -15,9 +16,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <HashRouter>
-        <App />
-      </HashRouter>
+      <PersistGate loading={null} persistor={persistor}>
+        <HashRouter>
+          <App />
+        </HashRouter>
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );
