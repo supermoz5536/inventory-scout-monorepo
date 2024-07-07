@@ -2,7 +2,13 @@
 // Firebaseの公式SDKから
 // Firestore関連の機能を
 // インポートするためのモジュールパスです。
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  DocumentData,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "./firebase";
 
 export const getFirstUserEmail = async () => {
@@ -14,5 +20,20 @@ export const getFirstUserEmail = async () => {
     }
   } catch (error) {
     console.log("getFirstUserEmail(): failed");
+  }
+};
+
+export const getUserDoc = async (
+  uid: string
+): Promise<DocumentData | undefined> => {
+  const docRef = doc(db, "users", uid);
+  // getDoc(): 引数で指定した参照のドキュメントを取得
+  const docSnapShot = await getDoc(docRef);
+
+  try {
+    if (docSnapShot.exists()) return docSnapShot;
+  } catch (error) {
+    console.log("getUserDoc(): error", error);
+    throw error;
   }
 };

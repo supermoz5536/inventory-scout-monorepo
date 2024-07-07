@@ -1,5 +1,5 @@
 import { auth } from "./firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
 
 // 必要な関数の機能
 // inputで入力された
@@ -8,13 +8,23 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 // サインインが成功したら、
 // 状態変数のisLoggedInをtrueに更新する
 
-const logInAndUpdateUser = async (email: string, password: string) => {
-  await signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // ■■■■■■■ 状態変数のisLoggedInをtrueに更新する ■■■■■■■■
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
+export const logInWithEmailAndPassword = async (
+  email: string,
+  password: string
+): Promise<UserCredential> => {
+  try {
+    // signInWithEmailAndPassword は
+    // ログイン成功時のみ
+    // UserCredential オブジェクトを返します。
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return userCredential;
+  } catch (error: any) {
+    console.log("signInWithEmailAndPassword: failed error.code", error.code);
+    console.log("signInWithEmailAndPassword: failed error.code", error.message);
+    throw error;
+  }
 };

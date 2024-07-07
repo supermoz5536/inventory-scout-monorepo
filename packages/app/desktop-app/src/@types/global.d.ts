@@ -1,3 +1,5 @@
+import { store } from "../redux/store";
+
 declare global {
   interface Window {
     myAPI: {
@@ -20,8 +22,12 @@ declare global {
       ) => void;
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;
+      saveUser: (user: User) => Promise<void>;
     };
   }
+
+  type RootState = ReturnType<typeof store.getState>;
+  type AppDispatch = typeof store.dispatch;
 
   // initialStateの型定義
   // ASINState型のオブジェクトが
@@ -58,21 +64,21 @@ declare global {
     sellerName: string;
     stockCountDatas: StockCountData[];
   }
-}
 
-/// key が日付 value が在庫数の型定義です。
-interface StockCountData {
-  [date: string]: number;
-}
+  /// key が日付 value が在庫数の型定義です。
+  interface StockCountData {
+    [date: string]: number;
+  }
 
-interface User {
-  uid: string;
-  email: string;
-  password: string;
-  isAuthed: boolean;
-  isAutoLogIn: boolean;
-  plan: string;
-  createdAt: Date;
+  interface User {
+    uid: string;
+    email: string | null;
+    password: string;
+    isAuthed: boolean;
+    isAutoLogIn: boolean;
+    plan: string;
+    createdAt: string;
+  }
 }
 
 // tsの構文では

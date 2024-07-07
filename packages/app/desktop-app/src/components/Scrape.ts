@@ -1,7 +1,6 @@
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { ipcMain } from "electron";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import UserAgent from "user-agents";
 
 // ■ クラスの定義

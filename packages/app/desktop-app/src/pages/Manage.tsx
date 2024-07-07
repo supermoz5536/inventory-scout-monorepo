@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "./Manage.css";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../redux/store"; // 型をインポート
+
 import {
   addAsin,
   removeAsin,
@@ -152,7 +152,7 @@ function Manage() {
     // const remainingCount をインクリメント
     // 要素1つにつき１分なのでそのまま表示
     const remainingCount: number = asinDataListRef.current.reduce(
-      (totalCount, asinData) => {
+      (totalCount: number, asinData: AsinData) => {
         return asinData.isScraping === true ? ++totalCount : totalCount;
       },
       0
@@ -247,7 +247,7 @@ function Manage() {
 
             {/* リスト部分 */}
             <div className="manage-asinArray-map-wrapper-manage-css">
-              {asinDataList.map((asinData, index) => (
+              {asinDataList.map((asinData: AsinData, index: any) => (
                 <div className="manage-asin-list" key={index}>
                   {/* 要素 ID */}
                   <div className="manage-square-space-amazon-num">

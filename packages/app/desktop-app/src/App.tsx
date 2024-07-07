@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AppDispatch, RootState, store } from "./redux/store";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateAsinData,
@@ -81,20 +81,22 @@ const App: React.FC = () => {
             today.getMonth() + 1
           ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-          const checkArray = asinDataListRef.current.find((asinData) => {
-            // 以下２点を満たすとTrue
-            // ・スクレイピングが取得中
-            // ・今日の日付のStockCountDataが存在してる
-            return (
-              asinData.isScraping === true &&
-              (asinData.fbaSellerDatas.some((fbaSellerData) =>
-                fbaSellerData.stockCountDatas.some((stockCountData) =>
-                  Object.keys(stockCountData).includes(todayFormatted)
-                )
-              ) ||
-                asinData.fetchLatestDate === "")
-            );
-          });
+          const checkArray = asinDataListRef.current.find(
+            (asinData: AsinData) => {
+              // 以下２点を満たすとTrue
+              // ・スクレイピングが取得中
+              // ・今日の日付のStockCountDataが存在してる
+              return (
+                asinData.isScraping === true &&
+                (asinData.fbaSellerDatas.some((fbaSellerData) =>
+                  fbaSellerData.stockCountDatas.some((stockCountData) =>
+                    Object.keys(stockCountData).includes(todayFormatted)
+                  )
+                ) ||
+                  asinData.fetchLatestDate === "")
+              );
+            }
+          );
 
           if (checkArray) {
             console.log("同日に前回処理が中断された際の自動フォローアップ起動");

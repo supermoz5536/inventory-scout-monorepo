@@ -108,12 +108,31 @@ ipcMain.handle("save-data", (event, data) => {
     // fs.writeFile: node.jsのファイル書き込みメソッド
     // 構文: fs.writeFile(path, data, callback)
     // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
+    // stringify 第二引数は「リプレーサー」と呼ばれ、
+    // どのプロパティをJSONに含めるかを決めるためのものです。
+    // null を指定すると、そのオブジェクトのすべてのプロパティがJSON文字列に含まれます。
+    // stringify 第3引数: JSON文字列を整形（インデント）するために使用されるスペース数
     fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
       if (err) {
         console.error("Failed to save data:");
         return reject(err);
       }
       console.log("Data saved successfully:", data);
+      resolve();
+    });
+  });
+});
+
+ipcMain.handle("save-user", (event, data: User) => {
+  // ローカルストレージのpathを取得
+  const storagePath = path.join(__dirname, "user.json");
+  return new Promise<void>((resolve, reject) => {
+    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        console.error("save-user Failed :");
+        return reject(err);
+      }
+      console.log("save-user success:", data);
       resolve();
     });
   });
@@ -216,13 +235,23 @@ function openPreferences() {
   const prefWindow = new BrowserWindow({
     width: 450,
     height: 800,
-    resizable: false, // ウィンドウサイズを変更できないようにする
+    // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
-      nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js"),
+      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
+      // preload.tsの読み込みに失敗します。
+      sandbox: false,
     },
   });
 
   // ローカルファイルを指定するパスを指定したいだけなので
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
   prefWindow.loadURL(`${appURL}#/Setting`);
+
+  if (!app.isPackaged) {
+    prefWindow.webContents.openDevTools();
+  } else {
+    // パッケージ化された状態でもデベロッパーツールを開く
+    prefWindow.webContents.openDevTools();
+  }
 }
