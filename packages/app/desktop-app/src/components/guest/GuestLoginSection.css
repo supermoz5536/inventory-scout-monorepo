@@ -43,7 +43,7 @@
 .guest-login-section-password-toggle-button {
   height: 100%; /* ボタンの高さを親要素の高さに一致させ、結果的に中央に配置させる */
   position: absolute; /* 親要素の相対位置を基準にして絶対位置に配置 */
-  left: 65%;
+  left: 75%;
   background: none; /* 背景を透明に設定 */
   border: none; /* ボーダーを取り除く */
   cursor: pointer; /* ホバー時にポインター（手の形のカーソル）を表示 */
@@ -51,13 +51,26 @@
 }
 
 .guest-login-section-login-button {
-  margin-top: 5px;
+  margin-top: 10px;
+  display: flex;
+  position: relative;
+}
+
+.guest-login-section-login-button button {
   height: 22.5px;
   width: 70px;
 }
 
+.guest-login-section-login-button p {
+  font-size: 12px;
+  color: rgb(255, 48, 48);
+  position: absolute;
+  top: -30%;
+  left: 25%;
+}
+
 .guest-login-section-auto-login {
-  margin-top: 7.5px;
+  margin-top: 10px;
   display: flex;
   flex-direction: row;
 }

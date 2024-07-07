@@ -12,6 +12,8 @@ const GuestLoginSection = () => {
   let isAutoLogIn: boolean = false;
   const dispatch = useDispatch<AppDispatch>();
 
+  const [errorFlag, setErrorFlag] = useState("");
+
   // パスワード表示制御ようのstate
   const [isVisiblePassword, setIsVisiblePassword] = useState(false);
   const toggleVisiblePassword = () => {
@@ -43,10 +45,11 @@ const GuestLoginSection = () => {
       inputEmail,
       inputPassword
     );
-    if (userCredential) {
-      // ■ userCredential.user.uid と一致するドキュメントが存在しない場合
-      // インフォトップ決済の仕様においては、手動でFirestoreのDocの作成が必要
 
+    // オブジェクトが存在し
+    // string型（エラーメッセージ）ではない場合は
+    // 取得成功してる
+    if (userCredential && typeof userCredential !== "string") {
       // ■ userCredential.user.uid と一致するドキュメントが存在する場合
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
@@ -68,11 +71,11 @@ const GuestLoginSection = () => {
 
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
-
-        // redux-persistでユーザー情報は管理できてるのでひとまず必要ない
-        // // ローカルストレージのuserDataを更新
-        // await window.myAPI.saveUser(userRef.current);
       }
+
+      // ログイン失敗時のエラーハンドリング
+    } else if (userCredential && typeof userCredential === "string") {
+      setErrorFlag(userCredential);
     }
   };
 
@@ -103,14 +106,35 @@ const GuestLoginSection = () => {
             <FontAwesomeIcon icon={isVisiblePassword ? faEyeSlash : faEye} />
           </button>
         </div>
-        <button
-          className="guest-login-section-login-button"
-          onClick={() => {
-            handleLogIn(inputEmail, inputPassword);
-          }}
-        >
-          ログイン
-        </button>
+        <div className="guest-login-section-login-button">
+          <button
+            onClick={() => {
+              handleLogIn(inputEmail, inputPassword);
+            }}
+          >
+            ログイン
+          </button>
+
+          {errorFlag === "" ? (
+            <p></p>
+          ) : errorFlag === "e0" ? (
+            <p>無効なメールアドレスです</p>
+          ) : errorFlag === "e1" ? (
+            <p>メールアドレスが見つかりません</p>
+          ) : errorFlag === "e2" ? (
+            <p>パスワードが間違っています</p>
+          ) : errorFlag === "e3" ? (
+            <p>ログイン情報に誤りがあります。</p>
+          ) : errorFlag === "e4" ? (
+            <p>
+              ログインの試行回数が多すぎます
+              <br />
+              少し時間をおいてからもう一度お試しください
+            </p>
+          ) : (
+            <p>"不明なエラーです、運営者にお問い合わせください"</p>
+          )}
+        </div>
         <div className="guest-login-section-auto-login">
           <input type="checkbox" onChange={(event) => {}} />
           <p>次回から自動でログインする</p>

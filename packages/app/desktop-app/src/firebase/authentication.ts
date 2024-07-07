@@ -11,7 +11,7 @@ import {
 export const logInWithEmailAndPassword = async (
   email: string,
   password: string
-): Promise<UserCredential> => {
+) => {
   try {
     // signInWithEmailAndPassword は
     // ログイン成功時のみ
@@ -22,10 +22,32 @@ export const logInWithEmailAndPassword = async (
       password
     );
     return userCredential;
-  } catch (error: any) {
-    console.log("signInWithEmailAndPassword: failed error.code", error.code);
-    console.log("signInWithEmailAndPassword: failed error.code", error.message);
-    throw error;
+  } catch (e: any) {
+    console.log("logInWithEmailAndPassword( ): e.message", e.code.message);
+
+    if (e.code == "auth/invalid-email") {
+      console.log("logInWithEmailAndPassword( ): failed e0", e.code);
+      // 無効なメールアドレスです
+      return "e0";
+    } else if (e.code == "auth/user-not-found") {
+      console.log("logInWithEmailAndPassword( ): failed e1", e.code);
+      // メールアドレスが見つかりません。
+      return "e1";
+    } else if (e.code == "auth/wrong-password") {
+      console.log("logInWithEmailAndPassword( ): failed e2", e.code);
+      // パスワードが間違っています。
+      return "e2";
+    } else if (e.code == "auth/invalid-credential") {
+      console.log("logInWithEmailAndPassword( ): failed e3", e.code);
+      // ログイン情報に誤りがあります。
+      return "e3";
+    } else if (e.code == "auth/too-many-requests") {
+      console.log("logInWithEmailAndPassword( ): failed e4", e.code);
+      // ログインの試行回数が多すぎます。少し時間をおいてからもう一度お試しください
+      return "e4";
+    } else {
+      console.log("logInWithEmailAndPassword( ): failed", e.code);
+    }
   }
 };
 
