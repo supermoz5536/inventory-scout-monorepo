@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./AuthedLoginSection.css";
 import { getFirstUserEmail } from "../../firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { logOut } from "../../firebase/authentication";
+import { changeAuthedStatus } from "../../redux/userSlice";
 
 export const AuthedLoginSection = () => {
-  // テスト用ハードコード
-  const [email, setEmail] = useState("");
+  const user: User = useSelector((state: RootState) => state.user.value);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // ■■■■■■　ストア格納のuser変数から取得に変更すること　■■■■■■
-  useEffect(() => {
-    (async () => {
-      const fetchedEmail = await getFirstUserEmail();
-      setEmail(fetchedEmail);
-    })();
-  }, []);
+  const handleLogout = async () => {
+    const signOutResult: boolean = await logOut();
+
+    if (signOutResult === true) {
+      dispatch(changeAuthedStatus(false));
+    }
+  };
 
   return (
     <>
@@ -20,9 +23,12 @@ export const AuthedLoginSection = () => {
       <div className="authed-login-section">
         <div className="authed-login-section-email">
           <p className="authed-login-section-email-text">ログイン中：</p>
-          <p className="authed-login-section-email-adress">{email}</p>
+          <p className="authed-login-section-email-adress">{user.email}</p>
         </div>
-        <button className="authed-login-section-login-button">
+        <button
+          className="authed-login-section-login-button"
+          onClick={handleLogout}
+        >
           ログアウト
         </button>
       </div>

@@ -24,6 +24,10 @@ export const userSlice = createSlice({
     updateUser: (state, action: PayloadAction<User>) => {
       state.value = action.payload;
     },
+
+    changeAuthedStatus: (state, action: PayloadAction<boolean>) => {
+      state.value.isAuthed = action.payload;
+    },
   },
 });
 
@@ -31,7 +35,7 @@ export const userSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { updateUser } = userSlice.actions;
+export const { updateUser, changeAuthedStatus } = userSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。

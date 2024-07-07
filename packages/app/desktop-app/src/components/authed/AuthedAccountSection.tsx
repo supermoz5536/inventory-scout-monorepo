@@ -1,10 +1,10 @@
 import React from "react";
 import "./AuthedAccountSection.css";
-
-// デバッグ用ハードコード
-const email: string = "testtesttest@gmail.com";
+import { useSelector } from "react-redux";
 
 const AuthedEmailSection = () => {
+  const user: User = useSelector((state: RootState) => state.user.value);
+
   return (
     <>
       <h2 className="authed-account-section-h2">アカウント設定</h2>
@@ -14,7 +14,9 @@ const AuthedEmailSection = () => {
           <p>メールアドレスの変更</p>
           <div className="authed-account-section-email-item">
             <p>現在のメールアドレス：</p>
-            <p className="authed-account-section-email-item-value">{email}</p>
+            <p className="authed-account-section-email-item-value">
+              {user.email}
+            </p>
           </div>
           <div className="authed-account-section-email-item">
             <p>新しいメールアドレス：</p>
