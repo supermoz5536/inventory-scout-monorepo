@@ -122,7 +122,7 @@ function Top() {
           // isScrapingをTrueにするメソッド
           dispatch(setIsScrapingTrueForNewItems());
           window.myAPI.runScraping(asinDataListRef.current);
-          dispatch(switchSystemStatus(5));
+          dispatch(switchSystemStatus(3));
         } else {
           dispatch(updateIsScrapingTrueAll());
           window.myAPI.runScraping(asinDataList);
@@ -420,11 +420,11 @@ function Top() {
             : systemStatus === 2
             ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 3
-            ? `データ取得が完了しました。`
+            ? `追加されたASINのデータを取得しています`
             : systemStatus === 4
             ? `本日分のデータ取得は既に完了しています。`
             : systemStatus === 5
-            ? `追加されたASINのデータを取得しています`
+            ? `データ取得が完了しました。`
             : `System cord e`}
         </p>
       </div>
