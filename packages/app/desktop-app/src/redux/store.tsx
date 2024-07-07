@@ -13,6 +13,8 @@ import storage from "redux-persist/lib/storage"; // defaults to localStorage for
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: [], // 保存するリデューサーを指定
+  // whitelist: ["user"], // 保存するリデューサーを指定
 };
 
 // combineReducers: reducerを1つのオブジェクトにまとめる関数

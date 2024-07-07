@@ -5,6 +5,8 @@ import { getUserDoc } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/userSlice";
 import { DocumentData } from "firebase/firestore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const GuestLoginSection = () => {
   let isAutoLogIn: boolean = false;
@@ -12,6 +14,9 @@ const GuestLoginSection = () => {
 
   // パスワード表示制御ようのstate
   const [isVisiblePassword, setIsVisiblePassword] = useState(false);
+  const toggleVisiblePassword = () => {
+    setIsVisiblePassword(!isVisiblePassword);
+  };
 
   // グローバル変数のuserの参照を定数で定義
   const user = useSelector((state: RootState) => state.user.value);
@@ -64,8 +69,9 @@ const GuestLoginSection = () => {
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
 
-        // ローカルストレージのuserDataを更新
-        await window.myAPI.saveUser(userRef.current);
+        // redux-persistでユーザー情報は管理できてるのでひとまず必要ない
+        // // ローカルストレージのuserDataを更新
+        // await window.myAPI.saveUser(userRef.current);
       }
     }
   };
@@ -76,16 +82,26 @@ const GuestLoginSection = () => {
       <div className="guest-login-section">
         <div className="guest-login-section-email">
           <p>メールアドレス：</p>
-          <input value={inputEmail} onChange={handleInputEmailChange}></input>
+          <input
+            placeholder="メールアドレス"
+            value={inputEmail}
+            onChange={handleInputEmailChange}
+          ></input>
         </div>
         <div className="guest-login-section-password">
           <p>パスワード：</p>
           <input
-            placeholder="Password"
+            placeholder="パスワード"
             type={isVisiblePassword ? "text" : "password"}
             value={inputPassword}
             onChange={handleInputPasswordChange}
           ></input>
+          <button
+            className="guest-login-section-password-toggle-button"
+            onClick={toggleVisiblePassword}
+          >
+            <FontAwesomeIcon icon={isVisiblePassword ? faEyeSlash : faEye} />
+          </button>
         </div>
         <button
           className="guest-login-section-login-button"
