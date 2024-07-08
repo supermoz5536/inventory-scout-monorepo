@@ -213,10 +213,11 @@ ipcMain.handle("load-data", () => {
 /// 初期化処理として
 /// 設定画面をコールするメニュー部分を生成する関数です。
 app.whenReady().then(() => {
-  // createWindow();
-
   const menu = new Menu();
-  const isMac = process.platform === "darwin"; // macOSかどうかを判定
+
+  // darwin はmacOXの意味
+  const isMac = process.platform === "darwin";
+  // メニューバーのアプリ変更はパッケージ化するまで反映されません
   app.setName("在庫スカウター");
 
   // ■ macOS用のカスタムメニューアイテムを作成
