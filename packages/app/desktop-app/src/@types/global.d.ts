@@ -6,6 +6,7 @@ declare global {
       counter: (count: number) => number;
       openExternal: (url: string) => void | null;
       runScraping: (asinDataList: AsinData[]) => void;
+      stopScraping: () => void;
       scrapingResult: (
         callback: (
           event: Electron.IpcRendererEvent,

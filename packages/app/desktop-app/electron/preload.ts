@@ -32,6 +32,8 @@ contextBridge.exposeInMainWorld("myAPI", {
   runScraping: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("runScraping", asinDataList),
 
+  stopScraping: () => ipcRenderer.invoke("stopScraping"),
+
   scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
 
   removeScrapingResult: (callback) =>

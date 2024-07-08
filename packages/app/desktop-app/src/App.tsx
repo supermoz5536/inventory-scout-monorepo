@@ -40,7 +40,7 @@ const App: React.FC = () => {
         if (isEnd) {
           // システムメッセージの表示フラグ
           //「データ取得完了」
-          dispatch(switchSystemStatus(3));
+          dispatch(switchSystemStatus(5));
         } else if (asinData) {
           // グローバル変数のASINリストの
           // 取得したasinDataと合致するオブジェクトを
