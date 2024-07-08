@@ -4,7 +4,7 @@
 // なので、自動的にpreload.tsでも参照が反映されます。
 /// <reference path="../src/@types/global.d.ts" />
 
-import { app, BrowserWindow, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, MenuItem } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
@@ -12,6 +12,8 @@ import scrapePromis from "../src/components/Scrape";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
+let scrape: any;
+let browser: any;
 
 /// メイン画面を生成する関数です
 const createMainWindow = () => {
@@ -85,6 +87,11 @@ app.whenReady().then(() => {
 
 //====================================================================
 
+// メインプロセス内で通常利用できる関数
+function updateGlobalBrowser(newBrowser: any) {
+  browser = newBrowser;
+}
+
 // ipcMain.handle メソッドは、メインプロセスで
 // 特定のIPC (Inter-Process Communication) チャンネルを設定し、
 // そのチャンネルに対する非同期のリクエストを
@@ -93,11 +100,27 @@ app.whenReady().then(() => {
 // 非同期でメッセージを送信し、応答を受け取ることができます。
 ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
   try {
-    const scrape = await scrapePromis;
-    scrape.runScraping(event, asinDataList);
+    scrape = await scrapePromis;
+    browser = await scrape.launchBrowser();
+    scrape.runScraping(
+      scrape,
+      browser,
+      updateGlobalBrowser,
+      event,
+      asinDataList
+    );
   } catch (error) {
-    console.error("MyAPI scrape ERROR", error);
-    return "MyAPI scrape ERROR"; // エラーメッセージを返す
+    console.error("runScraping ERROR", error);
+    return "runScraping ERROR"; // エラーメッセージを返す
+  }
+});
+
+ipcMain.handle("stopScraping", async () => {
+  try {
+    browser.close();
+  } catch (error) {
+    console.error("stopScraping ERROR", error);
+    return "stopScraping ERROR"; // エラーメッセージを返す
   }
 });
 
@@ -192,40 +215,86 @@ ipcMain.handle("load-data", () => {
 app.whenReady().then(() => {
   // createWindow();
 
+  const menu = new Menu();
   const isMac = process.platform === "darwin"; // macOSかどうかを判定
+  app.setName("在庫スカウター");
 
-  const template = [
-    // 三項演算子で記述
-    // macOSの場合、メニューオブジェクトを記述
-    // macOSでない場合、空のの配列
-    ...(isMac
-      ? [
-          {
-            label: app.name,
-            submenu: [
-              // macOS用のPreferences
-              { label: "Preferences", click: openPreferences },
-            ],
-          },
-        ]
-      : []),
+  // ■ macOS用のカスタムメニューアイテムを作成
+  if (isMac) {
+    const appMenu = new MenuItem({
+      label: app.name,
+      submenu: [
+        { label: "環境設定", click: openPreferences },
+        { type: "separator" },
+        { label: "終了", role: "quit" },
+      ],
+    });
 
-    // windowsの場合、ファイルメニュー
-    // windowsの場合、空の配列
-    ...(!isMac
-      ? [
-          {
-            label: "ファイル",
-            submenu: [
-              // Windows用のPreferences
-              { label: "Preferences", click: openPreferences },
-            ],
-          },
-        ]
-      : []),
-  ];
+    // macOSの場合は、メニューバーの２番目の項目に
+    // 自動で「音声入力を開始」と「絵文字と記号」が
+    // 追加されるので、ダミーデータを渡し非表示設定
+    const dummyMenu = new MenuItem({
+      label: "DummyData",
+      visible: false,
+    });
 
-  const menu = Menu.buildFromTemplate(template);
+    const fileMenu = new MenuItem({
+      label: "ファイル",
+      submenu: [{ label: "csvで書き出し" }],
+    });
+
+    const editMenu = new MenuItem({
+      label: "編集",
+      submenu: [
+        { label: "切り取り", role: "cut" },
+        { label: "コピー", role: "copy" },
+        { label: "ペースト", role: "paste" },
+        { type: "separator" },
+        { label: "取り消し", role: "undo" },
+        { label: "すべて選択", role: "selectAll" },
+      ],
+    });
+
+    menu.append(appMenu);
+    menu.append(dummyMenu);
+    menu.append(fileMenu);
+    menu.append(editMenu);
+  } else {
+    // ■ Windows用のカスタムメニューアイテムを作成
+    const appMenu = new MenuItem({
+      label: app.name,
+      submenu: [
+        { label: "環境設定", click: openPreferences },
+        { type: "separator" },
+        { label: "終了", role: "quit" },
+      ],
+    });
+
+    const fileMenu = new MenuItem({
+      label: "ファイル",
+      submenu: [{ label: "csvで書き出し" }],
+    });
+
+    const editMenu = new MenuItem({
+      label: "編集",
+      submenu: [
+        { label: "切り取り", role: "cut" },
+        { label: "コピー", role: "copy" },
+        { label: "ペースト", role: "paste" },
+        { type: "separator" },
+        { label: "取り消し", role: "undo" },
+        { label: "すべて選択", role: "selectAll" },
+      ],
+    });
+
+    menu.append(appMenu);
+    menu.append(fileMenu);
+    menu.append(editMenu);
+  }
+
+  // デフォルトのメニューを削除
+  Menu.setApplicationMenu(null);
+  // const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 });
 

@@ -7,7 +7,6 @@ import {
   removeAsin,
   switchRemoveCheck,
 } from "../redux/asinDataListSlice";
-import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -44,6 +43,13 @@ function Manage() {
   // その型をAppDispatchとして指定することで
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
+
+  // onPasteイベントをハンドルする関数
+  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    event.preventDefault();
+    const pastedText = event.clipboardData.getData("text");
+    setInputAsin((inputAsin) => inputAsin + pastedText);
+  };
 
   // ボタンをクリックしたときにアクションをディスパッチする関数
   const handleAddAsin = async () => {
@@ -197,6 +203,7 @@ function Manage() {
                 handleAddAsin();
               }
             }}
+            onPaste={handlePaste}
             rows={300}
             cols={10}
             placeholder={

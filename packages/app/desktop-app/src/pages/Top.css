@@ -34,9 +34,9 @@
   display: flex;
   position: relative;
 }
-.top-square-space-menu-container-left-update {
+.top-square-space-menu-container-left-scraping {
   height: 25px;
-  width: 45px;
+  width: 90px;
   display: flex;
   justify-content: center;
   align-items: center;

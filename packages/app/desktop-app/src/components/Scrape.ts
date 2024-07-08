@@ -920,6 +920,9 @@ const scrapePromise = (async () => {
     },
 
     runScraping: async (
+      scrape: any,
+      browser: any,
+      updateGlobalBrowser: (newBrowser: any) => void,
       event: Electron.IpcMainInvokeEvent,
       asinDataList: AsinData[],
       today?: Date // ? はデフォルト値の設定がないことを意味します
@@ -936,8 +939,8 @@ const scrapePromise = (async () => {
 
       // scraperPromisの初期化（メンバ変数の宣言）部分が非同期なので
       // 同期化してからメソッド部分の非同期メソッドを各々実行
-      const scrape = await scrapePromise;
-      const browser = await scrape.launchBrowser();
+      // const scrape = await scrapePromise;
+      // const browser = await scrape.launchBrowser();
       const page = await scrape.launchPage(browser);
 
       try {
@@ -1035,7 +1038,19 @@ const scrapePromise = (async () => {
           retryCount++;
           await sleep(3000);
           await browser.close();
-          await scrape.runScraping(event, asinDataList, today);
+          const newBrowser = await scrape.launchBrowser();
+          // 他のメインプロセス関数のstopScrapingで
+          // ブラウザを強制終了できるように
+          // メインプロセスのグローバルスコープのbrowser変数を更新する
+          updateGlobalBrowser(newBrowser);
+          await scrape.runScraping(
+            scrape,
+            newBrowser,
+            updateGlobalBrowser,
+            event,
+            asinDataList,
+            today
+          );
         } else {
           console.log("最大リトライ回数に達しました。処理を終了します。");
           await browser.close();
