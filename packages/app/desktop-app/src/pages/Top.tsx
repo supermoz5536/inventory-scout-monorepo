@@ -12,6 +12,10 @@ import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
+  let stopConfirmed: boolean = false;
+  let isRunning: boolean = false;
+  const [showButton, setShowButton] = useState<number>(0);
+
   // グローバル変数のasinDataListの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
@@ -52,6 +56,40 @@ function Top() {
     const asinDataListCount = asinDataList.length;
     setAsinDataListCount(asinDataListCount);
   }, [asinDataList.length]);
+
+  const handleScrapingButton = (
+    asinDataList: AsinData[],
+    stopConfirmed: boolean,
+    isRunning: boolean,
+    showButton: number
+  ) => {
+    // 待機状態での「取得開始」のクリック
+    if ([0, 4, 5].includes(systemStatus)) {
+      // スクレイピングを開始
+      showButton = 1;
+      handleRunScraping(asinDataList);
+
+      // スクレイピング中の「取得停止」のクリック
+    } else if (
+      [1, 2, 3].includes(systemStatus) &&
+      stopConfirmed === false &&
+      showButton === 1
+    ) {
+      // 「本当に？」UIを表示
+      showButton = 2;
+
+      // スクレイピング中の「本当に？」のクリック
+    } else if (
+      [1, 2, 3].includes(systemStatus) &&
+      stopConfirmed === false &&
+      showButton === 2
+    ) {
+      // スクレイピングの終了処理を実行
+      showButton = 0;
+      isRunning = false;
+      // stopScraping関数を実行
+    }
+  };
 
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     if (asinDataListRef.current.length > 0) {
@@ -132,6 +170,10 @@ function Top() {
     }
   };
 
+  const handleStopScraping = async () => {
+    // メインプロセスの終了メソッドの呼び出し
+  };
+
   const handleRemoveAsin = async () => {
     dispatch(removeAsin());
     // 状態変数の更新が完了するまで200ms待機
@@ -184,9 +226,22 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-update"
-            onClick={() => handleRunScraping(asinDataList)}
+            onClick={() =>
+              handleScrapingButton(
+                asinDataList,
+                stopConfirmed,
+                isRunning,
+                showButton
+              )
+            }
           >
-            更新
+            {showButton === 0
+              ? "取得開始"
+              : showButton === 1
+              ? "取得停止"
+              : showButton === 2
+              ? "本当に？"
+              : null}
           </button>
           {/* 全選択チェック */}
           <input
