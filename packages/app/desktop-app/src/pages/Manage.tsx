@@ -335,8 +335,12 @@ function Manage() {
             : systemStatus === 2
             ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 3
+            ? `追加されたASINのデータを取得しています`
+            : systemStatus === 4
+            ? `本日分のデータ取得は既に完了しています。`
+            : systemStatus === 5
             ? `データ取得が完了しました。`
-            : "system code e"}
+            : `System cord e`}
         </p>
       </div>
     </div>
