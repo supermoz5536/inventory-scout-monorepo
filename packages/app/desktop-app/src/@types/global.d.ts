@@ -81,6 +81,12 @@ declare global {
     plan: string;
     createdAt: string;
   }
+
+  interface SystemStatus {
+    systemStatus: number;
+    isConfirmed: boolean;
+    showButtonStatus: number;
+  }
 }
 
 // tsの構文では

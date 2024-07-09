@@ -6,7 +6,7 @@ import {
   updateAsinData,
   updateWithLoadedData,
 } from "./redux/asinDataListSlice";
-import { switchSystemStatus } from "./redux/systemStatusSlice";
+import { changeSystemStatus } from "./redux/systemStatusSlice";
 import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
@@ -41,7 +41,7 @@ const App: React.FC = () => {
         if (isEnd) {
           // システムメッセージの表示フラグ
           //「データ取得完了」
-          dispatch(switchSystemStatus(5));
+          dispatch(changeSystemStatus(5));
         } else if (asinData) {
           // グローバル変数のASINリストの
           // 取得したasinDataと合致するオブジェクトを
@@ -103,7 +103,7 @@ const App: React.FC = () => {
             console.log("同日に前回処理が中断された際の自動フォローアップ起動");
             // システムメッセージ表示フラグ
             //「アプリ終了で中断された取得処理を自動で...」
-            dispatch(switchSystemStatus(2));
+            dispatch(changeSystemStatus(2));
             window.myAPI.runScraping(asinDataListRef.current);
           }
         }

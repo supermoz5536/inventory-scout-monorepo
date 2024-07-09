@@ -23,7 +23,7 @@ function Manage() {
 
   // グローバル変数のsystemStatusの値を取得
   const systemStatus = useSelector(
-    (state: RootState) => state.systemStatus.value
+    (state: RootState) => state.systemStatus.value.systemStatus
   );
 
   // 入力フィールドの状態を管理するためのuseState
