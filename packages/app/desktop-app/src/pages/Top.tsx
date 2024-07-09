@@ -8,17 +8,13 @@ import {
   switchIsDeleteCheckAll,
   setIsScrapingTrueForNewItems,
 } from "../redux/asinDataListSlice";
-import { switchSystemStatus } from "../redux/systemStatusSlice";
+import {
+  changeSystemStatus,
+  changeShowButtonStatus,
+} from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
-<<<<<<< Updated upstream
-  let stopConfirmed: boolean = false;
-  let isRunning: boolean = false;
-  const [showButton, setShowButton] = useState<number>(0);
-
-  // グローバル変数のasinDataListの値を取得
-=======
   // asinDataListを取得
   // handleRemoveAsinで
   // レンダリング処理の時間分で
@@ -28,7 +24,6 @@ function Top() {
   // useRefで再レンダリング処理を避けることで
   // 最速での状態の取得処理により
   // 順番のズレを回避する
->>>>>>> Stashed changes
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -37,19 +32,9 @@ function Top() {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
-<<<<<<< Updated upstream
-  // グローバル変数のsystemStatusの値を取得
-  const systemStatus = useSelector(
-    (state: RootState) => state.systemStatus.value
-  );
-
-=======
   // システム関係の状態変数の取得
   const systemStatus: number = useSelector(
     (state: RootState) => state.systemStatus.value.systemStatus
-  );
-  const isConfirmed: boolean = useSelector(
-    (state: RootState) => state.systemStatus.value.isConfirmed
   );
   const showButtonStatus = useSelector(
     (state: RootState) => state.systemStatus.value.showButtonStatus
@@ -58,7 +43,6 @@ function Top() {
   // ユーザーの状態変数の取得
   const user = useSelector((state: RootState) => state.user.value);
 
->>>>>>> Stashed changes
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
   // その型をAppDispatchとして指定することで
@@ -84,14 +68,8 @@ function Top() {
 
   const handleScrapingButton = (
     asinDataList: AsinData[],
-    stopConfirmed: boolean,
-    isRunning: boolean,
-    showButton: number
+    showButtonStatus: number
   ) => {
-<<<<<<< Updated upstream
-    // 待機状態での「取得開始」のクリック
-    if (
-=======
     // ■ ログインウインドウの表示
     if (user.isAuthed === false) {
       console.log("1");
@@ -101,13 +79,12 @@ function Top() {
     } else if (
       user.isAuthed === true &&
       user.plan !== "free" &&
->>>>>>> Stashed changes
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
       console.log("2");
       // スクレイピングを開始
-      setShowButton(1);
+      dispatch(changeShowButtonStatus(1));
       handleRunScraping(asinDataList);
 
       // スクレイピング中の「取得停止」のクリック
@@ -115,23 +92,20 @@ function Top() {
       user.isAuthed === true &&
       user.plan !== "free" &&
       [1, 2, 3].includes(systemStatus) &&
-      stopConfirmed === false &&
-      showButton === 1
+      showButtonStatus === 1
     ) {
       // 「本当に？」UIを表示
-      setShowButton(2);
+      dispatch(changeShowButtonStatus(2));
 
       // スクレイピング中の「本当に？」のクリック
     } else if (
       user.isAuthed === true &&
       user.plan !== "free" &&
       [1, 2, 3].includes(systemStatus) &&
-      stopConfirmed === false &&
-      showButton === 2
+      showButtonStatus === 2
     ) {
       // スクレイピングの終了処理を実行
-      setShowButton(0);
-      isRunning = false;
+      dispatch(changeShowButtonStatus(0));
       window.myAPI.stopScraping();
     }
   };
@@ -170,7 +144,7 @@ function Top() {
       // 当日のデータ取得が完了してるので
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
-      dispatch(switchSystemStatus(4));
+      dispatch(changeSystemStatus(4));
     } else {
       // ■ 同日に前回の処理が中断されている場合の処理
       // 以下２点を満たすとTrue
@@ -188,7 +162,7 @@ function Top() {
         // システムメッセージ表示フラグ
         //「アプリ終了で中断された取得処理を自動で...」
         window.myAPI.runScraping(asinDataListRef.current);
-        dispatch(switchSystemStatus(2));
+        dispatch(changeSystemStatus(2));
       } else if (hasNewItems) {
         // ■ 同日にデータ取得が無事完了している && 新規アイテムの追加がある場合
         // 新規アイテムのみを isScraping === trueに変更して引数に渡す
@@ -200,11 +174,11 @@ function Top() {
         // isScrapingをTrueにするメソッド
         dispatch(setIsScrapingTrueForNewItems());
         window.myAPI.runScraping(asinDataListRef.current);
-        dispatch(switchSystemStatus(3));
+        dispatch(changeSystemStatus(3));
       } else {
         dispatch(updateIsScrapingTrueAll());
         window.myAPI.runScraping(asinDataList);
-        dispatch(switchSystemStatus(1));
+        dispatch(changeSystemStatus(1));
       }
     }
   };
@@ -261,20 +235,13 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-scraping"
-            onClick={() =>
-              handleScrapingButton(
-                asinDataList,
-                stopConfirmed,
-                isRunning,
-                showButton
-              )
-            }
+            onClick={() => handleScrapingButton(asinDataList, showButtonStatus)}
           >
-            {showButton === 0
+            {showButtonStatus === 0
               ? "取得開始"
-              : showButton === 1
+              : showButtonStatus === 1
               ? "取得停止"
-              : showButton === 2
+              : showButtonStatus === 2
               ? "本当に？"
               : null}
           </button>
@@ -468,12 +435,12 @@ function Top() {
 
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease1 == -1 ? "" : asinData.decrease1}</p>
+                <p>{asinData.decrease1 === -1 ? "" : asinData.decrease1}</p>
               </div>
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease2 == -1 ? "" : asinData.decrease2}</p>
+                <p>{asinData.decrease2 === -1 ? "" : asinData.decrease2}</p>
               </div>
 
               {/* 要素11 最新取得 */}
