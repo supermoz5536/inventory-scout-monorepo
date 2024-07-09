@@ -14,6 +14,7 @@ import scrapePromis from "../src/components/Scrape";
 let appURL: string;
 let scrape: any;
 let browser: any;
+let LoginPromptWindow: any;
 
 /// メイン画面を生成する関数です
 const createMainWindow = () => {
@@ -87,11 +88,6 @@ app.whenReady().then(() => {
 
 //====================================================================
 
-// メインプロセス内で通常利用できる関数
-function updateGlobalBrowser(newBrowser: any) {
-  browser = newBrowser;
-}
-
 // ipcMain.handle メソッドは、メインプロセスで
 // 特定のIPC (Inter-Process Communication) チャンネルを設定し、
 // そのチャンネルに対する非同期のリクエストを
@@ -146,21 +142,6 @@ ipcMain.handle("save-data", (event, data) => {
   });
 });
 
-ipcMain.handle("save-user", (event, data: User) => {
-  // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "user.json");
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
-      if (err) {
-        console.error("save-user Failed :");
-        return reject(err);
-      }
-      console.log("save-user success:", data);
-      resolve();
-    });
-  });
-});
-
 ipcMain.handle("load-data", () => {
   const storagePath = path.join(__dirname, "asinDataList.json");
   return new Promise((resolve, reject) => {
@@ -206,6 +187,25 @@ ipcMain.handle("load-data", () => {
       }
     });
   });
+});
+
+ipcMain.handle("save-user", (event, data: User) => {
+  // ローカルストレージのpathを取得
+  const storagePath = path.join(__dirname, "user.json");
+  return new Promise<void>((resolve, reject) => {
+    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        console.error("save-user Failed :");
+        return reject(err);
+      }
+      console.log("save-user success:", data);
+      resolve();
+    });
+  });
+});
+
+ipcMain.handle("open-login-prompt", () => {
+  openLoginPrompt();
 });
 
 //====================================================================
@@ -299,6 +299,13 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(menu);
 });
 
+//====================================================================
+
+// メインプロセス内で通常利用できる関数
+function updateGlobalBrowser(newBrowser: any) {
+  browser = newBrowser;
+}
+
 // Preferencesがクリックされた際の
 // 設定画面を生成する関数です
 function openPreferences() {
@@ -324,4 +331,44 @@ function openPreferences() {
     // パッケージ化された状態でもデベロッパーツールを開く
     prefWindow.webContents.openDevTools();
   }
+}
+
+//「取得開始」がクリックされた際の
+// 設定画面を生成する関数です
+function openLoginPrompt() {
+  if (LoginPromptWindow) {
+    LoginPromptWindow.focus();
+    return;
+  }
+
+  LoginPromptWindow = new BrowserWindow({
+    width: 450,
+    height: 300,
+    resizable: false, // ウィンドウサイズを変更できないようにする
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
+      // preload.tsの読み込みに失敗します。
+      sandbox: false,
+    },
+  });
+
+  // ローカルファイルを指定するパスを指定したいだけなので
+  // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
+  LoginPromptWindow.loadURL(`${appURL}#/LoginPrompt`);
+
+  if (!app.isPackaged) {
+    LoginPromptWindow.webContents.openDevTools();
+  } else {
+    // パッケージ化された状態でもデベロッパーツールを開く
+    LoginPromptWindow.webContents.openDevTools();
+  }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  LoginPromptWindow.on("closed", () => {
+    LoginPromptWindow = null;
+  });
 }

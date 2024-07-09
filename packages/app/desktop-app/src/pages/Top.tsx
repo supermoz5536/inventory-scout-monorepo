@@ -12,11 +12,23 @@ import { switchSystemStatus } from "../redux/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
+<<<<<<< Updated upstream
   let stopConfirmed: boolean = false;
   let isRunning: boolean = false;
   const [showButton, setShowButton] = useState<number>(0);
 
   // グローバル変数のasinDataListの値を取得
+=======
+  // asinDataListを取得
+  // handleRemoveAsinで
+  // レンダリング処理の時間分で
+  // 状態変数の変更と
+  // 非同期のローカルストレージへの保存処理の順番に
+  // ズレが生じるので
+  // useRefで再レンダリング処理を避けることで
+  // 最速での状態の取得処理により
+  // 順番のズレを回避する
+>>>>>>> Stashed changes
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -25,28 +37,41 @@ function Top() {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
+<<<<<<< Updated upstream
   // グローバル変数のsystemStatusの値を取得
   const systemStatus = useSelector(
     (state: RootState) => state.systemStatus.value
   );
 
+=======
+  // システム関係の状態変数の取得
+  const systemStatus: number = useSelector(
+    (state: RootState) => state.systemStatus.value.systemStatus
+  );
+  const isConfirmed: boolean = useSelector(
+    (state: RootState) => state.systemStatus.value.isConfirmed
+  );
+  const showButtonStatus = useSelector(
+    (state: RootState) => state.systemStatus.value.showButtonStatus
+  );
+
+  // ユーザーの状態変数の取得
+  const user = useSelector((state: RootState) => state.user.value);
+
+>>>>>>> Stashed changes
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
   // その型をAppDispatchとして指定することで
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
-
+  const navigate = useNavigate();
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
-
   const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
 
   const gotoURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
-
     window.myAPI.openExternal(amazonURL);
   };
-
-  const navigate = useNavigate();
 
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
@@ -63,17 +88,32 @@ function Top() {
     isRunning: boolean,
     showButton: number
   ) => {
+<<<<<<< Updated upstream
     // 待機状態での「取得開始」のクリック
     if (
+=======
+    // ■ ログインウインドウの表示
+    if (user.isAuthed === false) {
+      console.log("1");
+      window.myAPI.openLoginPrompt();
+
+      // ■ 待機状態での「取得開始」のクリック
+    } else if (
+      user.isAuthed === true &&
+      user.plan !== "free" &&
+>>>>>>> Stashed changes
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
+      console.log("2");
       // スクレイピングを開始
       setShowButton(1);
       handleRunScraping(asinDataList);
 
       // スクレイピング中の「取得停止」のクリック
     } else if (
+      user.isAuthed === true &&
+      user.plan !== "free" &&
       [1, 2, 3].includes(systemStatus) &&
       stopConfirmed === false &&
       showButton === 1
@@ -83,6 +123,8 @@ function Top() {
 
       // スクレイピング中の「本当に？」のクリック
     } else if (
+      user.isAuthed === true &&
+      user.plan !== "free" &&
       [1, 2, 3].includes(systemStatus) &&
       stopConfirmed === false &&
       showButton === 2
@@ -165,10 +207,6 @@ function Top() {
         dispatch(switchSystemStatus(1));
       }
     }
-  };
-
-  const handleStopScraping = async () => {
-    // メインプロセスの終了メソッドの呼び出し
   };
 
   const handleRemoveAsin = async () => {

@@ -24,6 +24,7 @@ declare global {
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;
       saveUser: (user: User) => Promise<void>;
+      openLoginPrompt: () => void;
     };
   }
 

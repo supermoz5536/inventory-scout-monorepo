@@ -10,6 +10,7 @@ import { switchSystemStatus } from "./redux/systemStatusSlice";
 import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
+import LoginPrompt from "./pages/LoginPrompt";
 
 const App: React.FC = () => {
   // ストアから asinDataList の現在の値を取得し、
@@ -128,6 +129,7 @@ const App: React.FC = () => {
         <Route path="/Top" element={<Top />} />
         <Route path="/Manage" element={<Manage />} />
         <Route path="/Setting" element={<Setting />} />
+        <Route path="/LoginPrompt" element={<LoginPrompt />} />
       </Routes>
     </div>
   );

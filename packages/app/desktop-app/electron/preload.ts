@@ -45,4 +45,6 @@ contextBridge.exposeInMainWorld("myAPI", {
   loadData: () => ipcRenderer.invoke("load-data"),
 
   saveUser: (user: User) => ipcRenderer.invoke("save-user", user),
+
+  openLoginPrompt: () => ipcRenderer.invoke("open-login-prompt"),
 });
