@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import asinDataListSlice from "./asinDataListSlice";
-import systemStatusSlice from "./systemStatusSlice";
-import userSlice from "./userSlice";
+import asinDataListSlice from "../slices/asinDataListSlice";
+import systemStatusSlice from "../slices/systemStatusSlice";
+import userSlice from "../slices/userSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 

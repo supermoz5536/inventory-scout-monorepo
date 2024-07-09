@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateAsinData,
   updateWithLoadedData,
-} from "./redux/asinDataListSlice";
-import { changeSystemStatus } from "./redux/systemStatusSlice";
+} from "./slices/asinDataListSlice";
+import { changeSystemStatus } from "./slices/systemStatusSlice";
 import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";

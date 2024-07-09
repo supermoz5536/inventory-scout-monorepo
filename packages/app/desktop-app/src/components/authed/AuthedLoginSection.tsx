@@ -3,7 +3,7 @@ import "./AuthedLoginSection.css";
 import { getFirstUserEmail } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
-import { changeAuthedStatus } from "../../redux/userSlice";
+import { changeAuthedStatus } from "../../slices/userSlice";
 
 export const AuthedLoginSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);

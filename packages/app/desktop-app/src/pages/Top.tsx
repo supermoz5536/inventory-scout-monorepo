@@ -7,11 +7,11 @@ import {
   updateIsScrapingTrueAll,
   switchIsDeleteCheckAll,
   setIsScrapingTrueForNewItems,
-} from "../redux/asinDataListSlice";
+} from "../slices/asinDataListSlice";
 import {
   changeSystemStatus,
   changeShowButtonStatus,
-} from "../redux/systemStatusSlice";
+} from "../slices/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 
 function Top() {

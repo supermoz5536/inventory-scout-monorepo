@@ -3,7 +3,7 @@ import "./GuestLoginSection.css";
 import { logInWithEmailAndPassword } from "../../firebase/authentication";
 import { getUserDoc } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser } from "../../redux/userSlice";
+import { updateUser } from "../../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
