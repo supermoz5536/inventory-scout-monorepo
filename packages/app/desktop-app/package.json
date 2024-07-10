@@ -66,6 +66,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@types/redux-state-sync": "^3.1.10",
     "@types/user-agents": "^1.0.4",
     "@types/uuid": "^10.0.0",
     "concurrently": "^8.2.2",
