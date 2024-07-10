@@ -4,6 +4,11 @@ import systemStatusSlice from "../slices/systemStatusSlice";
 import userSlice from "../slices/userSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+import {
+  createStateSyncMiddleware,
+  initMessageListener,
+  withReduxStateSync,
+} from "redux-state-sync";
 
 // store: 状態(=state)と、状態変更関数のreducer(=Notifier)をまとめて、各sliceを格納したコンテナ
 // このstoreというコンテナ内の情報を安全にグローバルに公開するのがProvider
@@ -14,7 +19,6 @@ const persistConfig = {
   key: "root",
   storage,
   whitelist: ["user"], // 保存するリデューサーを指定
-  // whitelist: ["user"], // 保存するリデューサーを指定
 };
 
 // combineReducers: reducerを1つのオブジェクトにまとめる関数
@@ -29,13 +33,44 @@ const rootReducer = combineReducers({
 // 永続化の設定を含めた各リデューサーを一括したオブジェクトを作成
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// ミドルウェアでアクションを処理する際の設定
+const config = {
+  predicate: (action: any) => {
+    // actionに関数が含まれている場合は、
+    // containsFunction === trueとなります。
+    const containsFunction = (obj: any): boolean => {
+      if (typeof obj === "function") return true;
+      if (obj && typeof obj === "object") {
+        // Object.values(obj)が
+        // オブジェクトのすべての値を配列として返し、
+        // その配列内に関数が含まれているか確認します。
+        return Object.values(obj).some(containsFunction);
+      }
+      return false;
+    };
+    // predicateはフィルタリングする関数なので
+    // predictate === falseの場合のみ
+    // そのオブジェクトを通過させるため
+    // 結果を反転させてreturnします。
+    return !containsFunction(action);
+  },
+};
+
 // configureStore: storeを簡単に作ることのできる関数
-export const store = configureStore({
+const store = configureStore({
   reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(createStateSyncMiddleware(config) as any),
 });
 
 // storeを永続用のオブジェクトに変換
-export const persistor = persistStore(store);
+const persistor = persistStore(store);
+
+// initMessageListenerを初期化
+// store の設定やリスナーの初期化を行います
+initMessageListener(store);
+
+export { persistor, store };
 
 // ■ RootState型 & DisPatch型をエクスポート(global.d.tsで代わりに宣言)
 // store.getState()の戻り値の型（ストアの状態の型）を取得し、
