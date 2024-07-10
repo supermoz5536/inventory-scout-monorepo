@@ -3,7 +3,7 @@ import "./AuthedLoginSection.css";
 import { getFirstUserEmail } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
-import { changeAuthedStatus } from "../../slices/userSlice";
+import { changeIsAuthed } from "../../slices/userSlice";
 
 export const AuthedLoginSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
@@ -13,7 +13,7 @@ export const AuthedLoginSection = () => {
     const signOutResult: boolean = await logOut();
 
     if (signOutResult === true) {
-      dispatch(changeAuthedStatus(false));
+      dispatch(changeIsAuthed(false));
     }
   };
 

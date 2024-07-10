@@ -12,7 +12,7 @@ import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
 import LoginPrompt from "./pages/LoginPrompt";
 import { logOut } from "./firebase/authentication";
-import { changeAuthedStatus } from "./slices/userSlice";
+import { changeIsAuthed } from "./slices/userSlice";
 
 const App: React.FC = () => {
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
@@ -49,7 +49,7 @@ const App: React.FC = () => {
         // ③
         const signOutResult: boolean = await logOut();
         if (signOutResult === true) {
-          dispatch(changeAuthedStatus(false));
+          dispatch(changeIsAuthed(false));
         }
 
         // ⑤
