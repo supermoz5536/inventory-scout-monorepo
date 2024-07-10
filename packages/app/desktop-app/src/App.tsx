@@ -11,6 +11,8 @@ import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
 import LoginPrompt from "./pages/LoginPrompt";
+import { logOut } from "./firebase/authentication";
+import { changeAuthedStatus } from "./slices/userSlice";
 
 const App: React.FC = () => {
   // ストアから asinDataList の現在の値を取得し、
@@ -62,7 +64,8 @@ const App: React.FC = () => {
   /// アプリ立ち上げの初期化処理
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② ローカルストレージデータのロード
-  /// ③ 中断されていた場合の自動フォローアップ
+  /// ③ ログアウト処理
+  /// ⑤ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     (async () => {
       try {
@@ -75,6 +78,12 @@ const App: React.FC = () => {
         dispatch(updateWithLoadedData(loadedData));
 
         // ③
+        const signOutResult: boolean = await logOut();
+        if (signOutResult === true) {
+          dispatch(changeAuthedStatus(false));
+        }
+
+        // ⑤
         // ■ 同日に前回の処理が中断されている場合の自動処理
         if (asinDataListRef.current.length > 0) {
           const today = new Date();
