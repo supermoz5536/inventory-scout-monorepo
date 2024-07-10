@@ -1,9 +1,12 @@
+import { store } from "../redux/store";
 import { auth } from "./firebase";
 import {
-  UserCredential,
   signInWithEmailAndPassword,
   signOut,
+  onAuthStateChanged,
+  User,
 } from "firebase/auth";
+import { changeIsAuthed } from "../slices/userSlice";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -58,5 +61,29 @@ export const logOut = async (): Promise<boolean> => {
   } catch (error) {
     console.log("logOut() failed:", error);
     return false;
+  }
+};
+
+/// サーバーの認証状態の変更を取得するリスナーを設置します
+export const listenAuthState = async () => {
+  const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+    // ログイン状態の場合
+    if (user) {
+      store.dispatch(changeIsAuthed(true));
+    } else {
+      // ログアウト状態の場合
+      store.dispatch(changeIsAuthed(false));
+    }
+  });
+  return unsubscribe;
+};
+
+export const initLogoutCallBack = async () => {
+  try {
+    await signOut(auth);
+    store.dispatch(changeIsAuthed(false));
+    console.log("Logged out successfully");
+  } catch (error) {
+    console.error("Failed to log out:", error);
   }
 };

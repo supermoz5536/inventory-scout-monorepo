@@ -9,12 +9,15 @@ import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 import scrapePromis from "../src/components/Scrape";
+import { persistor } from "../src/redux/store";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
 let scrape: any;
 let browser: any;
-let LoginPromptWindow: any;
+let loginPromptWindow: any;
+let prefWindow: any;
+let isLoggedOut: boolean = false;
 
 /// メイン画面を生成する関数です
 const createMainWindow = () => {
@@ -53,6 +56,19 @@ const createMainWindow = () => {
 
   win.loadURL(appURL);
 
+  console.log("1 isLoggedOut =", isLoggedOut);
+
+  // 初回起動時のみログアウト処理を実行
+  // ウィンドウの読み込みが完了した後に処理します
+  win.webContents.once("did-finish-load", () => {
+    if (isLoggedOut === false) {
+      win.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
+      isLoggedOut = true; // ログアウト処理が実行されたことを記録
+    }
+  });
+
+  console.log("2 isLoggedOut =", isLoggedOut);
+
   if (!app.isPackaged) {
     win.webContents.openDevTools();
   } else {
@@ -74,6 +90,14 @@ app.on("window-all-closed", () => {
   // Electronのappオブジェクトのイベントの1つ。
   // darwin は macOSのこと
   if (process.platform !== "darwin") app.quit();
+});
+
+// アプリケーション終了前に状態を保存する
+app.on("before-quit", async (event) => {
+  event.preventDefault(); // プロセスの終了を防ぐ
+  await persistor.flush();
+  console.log("State has been flushed to persistent storage before app quit");
+  app.exit(); // フラッシュ完了後にアプリケーションを終了
 });
 
 /// アプリ起動時にウインドウがない場合に
@@ -309,7 +333,12 @@ function updateGlobalBrowser(newBrowser: any) {
 // Preferencesがクリックされた際の
 // 設定画面を生成する関数です
 function openPreferences() {
-  const prefWindow = new BrowserWindow({
+  if (prefWindow) {
+    prefWindow.focus();
+    return;
+  }
+
+  prefWindow = new BrowserWindow({
     width: 450,
     height: 800,
     resizable: false, // ウィンドウサイズを変更できないようにする
@@ -331,17 +360,25 @@ function openPreferences() {
     // パッケージ化された状態でもデベロッパーツールを開く
     prefWindow.webContents.openDevTools();
   }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  prefWindow.on("closed", async () => {
+    prefWindow = null;
+  });
 }
 
 //「取得開始」がクリックされた際の
 // 設定画面を生成する関数です
 function openLoginPrompt() {
-  if (LoginPromptWindow) {
-    LoginPromptWindow.focus();
+  if (loginPromptWindow) {
+    loginPromptWindow.focus();
     return;
   }
 
-  LoginPromptWindow = new BrowserWindow({
+  loginPromptWindow = new BrowserWindow({
     width: 450,
     height: 300,
     resizable: false, // ウィンドウサイズを変更できないようにする
@@ -355,20 +392,20 @@ function openLoginPrompt() {
 
   // ローカルファイルを指定するパスを指定したいだけなので
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
-  LoginPromptWindow.loadURL(`${appURL}#/LoginPrompt`);
+  loginPromptWindow.loadURL(`${appURL}#/LoginPrompt`);
 
   if (!app.isPackaged) {
-    LoginPromptWindow.webContents.openDevTools();
+    loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    LoginPromptWindow.webContents.openDevTools();
+    loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
   // onメソッドでリスナーを設置する
   // 閉じた時(closed)にトリガーされる
   // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
-  LoginPromptWindow.on("closed", () => {
-    LoginPromptWindow = null;
+  loginPromptWindow.on("closed", () => {
+    loginPromptWindow = null;
   });
 }
