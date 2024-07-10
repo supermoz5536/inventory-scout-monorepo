@@ -15,56 +15,25 @@ import { logOut } from "./firebase/authentication";
 import { changeAuthedStatus } from "./slices/userSlice";
 
 const App: React.FC = () => {
-  // ストアから asinDataList の現在の値を取得し、
-  // コンポーネントのレンダリングサイクル内で使用できるようにします。
-  const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
-  );
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
   // コンポーネントの再レンダリングに影響されず
   // asinDataListの変更のみに依存して
   // 最新のデータを参照できるようにします。
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
   const asinDataListRef = useRef(asinDataList);
-
   useEffect(() => {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
   const dispatch = useDispatch<AppDispatch>();
 
-  /// useCallbackを使用して関数の参照を安定させる
-  const handleScrapingResult = useCallback(
-    (
-      event: Electron.IpcRendererEvent,
-      asinData: AsinData | null,
-      isEnd: boolean | null
-    ) => {
-      (async () => {
-        if (isEnd) {
-          // システムメッセージの表示フラグ
-          //「データ取得完了」
-          dispatch(changeSystemStatus(5));
-        } else if (asinData) {
-          // グローバル変数のASINリストの
-          // 取得したasinDataと合致するオブジェクトを
-          // 取得したデータに更新
-          dispatch(updateAsinData(asinData));
-          // 状態変数の更新が完了するまで200ms待機
-          await new Promise((resolve) => setTimeout(resolve, 200));
-          // ローカルストレージへasinDataListを保存
-          // 最新の参照を利用してるので
-          // 依存関係の指定は必要ない
-          await window.myAPI.saveData(asinDataListRef.current);
-        }
-      })();
-    },
-    [dispatch]
-  );
-
   /// アプリ立ち上げの初期化処理
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② ローカルストレージデータのロード
   /// ③ ログアウト処理
+  /// ④ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
   /// ⑤ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     (async () => {
@@ -126,7 +95,42 @@ const App: React.FC = () => {
         console.log("アプリ立ち上げの初期化処理エラー:", error);
       }
     })();
-  }, [handleScrapingResult]);
+  }, []);
+  // }, [handleScrapingResult]);
+  // 不具合が生じた際は、,[]の追跡を
+  // コメントアウトしてるhandleScrapingResultに戻して
+  // handleScrapingResultの宣言の後にuseEffectを再配置する
+
+  /// メインプロセスからスクレイピングデータを
+  /// 取得した際のコールバック関数
+  /// useCallbackを使用して関数の参照を安定させる
+  const handleScrapingResult = useCallback(
+    (
+      event: Electron.IpcRendererEvent,
+      asinData: AsinData | null,
+      isEnd: boolean | null
+    ) => {
+      (async () => {
+        if (isEnd) {
+          // システムメッセージの表示フラグ
+          //「データ取得完了」
+          dispatch(changeSystemStatus(5));
+        } else if (asinData) {
+          // グローバル変数のASINリストの
+          // 取得したasinDataと合致するオブジェクトを
+          // 取得したデータに更新
+          dispatch(updateAsinData(asinData));
+          // 状態変数の更新が完了するまで200ms待機
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          // ローカルストレージへasinDataListを保存
+          // 最新の参照を利用してるので
+          // 依存関係の指定は必要ない
+          await window.myAPI.saveData(asinDataListRef.current);
+        }
+      })();
+    },
+    [dispatch]
+  );
 
   return (
     <div>
