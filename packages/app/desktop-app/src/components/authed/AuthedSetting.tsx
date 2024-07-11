@@ -4,11 +4,11 @@ import AuthedAccountSection from "./AuthedAccountSection";
 import AuthedScrapeSection from "./AuthedScrapeSection";
 import "./AuthedSetting.css";
 
-const AuthedSetting = () => {
+const AuthedSetting = ({ isChecked }: IsAutoLoginProps) => {
   return (
     <>
       <hr className="authed-setting-divider" />
-      <AuthedLoginSection />
+      <AuthedLoginSection isChecked={isChecked} />
       <hr className="authed-setting-divider" />
       <AuthedAccountSection />
       <hr className="authed-setting-divider" />

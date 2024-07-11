@@ -1,21 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./AuthedLoginSection.css";
 import { getFirstUserEmail } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
-import { changeAuthedStatus } from "../../slices/userSlice";
+import { changeIsAuthed, changeIsAutoLogIn } from "../../slices/userSlice";
 
-export const AuthedLoginSection = () => {
+export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
   const user: User = useSelector((state: RootState) => state.user.value);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = async () => {
     const signOutResult: boolean = await logOut();
+    console.log("IsAutoLogIn 1 =", userRef.current.isAutoLogIn);
 
     if (signOutResult === true) {
-      dispatch(changeAuthedStatus(false));
+      dispatch(changeIsAuthed(false));
+      dispatch(changeIsAutoLogIn(false));
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      console.log("IsAutoLogIn 2 =", userRef.current.isAutoLogIn);
     }
   };
+
+  // マウント時にIsCheckedを判定して状態変更する関数
+  // Trueならstore管理のuserのisAutoLoginもTrueに
+  // falseならstore管理のuserのisAutoLoginもfalseに
+  useEffect(() => {
+    if (isChecked === true) {
+      dispatch(changeIsAutoLogIn(true));
+    } else {
+      dispatch(changeIsAutoLogIn(false));
+    }
+  });
 
   return (
     <>
@@ -27,7 +46,9 @@ export const AuthedLoginSection = () => {
         </div>
         <button
           className="authed-login-section-login-button"
-          onClick={handleLogout}
+          onClick={() => {
+            handleLogout();
+          }}
         >
           ログアウト
         </button>

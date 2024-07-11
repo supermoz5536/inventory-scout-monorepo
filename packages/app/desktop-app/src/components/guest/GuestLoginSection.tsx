@@ -7,9 +7,9 @@ import { updateUser } from "../../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { changeIsAutoLogIn } from "../../slices/userSlice";
 
-const GuestLoginSection = () => {
-  let isAutoLogIn: boolean = false;
+const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [errorFlag, setErrorFlag] = useState("");
@@ -64,7 +64,7 @@ const GuestLoginSection = () => {
           email: inputEmail,
           password: inputPassword,
           isAuthed: true,
-          isAutoLogIn: isAutoLogIn,
+          isAutoLogIn: userRef.current.isAutoLogIn,
           plan: userDocData["plan"] ?? "not found",
           createdAt: userDocData["created_at"] ?? "not found",
         };
@@ -76,6 +76,16 @@ const GuestLoginSection = () => {
       // ログイン失敗時のエラーハンドリング
     } else if (userCredential && typeof userCredential === "string") {
       setErrorFlag(userCredential);
+    }
+  };
+
+  // 「次回から自動でログインする」のコールバック
+  const callHandleCheckBoxChange = (event: any) => {
+    if (handleCheckBoxChange) {
+      // 親コンポーネントから
+      // AuthedLoginSectionに
+      // 渡すpropes（isChecked）を変更
+      handleCheckBoxChange(event.target.checked);
     }
   };
 
@@ -136,7 +146,12 @@ const GuestLoginSection = () => {
           )}
         </div>
         <div className="guest-login-section-auto-login">
-          <input type="checkbox" onChange={(event) => {}} />
+          <input
+            type="checkbox"
+            onChange={(event) => {
+              callHandleCheckBoxChange(event);
+            }}
+          />
           <p>次回から自動でログインする</p>
         </div>
       </div>
