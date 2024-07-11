@@ -65,8 +65,8 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
           password: inputPassword,
           isAuthed: true,
           isAutoLogIn: userRef.current.isAutoLogIn,
-          plan: userDocData["plan"] ?? "not found",
-          createdAt: userDocData["created_at"] ?? "not found",
+          plan: userDocData["plan"],
+          createdAt: userDocData["created_at"],
         };
 
         // ストアのUserオブジェクトを更新

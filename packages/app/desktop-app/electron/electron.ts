@@ -10,11 +10,13 @@ import * as url from "url";
 import * as fs from "fs";
 import scrapePromis from "../src/components/Scrape";
 import { persistor } from "../src/redux/store";
+import cron from "node-cron";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
 let scrape: any;
 let browser: any;
+let scheduledTask: any;
 let loginPromptWindow: any;
 let prefWindow: any;
 let isLoggedOut: boolean = false;
@@ -143,6 +145,43 @@ ipcMain.handle("stopScraping", async () => {
     return "stopScraping ERROR"; // エラーメッセージを返す
   }
 });
+
+/// 定時スクレイピングの実行関数
+ipcMain.handle(
+  "schedule-scraping",
+  async (event, time: string, asinDataList: AsinData[]) => {
+    if (scheduledTask) {
+      scheduledTask.stop();
+    }
+
+    console.log("in main time =", time);
+    console.log("in main time type =", typeof time);
+
+    const [hour, minute] = time.split(":");
+    const cronTime = `${minute} ${hour} * * *`;
+
+    scheduledTask = cron.schedule(cronTime, async () => {
+      try {
+        scrape = await scrapePromis;
+        browser = await scrape.launchBrowser();
+        await scrape.runScraping(
+          scrape,
+          browser,
+          updateGlobalBrowser,
+          event,
+          asinDataList
+        );
+      } catch (error) {
+        console.error("schedule-scraping ERROR", error);
+        return "schedule-scraping ERROR"; // エラーメッセージを返す
+      }
+    });
+
+    return "Scraping scheduled";
+  }
+);
+
+/// スクレイピングの強制終了関数
 
 ipcMain.handle("save-data", (event, data) => {
   // ローカルストレージのpathを取得

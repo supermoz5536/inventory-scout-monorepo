@@ -26,6 +26,7 @@ declare global {
       saveUser: (user: User) => Promise<void>;
       openLoginPrompt: () => void;
       initLogout: (callback: () => void) => void;
+      scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
     };
   }
 

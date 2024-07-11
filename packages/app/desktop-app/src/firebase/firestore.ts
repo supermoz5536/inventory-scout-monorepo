@@ -27,11 +27,13 @@ export const getUserDoc = async (
   uid: string
 ): Promise<DocumentData | undefined> => {
   const docRef = doc(db, "users", uid);
-  // getDoc(): 引数で指定した参照のドキュメントを取得
+
+  // getDoc(): 引数で指定した参照の
+  // ドキュメントスナップショットのオブジェクトを取得
   const docSnapShot = await getDoc(docRef);
 
   try {
-    if (docSnapShot.exists()) return docSnapShot;
+    if (docSnapShot.exists()) return docSnapShot.data();
   } catch (error) {
     console.log("getUserDoc(): error", error);
     throw error;
