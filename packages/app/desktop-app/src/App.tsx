@@ -11,6 +11,7 @@ import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
 import LoginPrompt from "./pages/LoginPrompt";
+import StockDetail from "./pages/StockDetail";
 import {
   logInWithEmailAndPassword,
   logOut,
@@ -216,6 +217,7 @@ const App: React.FC = () => {
         <Route path="/Manage" element={<Manage />} />
         <Route path="/Setting" element={<Setting />} />
         <Route path="/LoginPrompt" element={<LoginPrompt />} />
+        <Route path="/StockDetail" element={<StockDetail />} />
       </Routes>
     </div>
   );
