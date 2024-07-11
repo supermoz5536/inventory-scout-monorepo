@@ -25,7 +25,8 @@ declare global {
       loadData: () => Promise<AsinData[]>;
       saveUser: (user: User) => Promise<void>;
       openLoginPrompt: () => void;
-      openStockDetail: () => void;
+      openStockDetail: (asinDataList: AsinData) => void;
+      receiveAsinData: (callback: (asinData: AsinData) => void) => void;
       initLogout: (callback: () => void) => void;
       scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
     };

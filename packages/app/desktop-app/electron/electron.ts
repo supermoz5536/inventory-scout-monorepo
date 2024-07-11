@@ -268,8 +268,8 @@ ipcMain.handle("open-login-prompt", () => {
   openLoginPrompt();
 });
 
-ipcMain.handle("open-stock-detail", () => {
-  openStockDetail();
+ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
+  openStockDetail(asinData);
 });
 
 //====================================================================
@@ -452,7 +452,7 @@ function openLoginPrompt() {
 
 //「在庫詳細」がクリックされた際の
 // 詳細画面を生成する関数です
-function openStockDetail() {
+function openStockDetail(asinData: AsinData) {
   if (StockDetailWindow) {
     StockDetailWindow.focus();
     return;
@@ -473,6 +473,10 @@ function openStockDetail() {
   // ローカルファイルを指定するパスを指定したいだけなので
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
   StockDetailWindow.loadURL(`${appURL}#/StockDetail`);
+
+  StockDetailWindow.webContents.once("did-finish-load", () => {
+    StockDetailWindow.webContents.send("receive-asin-data", asinData);
+  });
 
   if (!app.isPackaged) {
     StockDetailWindow.webContents.openDevTools();

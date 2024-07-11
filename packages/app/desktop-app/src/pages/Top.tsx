@@ -405,7 +405,12 @@ function Top() {
                   >
                     商品URL
                   </button>
-                  <button className="top-square-space-each-button">
+                  <button
+                    className="top-square-space-each-button"
+                    onClick={() => {
+                      window.myAPI.openStockDetail(asinData);
+                    }}
+                  >
                     在庫データ
                   </button>
                 </div>
