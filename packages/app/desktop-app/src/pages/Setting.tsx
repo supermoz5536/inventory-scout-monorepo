@@ -7,18 +7,29 @@ import { useSelector } from "react-redux";
 const Setting = () => {
   const user = useSelector((state: RootState) => state.user.value);
 
+  // 「次回からは自動でログインする」のチェックボックスの真偽値の状態を格納する変数を宣言
+  let isChecked: boolean = false;
+
+  // 子コンポーネント(GuestLoginSection)にpropsで渡し
+  // 親コンポーネント(Setting)のisChecked変数を更新して
+  // 子コンポーネント(AuthedLoginSection)に伝播させるための
+  // 変更関数を宣言
+  const handleCheckBoxChange = (value: boolean) => {
+    isChecked = value;
+  };
+
   return (
     <div>
       <h1 className="setting-h1">環境設定</h1>
       {user.isAuthed ? (
         <>
           {/* ログインしてる場合のコンポーネント読み込み */}
-          <AuthedSetting />
+          <AuthedSetting isChecked={isChecked} />
         </>
       ) : (
         <>
           {/* ログアウトしてる場合のコンポーネント読み込み */}
-          <GuestSetting />
+          <GuestSetting handleCheckBoxChange={handleCheckBoxChange!} />
         </>
       )}
     </div>

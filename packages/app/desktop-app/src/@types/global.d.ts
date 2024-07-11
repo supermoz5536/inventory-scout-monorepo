@@ -88,6 +88,11 @@ declare global {
     isConfirmed: boolean;
     showButtonStatus: number;
   }
+
+  interface IsAutoLoginProps {
+    isChecked?: boolean;
+    handleCheckBoxChange?: (value: boolean) => void;
+  }
 }
 
 // tsの構文では

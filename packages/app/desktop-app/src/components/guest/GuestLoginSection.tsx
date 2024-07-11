@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { changeIsAutoLogIn } from "../../slices/userSlice";
 
-const GuestLoginSection = () => {
+const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [errorFlag, setErrorFlag] = useState("");
@@ -79,6 +79,16 @@ const GuestLoginSection = () => {
     }
   };
 
+  // 「次回から自動でログインする」のコールバック
+  const callHandleCheckBoxChange = (event: any) => {
+    if (handleCheckBoxChange) {
+      // 親コンポーネントから
+      // AuthedLoginSectionに
+      // 渡すpropes（isChecked）を変更
+      handleCheckBoxChange(event.target.checked);
+    }
+  };
+
   return (
     <>
       <h2 className="guest-login-section-h2">ログイン設定</h2>
@@ -139,7 +149,7 @@ const GuestLoginSection = () => {
           <input
             type="checkbox"
             onChange={(event) => {
-              dispatch(changeIsAutoLogIn(event.target.checked));
+              callHandleCheckBoxChange(event);
             }}
           />
           <p>次回から自動でログインする</p>

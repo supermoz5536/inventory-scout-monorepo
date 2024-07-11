@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
 import { changeIsAuthed, changeIsAutoLogIn } from "../../slices/userSlice";
 
-export const AuthedLoginSection = () => {
+export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
   const user: User = useSelector((state: RootState) => state.user.value);
   const userRef = useRef(user);
   useEffect(() => {
@@ -24,6 +24,17 @@ export const AuthedLoginSection = () => {
       console.log("IsAutoLogIn 2 =", userRef.current.isAutoLogIn);
     }
   };
+
+  // マウント時にIsCheckedを判定して状態変更する関数
+  // Trueならstore管理のuserのisAutoLoginもTrueに
+  // falseならstore管理のuserのisAutoLoginもfalseに
+  useEffect(() => {
+    if (isChecked === true) {
+      dispatch(changeIsAutoLogIn(true));
+    } else {
+      dispatch(changeIsAutoLogIn(false));
+    }
+  });
 
   return (
     <>
