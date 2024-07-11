@@ -49,6 +49,8 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   openLoginPrompt: () => ipcRenderer.invoke("open-login-prompt"),
 
+  openStockDetail: () => ipcRenderer.invoke("open-stock-detail"),
+
   initLogout: (callback) => {
     ipcRenderer.on("init-logout", callback);
   },
