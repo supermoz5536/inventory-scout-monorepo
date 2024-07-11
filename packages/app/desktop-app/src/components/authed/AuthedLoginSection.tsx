@@ -15,13 +15,10 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
 
   const handleLogout = async () => {
     const signOutResult: boolean = await logOut();
-    console.log("IsAutoLogIn 1 =", userRef.current.isAutoLogIn);
 
     if (signOutResult === true) {
       dispatch(changeIsAuthed(false));
       dispatch(changeIsAutoLogIn(false));
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      console.log("IsAutoLogIn 2 =", userRef.current.isAutoLogIn);
     }
   };
 

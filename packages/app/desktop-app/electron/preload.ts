@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, shell } from "electron";
+import { scheduler } from "timers/promises";
 
 // contextBridge.exposeInMainWorld は、
 // 特定の関数やオブジェクトをレンダラープロセスの
@@ -51,4 +52,6 @@ contextBridge.exposeInMainWorld("myAPI", {
   initLogout: (callback) => {
     ipcRenderer.on("init-logout", callback);
   },
+  scheduledScraping: (time: string, asinDataList: AsinData[]) =>
+    ipcRenderer.invoke("schedule-scraping", time, asinDataList),
 });

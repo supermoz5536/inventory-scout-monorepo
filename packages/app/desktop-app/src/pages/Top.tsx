@@ -52,9 +52,13 @@ function Top() {
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
   const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
 
-  const gotoURL = (asin: string) => {
+  const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
     window.myAPI.openExternal(amazonURL);
+  };
+  const gotoPlanURL = () => {
+    const planURL = `https://www.google.co.jp/`;
+    window.myAPI.openExternal(planURL);
   };
 
   const handleDeleteCheck = (id: string) => {
@@ -75,14 +79,18 @@ function Top() {
       console.log("1");
       window.myAPI.openLoginPrompt();
 
+      // ■ freeプランユーザーの場合
+      // プラン加入ページへ誘導
+    } else if (user.isAuthed === true && user.plan === "f") {
+      gotoPlanURL();
+
       // ■ 待機状態での「取得開始」のクリック
     } else if (
       user.isAuthed === true &&
-      user.plan !== "free" &&
+      (user.plan === "s" || user.plan === "p") &&
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
-      console.log("2");
       // スクレイピングを開始
       dispatch(changeShowButtonStatus(1));
       handleRunScraping(asinDataList);
@@ -90,7 +98,7 @@ function Top() {
       // スクレイピング中の「取得停止」のクリック
     } else if (
       user.isAuthed === true &&
-      user.plan !== "free" &&
+      (user.plan === "s" || user.plan === "p") &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
@@ -100,7 +108,7 @@ function Top() {
       // スクレイピング中の「本当に？」のクリック
     } else if (
       user.isAuthed === true &&
-      user.plan !== "free" &&
+      (user.plan === "s" || user.plan === "p") &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {
@@ -392,7 +400,7 @@ function Top() {
                   <button
                     className="top-square-space-each-button"
                     onClick={() => {
-                      gotoURL(asinData.asin);
+                      gotoAmazonURL(asinData.asin);
                     }}
                   >
                     商品URL
