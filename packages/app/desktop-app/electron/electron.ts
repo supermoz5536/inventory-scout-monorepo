@@ -17,8 +17,9 @@ let appURL: string;
 let scrape: any;
 let browser: any;
 let scheduledTask: any;
-let loginPromptWindow: any;
 let prefWindow: any;
+let loginPromptWindow: any;
+let StockDetailWindow: any;
 let isLoggedOut: boolean = false;
 
 /// メイン画面を生成する関数です
@@ -58,8 +59,6 @@ const createMainWindow = () => {
 
   win.loadURL(appURL);
 
-  console.log("1 isLoggedOut =", isLoggedOut);
-
   // 初回起動時のみログアウト処理を実行
   // ウィンドウの読み込みが完了した後に処理します
   win.webContents.once("did-finish-load", () => {
@@ -68,8 +67,6 @@ const createMainWindow = () => {
       isLoggedOut = true; // ログアウト処理が実行されたことを記録
     }
   });
-
-  console.log("2 isLoggedOut =", isLoggedOut);
 
   if (!app.isPackaged) {
     win.webContents.openDevTools();
@@ -271,10 +268,14 @@ ipcMain.handle("open-login-prompt", () => {
   openLoginPrompt();
 });
 
+ipcMain.handle("open-stock-detail", () => {
+  openStockDetail();
+});
+
 //====================================================================
 
 /// 初期化処理として
-/// 設定画面をコールするメニュー部分を生成する関数です。
+/// メニュー部分を生成する関数です。
 app.whenReady().then(() => {
   const menu = new Menu();
 
@@ -446,5 +447,45 @@ function openLoginPrompt() {
   // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
   loginPromptWindow.on("closed", () => {
     loginPromptWindow = null;
+  });
+}
+
+//「在庫詳細」がクリックされた際の
+// 詳細画面を生成する関数です
+function openStockDetail() {
+  if (StockDetailWindow) {
+    StockDetailWindow.focus();
+    return;
+  }
+
+  StockDetailWindow = new BrowserWindow({
+    width: 900,
+    height: 600,
+    resizable: false, // ウィンドウサイズを変更できないようにする
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
+      // preload.tsの読み込みに失敗します。
+      sandbox: false,
+    },
+  });
+
+  // ローカルファイルを指定するパスを指定したいだけなので
+  // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
+  StockDetailWindow.loadURL(`${appURL}#/StockDetail`);
+
+  if (!app.isPackaged) {
+    StockDetailWindow.webContents.openDevTools();
+  } else {
+    // パッケージ化された状態でもデベロッパーツールを開く
+    StockDetailWindow.webContents.openDevTools();
+  }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  StockDetailWindow.on("closed", () => {
+    StockDetailWindow = null;
   });
 }
