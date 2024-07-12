@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import Calender from "../components/stock-detail/Calender";
-import { Table } from "../components/stock-detail/Table";
+import Table from "../components/stock-detail/Table";
 
 const StockDetail = () => {
-  //
+  // startDateとendDateの時間部分をリセットする関数
+  const resetTime = (date: Date) => {
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
 
   // コンポーネントマウント時に
   // 表示するasinDataをメインプロセスから取得
@@ -44,11 +48,12 @@ const StockDetail = () => {
   // ①② の更新処理を行います。
   useEffect(() => {
     // ① 変更された日付範囲に、列見出しを更新
-    const startDate = new Date(dateRange[0]);
-    const endDate = new Date(dateRange[1]);
+    const startDate = resetTime(new Date(dateRange[0]));
+    const endDate = resetTime(new Date(dateRange[1]));
+
     const newColumnHeader = ["Seller"];
 
-    let currentDate = startDate;
+    let currentDate = new Date(startDate); // startDateのコピーを作成
     while (currentDate <= endDate) {
       const formattedDate = format(currentDate, "yyyy-MM-dd");
       newColumnHeader.push(formattedDate);
@@ -81,16 +86,22 @@ const StockDetail = () => {
       // startDataとendDataの間に含まれていること
 
       // 含まれている場合、sellerDataに新たなプロパティとして追加
+      console.log("3 newData :");
       fbaSellerData.stockCountDatas.forEach((eachData: StockCountData) => {
         // StockCountData型objのキーは
         // "yyyy-MM-dd"形式のstring型なので
         // 比較可能な形式のDate型に変換
+        console.log("4 newData :");
         const dateKeys = Object.keys(eachData);
-        const date: Date = parseISO(dateKeys[0]);
-
-        if (startDate <= date && date >= endDate) {
+        console.log("5 newData :");
+        const date: Date = resetTime(parseISO(dateKeys[0]));
+        console.log("6 newData : startDate =", startDate);
+        console.log("6 newData : endDate =", endDate);
+        console.log("6 newData : date =", date);
+        if (date >= startDate && date <= endDate) {
+          console.log("7 newData :");
           const formattedDate: string = format(date, "yyyy-MM-dd");
-
+          console.log("8 newData: formattedDate =", formattedDate);
           // ブラケット記法（[ ]（ブラケット）を使って
           // sellerDataオブジェクトのプロパティに
           // [プロパティ名(キー)]を作成し、その値に
@@ -98,6 +109,7 @@ const StockDetail = () => {
           sellerData[formattedDate] = eachData[formattedDate];
         }
       });
+      return sellerData;
     });
 
     setData(newData);

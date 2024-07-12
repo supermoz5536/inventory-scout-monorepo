@@ -65,11 +65,7 @@ const App: React.FC = () => {
         // 引数はリスナーのコールバック関数で
         // 関数自体を渡す必要があるため
         // ()なしで関数名のみ記述
-        console.log("initLogout 1 isAuthed =", userRef.current.isAuthed);
-        console.log("initLogout 1 isAutoLogin =", userRef.current.isAutoLogIn);
         window.myAPI.initLogout(initLogoutCallBack);
-        console.log("initLogout 2 isAuthed =", userRef.current.isAuthed);
-        console.log("initLogout 2 isAutoLogin =", userRef.current.isAutoLogIn);
 
         // ④
         const unsubscribe = await listenAuthState();

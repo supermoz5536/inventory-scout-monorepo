@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import { TextField, Popover, Box } from "@mui/material";
 import "react-calendar/dist/Calendar.css";
@@ -22,11 +22,13 @@ const Calender = ({ onChange }: StockDetailProps) => {
 
   const handleDateChange = (date: any) => {
     if (currentPicker === "start") {
+      // UIの更新
       setStartDate(date);
-      if (onChange) onChange([startDate, endDate]);
+      // 親コンポーネントの変数を変更
+      if (onChange) onChange([date, endDate]);
     } else {
       setEndDate(date);
-      if (onChange) onChange([startDate, endDate]);
+      if (onChange) onChange([startDate, date]);
     }
     handleClose();
   };
