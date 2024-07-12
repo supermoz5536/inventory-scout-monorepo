@@ -96,6 +96,12 @@ declare global {
     isChecked?: boolean;
     handleCheckBoxChange?: (value: boolean) => void;
   }
+
+  interface StockDetailProps {
+    columnHeader?: string[];
+    data?: any;
+    onChange?: (dates: [Date, Date]) => void;
+  }
 }
 
 // tsの構文では

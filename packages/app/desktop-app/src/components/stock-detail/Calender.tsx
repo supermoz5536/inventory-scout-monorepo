@@ -1,6 +1,6 @@
 import React from "react";
 
-const Calender = () => {
+const Calender = ({ onChange }: StockDetailProps) => {
   return <div>Calender</div>;
 };
 
