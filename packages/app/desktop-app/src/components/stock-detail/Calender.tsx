@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
-import { TextField, Popover, Box } from "@mui/material";
+import { TextField, Popover, Box, InputAdornment } from "@mui/material";
 import { subDays } from "date-fns";
 import "react-calendar/dist/Calendar.css";
-import "./CustomCalender.css";
+import { CgCalendarToday } from "react-icons/cg";
 
 const Calender = ({ onChange }: StockDetailProps) => {
   // 本日のDateオブジェクト
@@ -17,12 +17,18 @@ const Calender = ({ onChange }: StockDetailProps) => {
   const [currentPicker, setCurrentPicker] = useState(null);
 
   const handleOpen = (event: any, pickerType: any) => {
+    // ポップオーバー（カレンダー）表示に必要な
+    // アンカー要素（基準となる要素）を設定します。
     setAnchorEl(event.currentTarget);
+    // 現在選択されているピッカーの種類を設定します。
+    // 例えば、開始日を選択する場合は"start"、
+    // 終了日を選択する場合は"end"になります。
     setCurrentPicker(pickerType);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+
     setCurrentPicker(null);
   };
 
@@ -46,17 +52,35 @@ const Calender = ({ onChange }: StockDetailProps) => {
   }, []);
 
   const open = Boolean(anchorEl);
-  const id = open ? "calendar-popover" : undefined;
 
   return (
     <Box display="flex" alignItems="center" gap={2} className="custom-calendar">
       <TextField
         label="開始日"
+        // toLocaleDateString: Date型のobjを日本語の日付形式で表示します。
         value={startDate.toLocaleDateString("ja-JP")}
         onClick={(e) => handleOpen(e, "start")}
         InputProps={{
           readOnly: true,
+          sx: {
+            height: 35,
+            width: 116,
+            paddingTop: 0.5,
+          },
+          startAdornment: (
+            <InputAdornment
+              position="start"
+              sx={{
+                marginTop: -0.25,
+                marginLeft: -0.5,
+                marginRight: 0.5,
+              }}
+            >
+              <CgCalendarToday />
+            </InputAdornment>
+          ),
         }}
+        sx={{ marginTop: 3, marginLeft: 115, marginBottom: 3 }}
       />
       <TextField
         label="終了日"
@@ -64,10 +88,27 @@ const Calender = ({ onChange }: StockDetailProps) => {
         onClick={(e) => handleOpen(e, "end")}
         InputProps={{
           readOnly: true,
+          sx: {
+            height: 35,
+            width: 116,
+            paddingTop: 0.5,
+          },
+          startAdornment: (
+            <InputAdornment
+              position="start"
+              sx={{
+                marginTop: -0.25,
+                marginLeft: -0.5,
+                marginRight: 0.5,
+              }}
+            >
+              <CgCalendarToday />
+            </InputAdornment>
+          ),
         }}
+        sx={{ marginTop: 3, marginBottom: 3 }}
       />
       <Popover
-        id={id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
