@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { format, parseISO, subDays } from "date-fns";
 import Calender from "../components/stock-detail/Calender";
 import Table from "../components/stock-detail/Table";
+import { AppBar, Toolbar, Typography } from "@mui/material";
 
 const StockDetail = () => {
   // startDateとendDateの時間部分をリセットする関数
@@ -108,6 +109,15 @@ const StockDetail = () => {
 
   return (
     <>
+      {/* static: AppBar が通常の文書フローに従って配置されます。
+       スクロールしても固定されず、他のコンテンツと一緒にスクロールされます。 */}
+      <AppBar position="static">
+        <Toolbar sx={{ justifyContent: "center" }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            在庫データ
+          </Typography>
+        </Toolbar>
+      </AppBar>
       <Calender onChange={setDateRange} />
       <Table columnHeader={columnHeader} data={data} />
     </>
