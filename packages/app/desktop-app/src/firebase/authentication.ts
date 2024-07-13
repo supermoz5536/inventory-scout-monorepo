@@ -8,6 +8,7 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   updateEmail,
+  updatePassword,
 } from "firebase/auth";
 import { changeIsAuthed, changeEmail } from "../slices/userSlice";
 
@@ -116,6 +117,34 @@ export const changeEmailAdress = async (
     }
   } catch (error) {
     console.error("メールアドレスの更新に失敗しました:", error);
+    return false;
+  }
+};
+
+// パスワードを更新する関数
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+) => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      // ユーザーを再認証する
+      const credential = EmailAuthProvider.credential(
+        user.email as string,
+        currentPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // パスワードを更新する
+      await updatePassword(user, newPassword);
+      console.log("パスワードの更新に成功しました");
+      return true;
+    } else {
+      throw new Error("サインインしているユーザーがいません");
+    }
+  } catch (error) {
+    console.error("パスワードの更新に失敗しました:", error);
     return false;
   }
 };
