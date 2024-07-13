@@ -49,7 +49,7 @@ const Calender = ({ onChange }: StockDetailProps) => {
   const id = open ? "calendar-popover" : undefined;
 
   return (
-    <Box display="flex" alignItems="center" gap={2}>
+    <Box display="flex" alignItems="center" gap={2} className="custom-calendar">
       <TextField
         label="開始日"
         value={startDate.toLocaleDateString("ja-JP")}
@@ -88,14 +88,3 @@ const Calender = ({ onChange }: StockDetailProps) => {
 };
 
 export default Calender;
-
-// const Calender = ({ onChange }: StockDetailProps) => {
-//     const [value, setValue] = useState<Date | undefined>();
-
-//     return (
-//       <div>
-//         <Calendar value={value} onClickDay={(date: Date) => setValue(date)} />
-//         <div>{value ? value.toDateString() : "No date selected"}</div>
-//       </div>
-//     );
-//   };

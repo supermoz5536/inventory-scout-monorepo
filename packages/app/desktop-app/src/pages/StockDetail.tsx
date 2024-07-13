@@ -14,12 +14,9 @@ const StockDetail = () => {
   // 表示するasinDataをメインプロセスから取得
   const [targetAsinData, setTargetAsinData] = useState<AsinData>();
   useEffect(() => {
-    console.log("■ 1 targetAsinData =", targetAsinData);
     window.myAPI.receiveAsinData((asinData: AsinData) => {
-      console.log("■ 2 targetAsinData =", asinData);
       setTargetAsinData(asinData);
     });
-    console.log("■ 3 targetAsinData =", targetAsinData);
   }, [targetAsinData]);
 
   // 手動で日付の変更操作があった場合に
@@ -29,11 +26,6 @@ const StockDetail = () => {
     new Date(),
     new Date(),
   ]);
-
-  useEffect(() => {
-    console.log("startDate: dateRange[0]=", dateRange[0]);
-    console.log("endDate: dateRange[1]=", dateRange[1]);
-  }, [dateRange]);
 
   // ① 縦(日付)
   // ② 横(セラー)
@@ -55,13 +47,11 @@ const StockDetail = () => {
   // dataRangeの変更を取得するたびに
   // ①② の更新処理を行います。
   useEffect(() => {
-    console.log("1 newData :");
     // ① 変更された日付範囲に、列見出しを更新
     const startDate = resetTime(new Date(dateRange[0]));
     const endDate = resetTime(new Date(dateRange[1]));
 
     const newColumnHeader = ["Seller"];
-    console.log("2 newData :");
     let currentDate = new Date(startDate); // startDateのコピーを作成
 
     while (currentDate <= endDate) {
@@ -70,7 +60,6 @@ const StockDetail = () => {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    console.log("3.0 newData :");
     setColumnHeader(newColumnHeader);
     // ② 変更された日付範囲に、Table > body の要素を更新
     // 配列の初期値は
@@ -79,7 +68,6 @@ const StockDetail = () => {
     // のオブジェクトを、スプレット関数で連結させればいい。
     // 配列には、セラーごとのオブジェクトを格納する必要があるから
     // asinDataのセラーの値が格納されてるプロパティでmap処理すればいい
-    console.log("3.0 newData: targetAsinData=", targetAsinData);
     const newData = targetAsinData?.fbaSellerDatas.map((fbaSellerData) => {
       // イテレートな処理で各rowのdataオブジェクトを作成する
       // まず、セラー名のみのオブジェクトを作成
@@ -97,22 +85,15 @@ const StockDetail = () => {
       // startDataとendDataの間に含まれていること
 
       // 含まれている場合、sellerDataに新たなプロパティとして追加
-      console.log("3 newData :");
       fbaSellerData.stockCountDatas.forEach((eachData: StockCountData) => {
         // StockCountData型objのキーは
         // "yyyy-MM-dd"形式のstring型なので
         // 比較可能な形式のDate型に変換
-        console.log("4 newData :");
         const dateKeys = Object.keys(eachData);
-        console.log("5 newData :");
         const date: Date = resetTime(parseISO(dateKeys[0]));
-        console.log("6 newData : startDate =", startDate);
-        console.log("6 newData : endDate =", endDate);
-        console.log("6 newData : date =", date);
+
         if (date >= startDate && date <= endDate) {
-          console.log("7 newData :");
           const formattedDate: string = format(date, "yyyy-MM-dd");
-          console.log("8 newData: formattedDate =", formattedDate);
           // ブラケット記法（[ ]（ブラケット）を使って
           // sellerDataオブジェクトのプロパティに
           // [プロパティ名(キー)]を作成し、その値に
@@ -122,8 +103,6 @@ const StockDetail = () => {
       });
       return sellerData;
     });
-
-    console.log("newData =", newData);
     setData(newData);
   }, [targetAsinData, dateRange]);
 

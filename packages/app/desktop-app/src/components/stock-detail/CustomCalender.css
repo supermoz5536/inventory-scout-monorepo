@@ -1,39 +1,21 @@
-.custom-calendar {
-  border: none;
-  font-family: "Roboto", sans-serif;
-  font-size: 14px;
+/* カレンダーコンポーネントのカスタムスタイル */
+
+/* TextFieldコンポーネントのスタイル */
+.custom-calendar .MuiTextField-root {
+  width: 150px; /* 必要に応じて幅を調整 */
+}
+
+/* Popoverコンポーネントのスタイル */
+.custom-calendar .MuiPopover-paper {
+  width: 300px; /* 必要に応じて幅を調整 */
+  padding: 16px; /* 必要に応じてパディングを追加 */
+}
+
+/* Calendarコンポーネントのスタイル */
+.custom-calendar .react-calendar {
+  max-width: 100%;
 }
 
 .custom-calendar .react-calendar__tile {
-  background: none;
-  border: 1px solid #e0e0e0;
-  margin: 2px;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.custom-calendar .react-calendar__tile:enabled:hover,
-.custom-calendar .react-calendar__tile:enabled:focus {
-  background-color: #e0f7fa;
-}
-
-.custom-calendar .react-calendar__tile--active {
-  background-color: #1976d2;
-  color: white;
-}
-
-.custom-calendar .react-calendar__tile--now {
-  background-color: #ffeb3b;
-  border: 1px solid #fbc02d;
-}
-
-.custom-calendar .react-calendar__navigation button {
-  color: #1976d2;
-  background: none;
-  border: none;
-  font-size: 16px;
-  margin: 2px;
-}
-
-.custom-calendar .react-calendar__month-view__days__day--weekend {
-  color: #f50057;
+  height: 50px; /* 必要に応じて高さを調整 */
 }
