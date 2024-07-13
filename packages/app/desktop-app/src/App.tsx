@@ -11,6 +11,7 @@ import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
 import LoginPrompt from "./pages/LoginPrompt";
+import StockDetail from "./pages/StockDetail";
 import {
   logInWithEmailAndPassword,
   logOut,
@@ -64,11 +65,7 @@ const App: React.FC = () => {
         // 引数はリスナーのコールバック関数で
         // 関数自体を渡す必要があるため
         // ()なしで関数名のみ記述
-        console.log("initLogout 1 isAuthed =", userRef.current.isAuthed);
-        console.log("initLogout 1 isAutoLogin =", userRef.current.isAutoLogIn);
         window.myAPI.initLogout(initLogoutCallBack);
-        console.log("initLogout 2 isAuthed =", userRef.current.isAuthed);
-        console.log("initLogout 2 isAutoLogin =", userRef.current.isAutoLogIn);
 
         // ④
         const unsubscribe = await listenAuthState();
@@ -216,6 +213,7 @@ const App: React.FC = () => {
         <Route path="/Manage" element={<Manage />} />
         <Route path="/Setting" element={<Setting />} />
         <Route path="/LoginPrompt" element={<LoginPrompt />} />
+        <Route path="/StockDetail" element={<StockDetail />} />
       </Routes>
     </div>
   );

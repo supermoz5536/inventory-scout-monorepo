@@ -25,6 +25,8 @@ declare global {
       loadData: () => Promise<AsinData[]>;
       saveUser: (user: User) => Promise<void>;
       openLoginPrompt: () => void;
+      openStockDetail: (asinDataList: AsinData) => void;
+      receiveAsinData: (callback: (asinData: AsinData) => void) => void;
       initLogout: (callback: () => void) => void;
       scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
     };
@@ -93,6 +95,12 @@ declare global {
   interface IsAutoLoginProps {
     isChecked?: boolean;
     handleCheckBoxChange?: (value: boolean) => void;
+  }
+
+  interface StockDetailProps {
+    columnHeader?: string[];
+    data?: any;
+    onChange?: (dates: [Date, Date]) => void;
   }
 }
 
