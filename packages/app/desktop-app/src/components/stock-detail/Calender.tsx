@@ -119,7 +119,9 @@ const Calender = ({ onChange }: StockDetailProps) => {
       >
         <Box p={2}>
           <Calendar
-            onChange={handleDateChange}
+            // このプロパティは、ユーザーがカレンダーで日付を選択したときに
+            // 呼び出されるコールバック関数を指定します。
+            onChange={(date) => handleDateChange(date)}
             value={currentPicker === "start" ? startDate : endDate}
           />
         </Box>
