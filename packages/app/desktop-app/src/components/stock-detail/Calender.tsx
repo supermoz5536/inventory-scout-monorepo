@@ -157,7 +157,7 @@ const Calender = ({ onChange }: StockDetailProps) => {
             // したがって、このスタイルは StaticDatePicker コンポーネント内の
             // .MuiPickersDay-today クラスを持つ全ての要素に対して適用されます。
             "& .MuiPickersDay-today": {
-              border: "none",
+              border: "none !important",
             },
           }}
         >
