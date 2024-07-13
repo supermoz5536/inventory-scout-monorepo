@@ -10,23 +10,23 @@ import {
 } from "@mui/material";
 
 const Table = ({ columnHeader, data }: StockDetailProps) => {
-  console.log("columnHeader =", columnHeader);
-  console.log("data =", data);
+  const safecolumnHeader = columnHeader ? columnHeader : [];
+  const safeData = data ? data : [];
 
   return (
     <TableContainer component={Paper}>
       <MUITable>
         <TableHead>
           <TableRow>
-            {columnHeader!.map((column) => (
+            {safecolumnHeader.map((column) => (
               <TableCell key={column}>{column}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row: any, rowIndex: any) => (
+          {safeData.map((row: any, rowIndex: any) => (
             <TableRow key={rowIndex}>
-              {columnHeader!.map((column) => (
+              {safecolumnHeader.map((column) => (
                 <TableCell key={column}>{row[column]}</TableCell>
               ))}
             </TableRow>

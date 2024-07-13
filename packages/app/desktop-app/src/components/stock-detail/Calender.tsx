@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import { TextField, Popover, Box } from "@mui/material";
+import { subDays } from "date-fns";
 import "react-calendar/dist/Calendar.css";
 import "./CustomCalender.css";
 
 const Calender = ({ onChange }: StockDetailProps) => {
+  // 本日のDateオブジェクト
+  const today: Date = new Date();
+  // 7日前のDateオブジェクト
+  const sevenDaysAgo: Date = subDays(today, 7);
+
   const [anchorEl, setAnchorEl] = useState(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(sevenDaysAgo);
+  const [endDate, setEndDate] = useState(today);
   const [currentPicker, setCurrentPicker] = useState(null);
 
   const handleOpen = (event: any, pickerType: any) => {
@@ -32,6 +38,12 @@ const Calender = ({ onChange }: StockDetailProps) => {
     }
     handleClose();
   };
+
+  useEffect(() => {
+    if (onChange) {
+      onChange([startDate, endDate]);
+    }
+  }, []);
 
   const open = Boolean(anchorEl);
   const id = open ? "calendar-popover" : undefined;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, subDays } from "date-fns";
 import Calender from "../components/stock-detail/Calender";
 import Table from "../components/stock-detail/Table";
 
@@ -14,9 +14,12 @@ const StockDetail = () => {
   // 表示するasinDataをメインプロセスから取得
   const [targetAsinData, setTargetAsinData] = useState<AsinData>();
   useEffect(() => {
+    console.log("■ 1 targetAsinData =", targetAsinData);
     window.myAPI.receiveAsinData((asinData: AsinData) => {
+      console.log("■ 2 targetAsinData =", asinData);
       setTargetAsinData(asinData);
     });
+    console.log("■ 3 targetAsinData =", targetAsinData);
   }, [targetAsinData]);
 
   // 手動で日付の変更操作があった場合に
@@ -26,6 +29,11 @@ const StockDetail = () => {
     new Date(),
     new Date(),
   ]);
+
+  useEffect(() => {
+    console.log("startDate: dateRange[0]=", dateRange[0]);
+    console.log("endDate: dateRange[1]=", dateRange[1]);
+  }, [dateRange]);
 
   // ① 縦(日付)
   // ② 横(セラー)
@@ -47,21 +55,23 @@ const StockDetail = () => {
   // dataRangeの変更を取得するたびに
   // ①② の更新処理を行います。
   useEffect(() => {
+    console.log("1 newData :");
     // ① 変更された日付範囲に、列見出しを更新
     const startDate = resetTime(new Date(dateRange[0]));
     const endDate = resetTime(new Date(dateRange[1]));
 
     const newColumnHeader = ["Seller"];
-
+    console.log("2 newData :");
     let currentDate = new Date(startDate); // startDateのコピーを作成
+
     while (currentDate <= endDate) {
       const formattedDate = format(currentDate, "yyyy-MM-dd");
       newColumnHeader.push(formattedDate);
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
+    console.log("3.0 newData :");
     setColumnHeader(newColumnHeader);
-
     // ② 変更された日付範囲に、Table > body の要素を更新
     // 配列の初期値は
     // ["セラー名"] で、その後に、変更された日付範囲の
@@ -69,6 +79,7 @@ const StockDetail = () => {
     // のオブジェクトを、スプレット関数で連結させればいい。
     // 配列には、セラーごとのオブジェクトを格納する必要があるから
     // asinDataのセラーの値が格納されてるプロパティでmap処理すればいい
+    console.log("3.0 newData: targetAsinData=", targetAsinData);
     const newData = targetAsinData?.fbaSellerDatas.map((fbaSellerData) => {
       // イテレートな処理で各rowのdataオブジェクトを作成する
       // まず、セラー名のみのオブジェクトを作成
@@ -112,8 +123,9 @@ const StockDetail = () => {
       return sellerData;
     });
 
+    console.log("newData =", newData);
     setData(newData);
-  }, [dateRange]);
+  }, [targetAsinData, dateRange]);
 
   return (
     <>
