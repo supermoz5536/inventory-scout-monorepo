@@ -150,6 +150,16 @@ const Calender = ({ onChange }: StockDetailProps) => {
               },
             },
           }}
+          // カスタムスタイルを適用
+          sx={{
+            // & は「このスタイルが適用されている要素」、つまり
+            // StaticDatePicker コンポーネントを指します。
+            // したがって、このスタイルは StaticDatePicker コンポーネント内の
+            // .MuiPickersDay-today クラスを持つ全ての要素に対して適用されます。
+            "& .MuiPickersDay-today": {
+              border: "none",
+            },
+          }}
         >
           <Box p={2}>
             {currentPicker === "start" ? (
