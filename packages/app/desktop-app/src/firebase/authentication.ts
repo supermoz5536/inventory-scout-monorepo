@@ -5,8 +5,11 @@ import {
   signOut,
   onAuthStateChanged,
   User,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updateEmail,
 } from "firebase/auth";
-import { changeIsAuthed } from "../slices/userSlice";
+import { changeIsAuthed, changeEmail } from "../slices/userSlice";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -85,5 +88,34 @@ export const initLogoutCallBack = async () => {
     console.log("Logged out successfully");
   } catch (error) {
     console.error("Failed to log out:", error);
+  }
+};
+
+// メールアドレスを更新する関数
+export const changeEmailAdress = async (
+  newEmail: string,
+  currentPassword: string
+) => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      // ユーザーを再認証する
+      const credential = EmailAuthProvider.credential(
+        user.email as string,
+        currentPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // メールアドレスを更新する
+      await updateEmail(user, newEmail);
+      store.dispatch(changeEmail(newEmail));
+      console.log("メールアドレスの更新に成功しました");
+      return true;
+    } else {
+      throw new Error("サインインしているユーザーがいません");
+    }
+  } catch (error) {
+    console.error("メールアドレスの更新に失敗しました:", error);
+    return false;
   }
 };

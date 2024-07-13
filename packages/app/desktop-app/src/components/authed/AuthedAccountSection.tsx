@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AuthedAccountSection.css";
 import { useSelector } from "react-redux";
+import { changeEmailAdress } from "../../firebase/authentication";
 
 const AuthedEmailSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
-  let newEmail: string;
+  const [newEmail, setNewEmail] = useState("");
+  // const [inputNewEmail, setInputNewEmail] = useState("");
   let newPassword: string;
-  let currentPassword: string;
+  let currentPassword: string = user.password;
 
   // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
-  const handleChangeEmail = async () => {};
+  const handleChangeEmailAdress = async () => {
+    if (newEmail) {
+      changeEmailAdress(newEmail, currentPassword);
+      setNewEmail("");
+    }
+  };
 
   // パスワードの「変更」でトリガーされるメールアドレス変更関数
   const handleChangePassword = async () => {};
@@ -29,13 +36,19 @@ const AuthedEmailSection = () => {
           </div>
           <div className="authed-account-section-email-item">
             <p>新しいメールアドレス：</p>
-            <input className="authed-account-section-email-item-value-email"></input>
+            <input
+              className="authed-account-section-email-item-value-email"
+              value={newEmail}
+              onChange={(event) => {
+                setNewEmail(event.target.value);
+              }}
+            ></input>
           </div>
-          <div className="authed-account-section-email-item">
+          {/* <div className="authed-account-section-email-item">
             <p>パスワード：</p>
             <input className="authed-account-section-email-item-value-password"></input>
-          </div>
-          <button>変更</button>
+          </div> */}
+          <button onClick={handleChangeEmailAdress}>変更</button>
         </div>
         {/* パスワードセクション */}
         <div className="authed-account-section-password">
