@@ -37,8 +37,12 @@
   justify-content: start;
 }
 
-.authed-account-section-email-item-value {
+.authed-account-section-email-item-value-email {
   margin-left: 20px;
+}
+
+.authed-account-section-email-item-value-password {
+  margin-left: 99px;
 }
 
 .authed-account-section-email-item input {

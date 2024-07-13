@@ -14,13 +14,17 @@ const AuthedEmailSection = () => {
           <p>メールアドレスの変更</p>
           <div className="authed-account-section-email-item">
             <p>現在のメールアドレス：</p>
-            <p className="authed-account-section-email-item-value">
+            <p className="authed-account-section-email-item-value-email">
               {user.email}
             </p>
           </div>
           <div className="authed-account-section-email-item">
             <p>新しいメールアドレス：</p>
-            <input className="authed-account-section-email-item-value"></input>
+            <input className="authed-account-section-email-item-value-email"></input>
+          </div>
+          <div className="authed-account-section-email-item">
+            <p>パスワード：</p>
+            <input className="authed-account-section-email-item-value-password"></input>
           </div>
           <button>変更</button>
         </div>
