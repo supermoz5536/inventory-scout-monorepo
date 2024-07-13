@@ -51,7 +51,7 @@ const StockDetail = () => {
     const startDate = resetTime(new Date(dateRange[0]));
     const endDate = resetTime(new Date(dateRange[1]));
 
-    const newColumnHeader = ["Seller"];
+    const newColumnHeader = [""];
     let currentDate = new Date(startDate); // startDateのコピーを作成
 
     while (currentDate <= endDate) {
@@ -71,8 +71,8 @@ const StockDetail = () => {
     const newData = targetAsinData?.fbaSellerDatas.map((fbaSellerData) => {
       // イテレートな処理で各rowのdataオブジェクトを作成する
       // まず、セラー名のみのオブジェクトを作成
-      const sellerData: { Seller: string; [key: string]: number | string } = {
-        Seller: fbaSellerData.sellerName,
+      const sellerData: { "": string; [key: string]: number | string } = {
+        "": fbaSellerData.sellerName,
       };
 
       // このオブジェクトに、そのセラーデータが保有してる
