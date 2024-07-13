@@ -4,6 +4,15 @@ import { useSelector } from "react-redux";
 
 const AuthedEmailSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
+  let newEmail: string;
+  let newPassword: string;
+  let currentPassword: string;
+
+  // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
+  const handleChangeEmail = async () => {};
+
+  // パスワードの「変更」でトリガーされるメールアドレス変更関数
+  const handleChangePassword = async () => {};
 
   return (
     <>
