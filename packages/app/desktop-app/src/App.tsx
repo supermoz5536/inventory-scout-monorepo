@@ -45,11 +45,12 @@ const App: React.FC = () => {
 
   /// アプリ立ち上げの初期化処理
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
-  /// ② ローカルストレージデータのロード
-  /// ③ メインプロセス起動時の自動ログアウトを受信するリスナー設置
-  /// ④ サーバーサイドの認証ステータスと常に同期するリスナーを設置
-  /// ⑤ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
-  /// ⑥ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
+  /// ② 移行データの取得リスナーの配置と削除
+  /// ③ ローカルストレージデータのロード
+  /// ④ メインプロセス起動時にログアウト処理をトリガーする関数
+  /// ⑤ サーバーサイドの認証ステータスと常に同期するリスナーを設置
+  /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
+  /// ⑦ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     (async () => {
       try {
@@ -58,26 +59,31 @@ const App: React.FC = () => {
         window.myAPI.scrapingResult(handleScrapingResult);
 
         // ②
+        window.myAPI.loadTransferData((event, loadedTransferData) => {
+          dispatch(updateWithLoadedData(loadedTransferData));
+        });
+
+        // ③
         const loadedData = await window.myAPI.loadData();
         dispatch(updateWithLoadedData(loadedData));
 
-        // ③
+        // ④
         // 引数はリスナーのコールバック関数で
         // 関数自体を渡す必要があるため
         // ()なしで関数名のみ記述
         window.myAPI.initLogout(initLogoutCallBack);
 
-        // ④
+        // ⑤
         const unsubscribe = await listenAuthState();
 
-        // ⑤
+        // ⑥
         if (userRef.current.isAutoLogIn === true && userRef.current.email) {
           console.log("init login done 1");
           await handleLogIn(userRef.current.email, userRef.current.password);
           console.log("init login done 2");
         }
 
-        // ⑥
+        // ⑦
         // ■ 同日に前回の処理が中断されている場合の自動処理
         if (
           asinDataListRef.current.length > 0 &&
@@ -115,10 +121,9 @@ const App: React.FC = () => {
         }
 
         return () => {
-          // ① のリスナーをdispose
-          console.log("scrapingResult disposed ");
-          window.myAPI.removeScrapingResult(handleScrapingResult);
-          // ③ のリスナーをdispose
+          // preload.tsの登録関数で設置したリスナーを全てdispose
+          window.myAPI.disposeAllListeners();
+          // ⑤ のリスナーをdispose
           unsubscribe();
         };
       } catch (error) {

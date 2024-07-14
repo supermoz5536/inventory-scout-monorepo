@@ -18,6 +18,7 @@ let appURL: string;
 let scrape: any;
 let browser: any;
 let scheduledTask: any;
+let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
@@ -25,7 +26,7 @@ let isLoggedOut: boolean = false;
 
 /// メイン画面を生成する関数です
 const createMainWindow = () => {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1400,
     height: 975,
     // resizable: false, // ウィンドウサイズを変更できないようにする
@@ -58,22 +59,30 @@ const createMainWindow = () => {
       // アクセスするための URL を生成します。
       "http://localhost:3000";
 
-  win.loadURL(appURL);
+  mainWindow.loadURL(appURL);
 
   // 初回起動時のみログアウト処理を実行
   // ウィンドウの読み込みが完了した後に処理します
-  win.webContents.once("did-finish-load", () => {
+  mainWindow.webContents.once("did-finish-load", () => {
     if (isLoggedOut === false) {
-      win.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
+      mainWindow.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
       isLoggedOut = true; // ログアウト処理が実行されたことを記録
     }
   });
 
   if (!app.isPackaged) {
-    win.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
   } else {
-    win.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 };
 
 // app.on メソッドは、
@@ -179,28 +188,8 @@ ipcMain.handle(
   }
 );
 
-/// スクレイピングの強制終了関数
-
 ipcMain.handle("save-data", (event, data) => {
-  // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "asinDataList.json");
-  return new Promise<void>((resolve, reject) => {
-    // fs.writeFile: node.jsのファイル書き込みメソッド
-    // 構文: fs.writeFile(path, data, callback)
-    // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
-    // stringify 第二引数は「リプレーサー」と呼ばれ、
-    // どのプロパティをJSONに含めるかを決めるためのものです。
-    // null を指定すると、そのオブジェクトのすべてのプロパティがJSON文字列に含まれます。
-    // stringify 第3引数: JSON文字列を整形（インデント）するために使用されるスペース数
-    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
-      if (err) {
-        console.error("Failed to save data:");
-        return reject(err);
-      }
-      console.log("Data saved successfully:", data);
-      resolve();
-    });
-  });
+  saveDataToStorage(data);
 });
 
 ipcMain.handle("load-data", async () => {
@@ -267,8 +256,15 @@ app.whenReady().then(() => {
       label: "ファイル",
       submenu: [
         {
+          label: "読み込み",
+          submenu: [{ label: "移行データ...", click: loadTransferData }],
+        },
+        {
           label: "書き出し",
-          submenu: [{ label: "CSV...", click: saveDataWithCSV }],
+          submenu: [
+            { label: "CSV...", click: saveDataWithCSV },
+            { label: "移行データ...", click: saveTransferData },
+          ],
         },
       ],
     });
@@ -512,7 +508,7 @@ function parseJsonToJS(jsonData: string) {
 
 /// loadJsonData()で取得したJsonデータを
 /// CSVに変換する関数
-function parseJsonToCSV(javaScriptData: any) {
+function parseJavaScriptToCSV(javaScriptData: any) {
   try {
     // asinDataListのネストされた全ての要素を
     // csvの見出し列に追加できるように並列化処理
@@ -567,7 +563,7 @@ function parseJsonToCSV(javaScriptData: any) {
 async function saveDataWithCSV() {
   const jsonData: string = await loadJsonData();
   const javaScriptData = await parseJsonToJS(jsonData);
-  const csvData = parseJsonToCSV(javaScriptData);
+  const csvData = parseJavaScriptToCSV(javaScriptData);
 
   // dialogクラスのshowSaveDialogメソッドでの返り値のオブジェクトには
   // canceled, filePathのプロパティがあり、
@@ -595,4 +591,104 @@ async function saveDataWithCSV() {
   } catch (error) {
     console.error("CSVファイルの保存に失敗しました:", error);
   }
+}
+
+// ローカルストレージのJsonを
+// アップグレード用の移行データとして
+// そのまま出力する関数
+async function saveTransferData() {
+  const jsonData: string = await loadJsonData();
+
+  // dialogクラスのshowSaveDialogメソッドでの返り値のオブジェクトには
+  // canceled, filePathのプロパティがあり、
+  // そのプロパティ名で各プロパティの値を格納した変数を宣言
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: "CSVファイルを保存",
+    // path : node.jsの標準モジュール
+    // app : electronの標準モジュール
+    defaultPath: path.join(app.getPath("desktop"), "data.json"),
+    filters: [
+      // name: このフィルタの表示名
+      // extensions: 許可されるファイル拡張子のリスト。
+      // *は任意の拡張子を意味し、すべてのファイルが許可されます。
+      { name: "Json Files", extensions: ["json"] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+  try {
+    if (!canceled && filePath) {
+      await fs.promises.writeFile(filePath, jsonData);
+      console.log("移行データが保存されました");
+    } else {
+      console.log("ユーザーが保存をキャンセルしました");
+    }
+  } catch (error) {
+    console.error("移行データの保存に失敗しました:", error);
+  }
+}
+
+// ローカルストレージのJsonを
+// アップグレード用の移行データを読み込む関数
+async function loadTransferData() {
+  // ipcMain.handle("load-transfer-data", async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: "移行データの読み込み",
+    properties: ["openFile"],
+    filters: [
+      // name: このフィルタの表示名
+      // extensions: 許可されるファイル拡張子のリスト。
+      // *は任意の拡張子を意味し、すべてのファイルが許可されます。
+      { name: "CSV Files", extensions: ["json"] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+  try {
+    if (!canceled && filePaths.length > 0) {
+      const loadedTransferData = await fs.promises.readFile(
+        filePaths[0],
+        "utf8"
+      );
+      const parsedData = parseJsonToJS(loadedTransferData);
+      console.log("移行データを読み込みました");
+
+      // ローカルストレージへの保存
+      saveDataToStorage(parsedData);
+
+      // ウィンドウが存在しない場合は新しく作成
+      if (!mainWindow) {
+        createMainWindow();
+      }
+
+      // レンダラープロセスにデータを送信
+      mainWindow.webContents.send("load-transfer-data", parsedData);
+
+      return parsedData;
+    } else {
+      console.log("移行データの読み込みをユーザーがキャンセルしました");
+    }
+  } catch (error) {
+    console.error("移行データの読み込みに失敗しました:", error);
+  }
+}
+
+function saveDataToStorage(data: any) {
+  // ローカルストレージのpathを取得
+  const storagePath = path.join(__dirname, "asinDataList.json");
+  return new Promise<void>((resolve, reject) => {
+    // fs.writeFile: node.jsのファイル書き込みメソッド
+    // 構文: fs.writeFile(path, data, callback)
+    // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
+    // stringify 第二引数は「リプレーサー」と呼ばれ、
+    // どのプロパティをJSONに含めるかを決めるためのものです。
+    // null を指定すると、そのオブジェクトのすべてのプロパティがJSON文字列に含まれます。
+    // stringify 第3引数: JSON文字列を整形（インデント）するために使用されるスペース数
+    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        console.error("Failed to save data:");
+        return reject(err);
+      }
+      console.log("Data saved successfully:", data);
+      resolve();
+    });
+  });
 }

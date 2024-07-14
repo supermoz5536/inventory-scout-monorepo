@@ -37,8 +37,8 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
 
-  removeScrapingResult: (callback) =>
-    ipcRenderer.removeListener("scraping-result", callback),
+  // removeScrapingResult: (callback) =>
+  //   ipcRenderer.removeListener("scraping-result", callback),
 
   saveData: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("save-data", asinDataList),
@@ -52,12 +52,21 @@ contextBridge.exposeInMainWorld("myAPI", {
   openStockDetail: (asinDataList: AsinData) =>
     ipcRenderer.invoke("open-stock-detail", asinDataList),
 
-  receiveAsinData: (callback) =>
-    ipcRenderer.on("receive-asin-data", (event, data) => callback(data)),
+  receiveAsinData: (callback) => ipcRenderer.on("receive-asin-data", callback),
 
   initLogout: (callback) => {
     ipcRenderer.on("init-logout", callback);
   },
   scheduledScraping: (time: string, asinDataList: AsinData[]) =>
     ipcRenderer.invoke("schedule-scraping", time, asinDataList),
+
+  loadTransferData: (callback) =>
+    ipcRenderer.on("load-transfer-data", callback),
+
+  disposeAllListeners: () => {
+    ipcRenderer.removeAllListeners("scraping-result");
+    ipcRenderer.removeAllListeners("receive-asin-data");
+    ipcRenderer.removeAllListeners("init-logout");
+    ipcRenderer.removeAllListeners("load-transfer-data");
+  },
 });
