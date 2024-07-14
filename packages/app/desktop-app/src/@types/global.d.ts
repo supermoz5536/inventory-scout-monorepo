@@ -14,13 +14,13 @@ declare global {
           isEnd: boolean
         ) => void
       ) => void;
-      removeScrapingResult: (
-        callback: (
-          event: Electron.IpcRendererEvent,
-          data: AsinData,
-          isEnd: boolean
-        ) => void
-      ) => void;
+      // removeScrapingResult: (
+      //   callback: (
+      //     event: Electron.IpcRendererEvent,
+      //     data: AsinData,
+      //     isEnd: boolean
+      //   ) => void
+      // ) => void;
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;
       saveUser: (user: User) => Promise<void>;
@@ -32,6 +32,7 @@ declare global {
       loadTransferData: (
         callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
       ) => void;
+      disposeAllListeners: () => void;
     };
   }
 

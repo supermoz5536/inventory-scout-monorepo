@@ -121,8 +121,8 @@ const App: React.FC = () => {
         }
 
         return () => {
-          // ① のリスナーをdispose
-          window.myAPI.removeScrapingResult(handleScrapingResult);
+          // preload.tsの登録関数で設置したリスナーを全てdispose
+          window.myAPI.disposeAllListeners();
           // ⑤ のリスナーをdispose
           unsubscribe();
         };
