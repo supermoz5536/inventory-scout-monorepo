@@ -1,9 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AuthedAccountSection.css";
 import { useSelector } from "react-redux";
+import {
+  changeEmailAdress,
+  changePassword,
+} from "../../firebase/authentication";
 
 const AuthedEmailSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputCurrentPassword, setInputCurrentPassword] = useState("");
+  const [inputNewPassword, setInputNewPassword] = useState("");
+  const [inputConfirmedPassword, setInputConfirmedPassword] = useState("");
+
+  // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
+  const handleChangeEmailAdress = async () => {
+    if (inputEmail) {
+      changeEmailAdress(inputEmail, user.password);
+      setInputEmail("");
+    }
+  };
+
+  // パスワードの「変更」でトリガーされるメールアドレス変更関数
+  const handleChangePassword = async () => {
+    if (
+      inputCurrentPassword &&
+      inputNewPassword &&
+      inputConfirmedPassword &&
+      inputNewPassword === inputConfirmedPassword
+    ) {
+      changePassword(inputCurrentPassword, inputNewPassword);
+      setInputCurrentPassword("");
+      setInputNewPassword("");
+      setInputConfirmedPassword("");
+    }
+  };
 
   return (
     <>
@@ -14,32 +45,60 @@ const AuthedEmailSection = () => {
           <p>メールアドレスの変更</p>
           <div className="authed-account-section-email-item">
             <p>現在のメールアドレス：</p>
-            <p className="authed-account-section-email-item-value">
+            <p className="authed-account-section-email-item-value-email">
               {user.email}
             </p>
           </div>
           <div className="authed-account-section-email-item">
             <p>新しいメールアドレス：</p>
-            <input className="authed-account-section-email-item-value"></input>
+            <input
+              className="authed-account-section-email-item-value-email"
+              placeholder="新しいメールアドレス"
+              value={inputEmail}
+              onChange={(event) => {
+                setInputEmail(event.target.value);
+              }}
+            ></input>
           </div>
-          <button>変更</button>
+          <button onClick={handleChangeEmailAdress}>変更</button>
         </div>
         {/* パスワードセクション */}
         <div className="authed-account-section-password">
           <p>パスワードの変更</p>
           <div className="authed-account-section-password-item">
             <p>現在のパスワード：</p>
-            <input></input>
+            <input
+              placeholder="現在のパスワード"
+              type={"password"}
+              value={inputCurrentPassword}
+              onChange={(event) => {
+                setInputCurrentPassword(event.target.value);
+              }}
+            ></input>
           </div>
           <div className="authed-account-section-password-item">
             <p>新しいパスワード：</p>
-            <input></input>
+            <input
+              placeholder="新しいパスワード"
+              type={"password"}
+              value={inputNewPassword}
+              onChange={(event) => {
+                setInputNewPassword(event.target.value);
+              }}
+            ></input>
           </div>
           <div className="authed-account-section-password-item">
             <p>パスワードの確認：</p>
-            <input></input>
+            <input
+              placeholder="新しいパスワードを再度入力"
+              type={"password"}
+              value={inputConfirmedPassword}
+              onChange={(event) => {
+                setInputConfirmedPassword(event.target.value);
+              }}
+            ></input>
           </div>
-          <button>変更</button>
+          <button onClick={handleChangePassword}>変更</button>
         </div>
       </div>
     </>
