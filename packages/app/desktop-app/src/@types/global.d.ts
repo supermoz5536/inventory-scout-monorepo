@@ -29,6 +29,9 @@ declare global {
       receiveAsinData: (callback: (asinData: AsinData) => void) => void;
       initLogout: (callback: () => void) => void;
       scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
+      loadTransferData: (
+        callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
+      ) => void;
     };
   }
 

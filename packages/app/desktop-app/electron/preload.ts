@@ -60,4 +60,7 @@ contextBridge.exposeInMainWorld("myAPI", {
   },
   scheduledScraping: (time: string, asinDataList: AsinData[]) =>
     ipcRenderer.invoke("schedule-scraping", time, asinDataList),
+
+  loadTransferData: (callback) =>
+    ipcRenderer.on("load-transfer-data", (event, data) => callback(data)),
 });
