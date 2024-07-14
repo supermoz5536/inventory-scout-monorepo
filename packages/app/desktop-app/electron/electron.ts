@@ -75,6 +75,14 @@ const createMainWindow = () => {
   } else {
     mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 };
 
 // app.on メソッドは、
@@ -180,28 +188,8 @@ ipcMain.handle(
   }
 );
 
-/// スクレイピングの強制終了関数
-
 ipcMain.handle("save-data", (event, data) => {
-  // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "asinDataList.json");
-  return new Promise<void>((resolve, reject) => {
-    // fs.writeFile: node.jsのファイル書き込みメソッド
-    // 構文: fs.writeFile(path, data, callback)
-    // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
-    // stringify 第二引数は「リプレーサー」と呼ばれ、
-    // どのプロパティをJSONに含めるかを決めるためのものです。
-    // null を指定すると、そのオブジェクトのすべてのプロパティがJSON文字列に含まれます。
-    // stringify 第3引数: JSON文字列を整形（インデント）するために使用されるスペース数
-    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
-      if (err) {
-        console.error("Failed to save data:");
-        return reject(err);
-      }
-      console.log("Data saved successfully:", data);
-      resolve();
-    });
-  });
+  saveDataToStorage(data);
 });
 
 ipcMain.handle("load-data", async () => {
@@ -268,8 +256,15 @@ app.whenReady().then(() => {
       label: "ファイル",
       submenu: [
         {
+          label: "読み込み",
+          submenu: [{ label: "移行データ...", click: loadTransferData }],
+        },
+        {
           label: "書き出し",
-          submenu: [{ label: "CSV...", click: saveDataWithCSV }],
+          submenu: [
+            { label: "CSV...", click: saveDataWithCSV },
+            { label: "移行データ...", click: saveTransferData },
+          ],
         },
       ],
     });
@@ -656,6 +651,9 @@ async function loadTransferData() {
       const parsedData = parseJsonToJS(loadedTransferData);
       console.log("移行データを読み込みました");
 
+      // ローカルストレージへの保存
+      saveDataToStorage(parsedData);
+
       // ウィンドウが存在しない場合は新しく作成
       if (!mainWindow) {
         createMainWindow();
@@ -671,4 +669,26 @@ async function loadTransferData() {
   } catch (error) {
     console.error("移行データの読み込みに失敗しました:", error);
   }
+}
+
+function saveDataToStorage(data: any) {
+  // ローカルストレージのpathを取得
+  const storagePath = path.join(__dirname, "asinDataList.json");
+  return new Promise<void>((resolve, reject) => {
+    // fs.writeFile: node.jsのファイル書き込みメソッド
+    // 構文: fs.writeFile(path, data, callback)
+    // JSON形式のデータは基本的にUTF-8エンコーディングで保存されます。
+    // stringify 第二引数は「リプレーサー」と呼ばれ、
+    // どのプロパティをJSONに含めるかを決めるためのものです。
+    // null を指定すると、そのオブジェクトのすべてのプロパティがJSON文字列に含まれます。
+    // stringify 第3引数: JSON文字列を整形（インデント）するために使用されるスペース数
+    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        console.error("Failed to save data:");
+        return reject(err);
+      }
+      console.log("Data saved successfully:", data);
+      resolve();
+    });
+  });
 }
