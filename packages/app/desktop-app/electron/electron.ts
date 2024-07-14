@@ -4,13 +4,14 @@
 // なので、自動的にpreload.tsでも参照が反映されます。
 /// <reference path="../src/@types/global.d.ts" />
 
-import { app, BrowserWindow, ipcMain, Menu, MenuItem } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 import scrapePromis from "../src/components/Scrape";
 import { persistor } from "../src/redux/store";
 import cron from "node-cron";
+import { Parser } from "@json2csv/plainjs";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
@@ -264,7 +265,12 @@ app.whenReady().then(() => {
 
     const fileMenu = new MenuItem({
       label: "ファイル",
-      submenu: [{ label: "csvで書き出し" }],
+      submenu: [
+        {
+          label: "書き出し",
+          submenu: [{ label: "CSV...", click: saveDataWithCSV }],
+        },
+      ],
     });
 
     const editMenu = new MenuItem({
@@ -296,7 +302,12 @@ app.whenReady().then(() => {
 
     const fileMenu = new MenuItem({
       label: "ファイル",
-      submenu: [{ label: "csvで書き出し" }],
+      submenu: [
+        {
+          label: "書き出し",
+          submenu: [{ label: "CSV...", click: saveDataWithCSV }],
+        },
+      ],
     });
 
     const editMenu = new MenuItem({
@@ -454,7 +465,7 @@ function openStockDetail(asinData: AsinData) {
 }
 
 // ローカルストレージからJsonデータを取得する関数
-function loadJsonData() {
+function loadJsonData(): Promise<string> {
   const storagePath = path.join(__dirname, "asinDataList.json");
   return new Promise((resolve, reject) => {
     // fs.readFile メソッドで "utf8" を指定すると
@@ -475,7 +486,7 @@ function loadJsonData() {
           // 重大なエラーではないとみなし、
           // 空の配列を返して通常の処理を続行する
           console.warn("No data file found, returning empty array");
-          return resolve([]);
+          return resolve("");
         }
         // その他のエラーは、システムエラーの可能性があるため、
         // rejectして、適切に処理できるようにする
@@ -487,16 +498,101 @@ function loadJsonData() {
   });
 }
 
-function parseJsonToJS(loadedData: any) {
+/// loadJsonData()で取得したJsonデータを
+/// JSのオブジェクトに変換する関数
+function parseJsonToJS(jsonData: string) {
   try {
-    // ローカルに保存されている
-    // Jsonファイル(jsonString)を
-    // jsで扱えるように .parse で
-    // JavaScriptオブジェクトに変換します。
-    const parsedData = JSON.parse(loadedData);
-    console.log("Data loaded successfully");
+    const parsedData = JSON.parse(jsonData);
+    console.log("parseJsonToJS successfully");
     return parsedData;
   } catch (error) {
-    console.error("Failed to parse data:");
+    console.error("Failed to parseJsonToJS", error);
+  }
+}
+
+/// loadJsonData()で取得したJsonデータを
+/// CSVに変換する関数
+function parseJsonToCSV(javaScriptData: any) {
+  try {
+    // asinDataListのネストされた全ての要素を
+    // csvの見出し列に追加できるように並列化処理
+    const expandedData = javaScriptData.flatMap((item: any) => {
+      const { fbaSellerDatas, ...rest } = item;
+      return fbaSellerDatas.flatMap((sellerData: any) => {
+        return sellerData.stockCountDatas.map((stock: any) => {
+          const [date, count] = Object.entries(stock)[0];
+          return {
+            ...rest,
+            sellerId: sellerData.sellerId,
+            sellerName: sellerData.sellerName,
+            date,
+            count,
+          };
+        });
+      });
+    });
+
+    // csvの各見出し列名を日本語に変換
+    const opts = {
+      fields: [
+        { label: "ASIN", value: "asin" },
+        { label: "画像URL", value: "imageURL" },
+        { label: "名前", value: "name" },
+        { label: "Amazon在庫", value: "amazonStock" },
+        { label: "FBA出品者数", value: "fbaSellerNOP" },
+        { label: "総在庫数", value: "totalStock" },
+        { label: "カート価格", value: "cartPrice" },
+        { label: "減少1", value: "decrease1" },
+        { label: "減少2", value: "decrease2" },
+        { label: "親ASIN", value: "asinParent" },
+        { label: "出品者ID", value: "sellerId" },
+        { label: "出品者名", value: "sellerName" },
+        { label: "日付", value: "date" },
+        { label: "在庫数", value: "count" },
+      ],
+    };
+    const parser = new Parser(opts);
+    const csvData = parser.parse(expandedData);
+    console.log("parseJsonToCSV successfully");
+    return csvData;
+  } catch (error) {
+    console.error("Failed to parseJsonToCSV", error);
+    return [];
+  }
+}
+
+// ローカルストレージのjsonを
+// csv形式で出力する関数
+// 「メニュー → ファイル → 書き出し → CSV」
+async function saveDataWithCSV() {
+  const jsonData: string = await loadJsonData();
+  const javaScriptData = await parseJsonToJS(jsonData);
+  const csvData = parseJsonToCSV(javaScriptData);
+
+  // dialogクラスのshowSaveDialogメソッドでの返り値のオブジェクトには
+  // canceled, filePathのプロパティがあり、
+  // そのプロパティ名で各プロパティの値を格納した変数を宣言
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: "CSVファイルを保存",
+    // path : node.jsの標準モジュール
+    // app : electronの標準モジュール
+    defaultPath: path.join(app.getPath("desktop"), "data.csv"),
+    filters: [
+      // name: このフィルタの表示名
+      // extensions: 許可されるファイル拡張子のリスト。
+      // *は任意の拡張子を意味し、すべてのファイルが許可されます。
+      { name: "CSV Files", extensions: ["csv"] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+  try {
+    if (!canceled && filePath) {
+      await fs.promises.writeFile(filePath, csvData);
+      console.log("CSVファイルが保存されました");
+    } else {
+      console.log("ユーザーが保存をキャンセルしました");
+    }
+  } catch (error) {
+    console.error("CSVファイルの保存に失敗しました:", error);
   }
 }
