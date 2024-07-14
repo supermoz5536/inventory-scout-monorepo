@@ -202,51 +202,10 @@ ipcMain.handle("save-data", (event, data) => {
   });
 });
 
-ipcMain.handle("load-data", () => {
-  const storagePath = path.join(__dirname, "asinDataList.json");
-  return new Promise((resolve, reject) => {
-    // fs.readFile メソッドで "utf8" を指定すると
-    // ファイルの内容をUTF-8エンコーディングとして読み取ります。
-    // fs.readFile のコールバック関数の引数 (err, data) は、
-    // ファイル読み取り操作が完了したときに
-    // fs.readFile 関数によって自動的に提供されます。
-    fs.readFile(storagePath, "utf8", (err, data) => {
-      if (err) {
-        // エラーが発生した場合、
-        // 特にファイルが存在しない場合
-        // "Error NO ENTry" の略で、
-        // 指定されたファイルや
-        // ディレクトリが存在しない場合のエラー
-        if (err.code === "ENOENT") {
-          // ENOENTは、ファイルが存在しないことを示すエラー
-          // ファイルがまだ作成されていない場合に発生するため、
-          // 重大なエラーではないとみなし、
-          // 空の配列を返して通常の処理を続行する
-          console.warn("No data file found, returning empty array");
-          return resolve([]);
-        }
-        // その他のエラーは、システムエラーの可能性があるため、
-        // rejectして、適切に処理できるようにする
-        console.error("Failed to load data:");
-        return reject(err);
-      }
-      // JSON.parse は、
-      // 無効な JSON 文字列をパースしようとしたときに
-      // SyntaxError 例外をスローします。
-      try {
-        // ローカルに保存されている
-        // Jsonファイル(jsonString)を
-        // jsで扱えるように .parse で
-        // JavaScriptオブジェクトに変換します。
-        const parsedData = JSON.parse(data);
-        console.log("Data loaded successfully");
-        resolve(parsedData);
-      } catch (error) {
-        console.error("Failed to parse data:");
-        reject(error);
-      }
-    });
-  });
+ipcMain.handle("load-data", async () => {
+  const data = await loadJsonData();
+  const parsedData = await parseJsonToJS(data);
+  return parsedData;
 });
 
 ipcMain.handle("save-user", (event, data: User) => {
@@ -492,4 +451,52 @@ function openStockDetail(asinData: AsinData) {
   StockDetailWindow.on("closed", () => {
     StockDetailWindow = null;
   });
+}
+
+// ローカルストレージからJsonデータを取得する関数
+function loadJsonData() {
+  const storagePath = path.join(__dirname, "asinDataList.json");
+  return new Promise((resolve, reject) => {
+    // fs.readFile メソッドで "utf8" を指定すると
+    // ファイルの内容をUTF-8エンコーディングとして読み取ります。
+    // fs.readFile のコールバック関数の引数 (err, data) は、
+    // ファイル読み取り操作が完了したときに
+    // fs.readFile 関数によって自動的に提供されます。
+    fs.readFile(storagePath, "utf8", (err, data) => {
+      if (err) {
+        // エラーが発生した場合、
+        // 特にファイルが存在しない場合
+        // "Error NO ENTry" の略で、
+        // 指定されたファイルや
+        // ディレクトリが存在しない場合のエラー
+        if (err.code === "ENOENT") {
+          // ENOENTは、ファイルが存在しないことを示すエラー
+          // ファイルがまだ作成されていない場合に発生するため、
+          // 重大なエラーではないとみなし、
+          // 空の配列を返して通常の処理を続行する
+          console.warn("No data file found, returning empty array");
+          return resolve([]);
+        }
+        // その他のエラーは、システムエラーの可能性があるため、
+        // rejectして、適切に処理できるようにする
+        console.error("Failed to load data:");
+        return reject(err);
+      }
+      resolve(data);
+    });
+  });
+}
+
+function parseJsonToJS(loadedData: any) {
+  try {
+    // ローカルに保存されている
+    // Jsonファイル(jsonString)を
+    // jsで扱えるように .parse で
+    // JavaScriptオブジェクトに変換します。
+    const parsedData = JSON.parse(loadedData);
+    console.log("Data loaded successfully");
+    return parsedData;
+  } catch (error) {
+    console.error("Failed to parse data:");
+  }
 }
