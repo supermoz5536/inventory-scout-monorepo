@@ -503,6 +503,7 @@ function parseJsonToJS(jsonData: string) {
     return parsedData;
   } catch (error) {
     console.error("Failed to parseJsonToJS", error);
+    return [];
   }
 }
 

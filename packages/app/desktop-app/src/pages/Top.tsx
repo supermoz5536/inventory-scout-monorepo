@@ -15,15 +15,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
-  // asinDataListを取得
-  // handleRemoveAsinで
-  // レンダリング処理の時間分で
-  // 状態変数の変更と
-  // 非同期のローカルストレージへの保存処理の順番に
-  // ズレが生じるので
-  // useRefで再レンダリング処理を避けることで
-  // 最速での状態の取得処理により
-  // 順番のズレを回避する
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -51,6 +42,13 @@ function Top() {
   const navigate = useNavigate();
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
   const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+  const [asinQuery, setAsinQuery] = useState("");
+  const [nameQuery, setNameQuery] = useState("");
+  const [parentQuery, setParentQuery] = useState("");
+  const [searchType, setSearchType] = useState("asin");
+  const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
+    asinDataListRef.current
+  );
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -61,15 +59,47 @@ function Top() {
     window.myAPI.openExternal(planURL);
   };
 
-  const handleDeleteCheck = (id: string) => {
-    dispatch(switchRemoveCheck(id));
+  /// 最後に入力のあった検索クエリ欄のタイプが設定され
+  /// それの値で現在ユーザーの利用してる検索モードを判別します。
+  const handleAsinQuery = (inputData: string) => {
+    setAsinQuery(inputData);
+    setSearchType("asin");
+  };
+  const handleNameQuery = (inputData: string) => {
+    setNameQuery(inputData);
+    setSearchType("name");
+  };
+  const handleParentQuery = (inputData: string) => {
+    setParentQuery(inputData);
+    setSearchType("parent");
   };
 
+  // filteredAsinDataListを更新、再描画する関数
   useEffect(() => {
-    const asinDataListCount = asinDataList.length;
-    setAsinDataListCount(asinDataListCount);
-  }, [asinDataList.length]);
+    const newFilteredList = asinDataListRef.current.filter(
+      (asinData: AsinData) => {
+        // 各クエリの結果を以下のように取得する
+        // ① クエリが空の場合はTrue
+        // ② クエリがある場合は包含要素を返す（=True）
+        const asinMatch = !asinQuery || asinData.asin.includes(asinQuery);
+        const nameMatch = !nameQuery || asinData.name.includes(nameQuery);
+        const parentMatch =
+          !parentQuery || asinData.asinParent.includes(parentQuery);
 
+        // 各結果がすべてTrueの場合のみ
+        // つまり、3つのクエリ全てに合致する要素のみtrueを返し
+        // 新規配列に追加する
+        return asinMatch && nameMatch && parentMatch;
+      }
+    );
+
+    setFilteredAsinDataList(newFilteredList);
+    // 各クエリと元データのasinDataListの変更を追跡して
+    // 最新のフィルター状態を反映する。
+  }, [asinQuery, nameQuery, parentQuery, searchType, asinDataList]);
+
+  /// スクレイピングボタンを押した際の
+  /// 条件分岐を管理する関数
   const handleScrapingButton = (
     asinDataList: AsinData[],
     showButtonStatus: number
@@ -118,6 +148,8 @@ function Top() {
     }
   };
 
+  /// スクレイピングを実行する際の
+  /// 「データの下準備と実行」の管理をする関数
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     const today = new Date();
     const todayFormatted = `${today.getFullYear()}-${String(
@@ -191,12 +223,18 @@ function Top() {
     }
   };
 
+  /// チェックしたAsinリストを削除して
+  /// ストレージを最新に更新する関数
   const handleRemoveAsin = async () => {
     dispatch(removeAsin());
     // 状態変数の更新が完了するまで200ms待機
     await new Promise((resolve) => setTimeout(resolve, 200));
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
+  };
+
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchRemoveCheck(id));
   };
 
   /// スクレイピング残り時間の表示を動的に変更します。
@@ -213,6 +251,12 @@ function Top() {
     );
     setScrapeTimeLeft(remainingCount);
   }, [asinDataList]);
+
+  /// ASIN数のカウント関数
+  useEffect(() => {
+    const asinDataListCount = asinDataListRef.current.length;
+    setAsinDataListCount(asinDataListCount);
+  }, [asinDataListRef.current.length]);
 
   return (
     <div className="App">
@@ -264,6 +308,8 @@ function Top() {
           {/* ASIN検索入力欄 */}
           <input
             type="text"
+            value={asinQuery}
+            onChange={(event) => handleAsinQuery(event.target.value)}
             className="top-square-space-menu-container-left-input"
           />
         </div>
@@ -276,6 +322,10 @@ function Top() {
             減少２：直近１週間の減少数
           </p>
           <input
+            onChange={(event) => {
+              handleNameQuery(event.target.value);
+            }}
+            value={nameQuery}
             type="text"
             className="top-square-space-menu-container-center-input"
           />
@@ -293,6 +343,8 @@ function Top() {
             登録ASIN数：{asinDataListCount}
           </p>
           <input
+            value={parentQuery}
+            onChange={(event) => handleParentQuery(event.target.value)}
             type="text"
             className="top-square-space-menu-container-right-input"
           />
@@ -371,7 +423,7 @@ function Top() {
 
         <div className="top-asinArray-map-wrapper-top-css">
           {/* リスト部分 */}
-          {asinDataList.map((asinData: AsinData) => (
+          {filteredAsinDataList.map((asinData: AsinData) => (
             <div className="top-asin-list">
               {/* 要素0 チェック */}
               <div className="top-square-space-asin-delete">
