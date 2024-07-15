@@ -42,12 +42,14 @@ function Top() {
   const navigate = useNavigate();
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
   const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
-  const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
-    asinDataListRef.current
-  );
   const [asinQuery, setAsinQuery] = useState("");
   const [nameQuery, setNameQuery] = useState("");
-  const [parentAsinQuery, setParentAsinQuery] = useState("");
+  const [parentQuery, setParentQuery] = useState("");
+  const [searchType, setSearchType] = useState("asin");
+  let filteredAsinDataList = asinDataListRef.current;
+  // const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
+  //   asinDataListRef.current
+  // );
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -58,16 +60,40 @@ function Top() {
     window.myAPI.openExternal(planURL);
   };
 
+  /// 最後に入力のあった検索クエリ欄のタイプが設定され
+  /// それの値で現在ユーザーの利用してる検索モードを判別します。
   const handleAsinQuery = (inputData: string) => {
     setAsinQuery(inputData);
+    setSearchType("asin");
   };
   const handleNameQuery = (inputData: string) => {
     setNameQuery(inputData);
+    setSearchType("name");
+  };
+  const handleParentQuery = (inputData: string) => {
+    setParentQuery(inputData);
+    setSearchType("parent");
   };
 
-  const handleParentAsinQuery = (inputData: string) => {
-    setParentAsinQuery(inputData);
-  };
+  filteredAsinDataList = asinDataListRef.current.filter(
+    (asinData: AsinData) => {
+      // クエリが空の場合は
+      // 全ての処理にtrueを与えて全てを表示
+      if (!asinQuery && !nameQuery && !parentQuery) {
+        return true;
+      }
+
+      // searchTypeに基づいてフィルタリングを行う
+      if (searchType === "asin") {
+        return asinData.asin.includes(asinQuery);
+      } else if (searchType === "name") {
+        return asinData.name.includes(nameQuery);
+      } else if (searchType === "parent")
+        return asinData.asinParent.includes(parentQuery);
+      {
+      }
+    }
+  );
 
   /// スクレイピングボタンを押した際の
   /// 条件分岐を管理する関数
@@ -225,9 +251,9 @@ function Top() {
 
   /// ASIN数のカウント関数
   useEffect(() => {
-    const asinDataListCount = asinDataList.length;
+    const asinDataListCount = asinDataListRef.current.length;
     setAsinDataListCount(asinDataListCount);
-  }, [asinDataList.length]);
+  }, [asinDataListRef.current.length]);
 
   return (
     <div className="App">
@@ -314,8 +340,8 @@ function Top() {
             登録ASIN数：{asinDataListCount}
           </p>
           <input
-            value={parentAsinQuery}
-            onChange={(event) => handleParentAsinQuery(event.target.value)}
+            value={parentQuery}
+            onChange={(event) => handleParentQuery(event.target.value)}
             type="text"
             className="top-square-space-menu-container-right-input"
           />
