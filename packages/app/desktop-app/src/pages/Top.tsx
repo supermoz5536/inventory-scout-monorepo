@@ -15,15 +15,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 function Top() {
-  // asinDataListを取得
-  // handleRemoveAsinで
-  // レンダリング処理の時間分で
-  // 状態変数の変更と
-  // 非同期のローカルストレージへの保存処理の順番に
-  // ズレが生じるので
-  // useRefで再レンダリング処理を避けることで
-  // 最速での状態の取得処理により
-  // 順番のズレを回避する
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -51,6 +42,12 @@ function Top() {
   const navigate = useNavigate();
   const [asinDataListCount, setAsinDataListCount] = useState<number>(0);
   const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+  const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
+    asinDataListRef.current
+  );
+  const [asinQuery, setAsinQuery] = useState("");
+  const [nameQuery, setNameQuery] = useState("");
+  const [parentAsinQuery, setParentAsinQuery] = useState("");
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -61,15 +58,19 @@ function Top() {
     window.myAPI.openExternal(planURL);
   };
 
-  const handleDeleteCheck = (id: string) => {
-    dispatch(switchRemoveCheck(id));
+  const handleAsinQuery = (inputData: string) => {
+    setAsinQuery(inputData);
+  };
+  const handleNameQuery = (inputData: string) => {
+    setNameQuery(inputData);
   };
 
-  useEffect(() => {
-    const asinDataListCount = asinDataList.length;
-    setAsinDataListCount(asinDataListCount);
-  }, [asinDataList.length]);
+  const handleParentAsinQuery = (inputData: string) => {
+    setParentAsinQuery(inputData);
+  };
 
+  /// スクレイピングボタンを押した際の
+  /// 条件分岐を管理する関数
   const handleScrapingButton = (
     asinDataList: AsinData[],
     showButtonStatus: number
@@ -118,6 +119,8 @@ function Top() {
     }
   };
 
+  /// スクレイピングを実行する際の
+  /// 「データの下準備と実行」の管理をする関数
   const handleRunScraping = async (asinDataList: AsinData[]) => {
     const today = new Date();
     const todayFormatted = `${today.getFullYear()}-${String(
@@ -191,12 +194,18 @@ function Top() {
     }
   };
 
+  /// チェックしたAsinリストを削除して
+  /// ストレージを最新に更新する関数
   const handleRemoveAsin = async () => {
     dispatch(removeAsin());
     // 状態変数の更新が完了するまで200ms待機
     await new Promise((resolve) => setTimeout(resolve, 200));
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
+  };
+
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchRemoveCheck(id));
   };
 
   /// スクレイピング残り時間の表示を動的に変更します。
@@ -213,6 +222,12 @@ function Top() {
     );
     setScrapeTimeLeft(remainingCount);
   }, [asinDataList]);
+
+  /// ASIN数のカウント関数
+  useEffect(() => {
+    const asinDataListCount = asinDataList.length;
+    setAsinDataListCount(asinDataListCount);
+  }, [asinDataList.length]);
 
   return (
     <div className="App">
@@ -264,6 +279,8 @@ function Top() {
           {/* ASIN検索入力欄 */}
           <input
             type="text"
+            value={asinQuery}
+            onChange={(event) => handleAsinQuery(event.target.value)}
             className="top-square-space-menu-container-left-input"
           />
         </div>
@@ -276,6 +293,10 @@ function Top() {
             減少２：直近１週間の減少数
           </p>
           <input
+            onChange={(event) => {
+              handleNameQuery(event.target.value);
+            }}
+            value={nameQuery}
             type="text"
             className="top-square-space-menu-container-center-input"
           />
@@ -293,6 +314,8 @@ function Top() {
             登録ASIN数：{asinDataListCount}
           </p>
           <input
+            value={parentAsinQuery}
+            onChange={(event) => handleParentAsinQuery(event.target.value)}
             type="text"
             className="top-square-space-menu-container-right-input"
           />
@@ -371,7 +394,7 @@ function Top() {
 
         <div className="top-asinArray-map-wrapper-top-css">
           {/* リスト部分 */}
-          {asinDataList.map((asinData: AsinData) => (
+          {filteredAsinDataList.map((asinData: AsinData) => (
             <div className="top-asin-list">
               {/* 要素0 チェック */}
               <div className="top-square-space-asin-delete">
