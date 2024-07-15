@@ -66,3 +66,11 @@
   margin-left: 50px;
   width: 220px;
 }
+
+.authed-account-section-password-item-result {
+  margin-top: 7px;
+  padding-left: 150px;
+  font-size: 12.5px;
+  font-weight: bold;
+  color: rgb(255, 89, 89);
+}

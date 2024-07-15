@@ -6,12 +6,15 @@ import {
   changePassword,
 } from "../../firebase/authentication";
 
-const AuthedEmailSection = () => {
+const AuthedAccountSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
   const [inputEmail, setInputEmail] = useState("");
   const [inputCurrentPassword, setInputCurrentPassword] = useState("");
   const [inputNewPassword, setInputNewPassword] = useState("");
   const [inputConfirmedPassword, setInputConfirmedPassword] = useState("");
+  const [isPasswordChanged, setIsPasswordChanged] = useState<boolean | null>(
+    null
+  );
 
   // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
   const handleChangeEmailAdress = async () => {
@@ -29,7 +32,11 @@ const AuthedEmailSection = () => {
       inputConfirmedPassword &&
       inputNewPassword === inputConfirmedPassword
     ) {
-      changePassword(inputCurrentPassword, inputNewPassword);
+      const result: boolean = await changePassword(
+        inputCurrentPassword,
+        inputNewPassword
+      );
+      setIsPasswordChanged(result);
       setInputCurrentPassword("");
       setInputNewPassword("");
       setInputConfirmedPassword("");
@@ -98,11 +105,20 @@ const AuthedEmailSection = () => {
               }}
             ></input>
           </div>
-          <button onClick={handleChangePassword}>変更</button>
+          <div className="authed-account-section-password-item">
+            <button onClick={handleChangePassword}>変更</button>
+            <p className="authed-account-section-password-item-result">
+              {isPasswordChanged === null
+                ? ""
+                : isPasswordChanged
+                ? "パスワードが変更されました"
+                : "パスワード変更に失敗しました"}
+            </p>
+          </div>
         </div>
       </div>
     </>
   );
 };
 
-export default AuthedEmailSection;
+export default AuthedAccountSection;
