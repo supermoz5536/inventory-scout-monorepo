@@ -46,10 +46,9 @@ function Top() {
   const [nameQuery, setNameQuery] = useState("");
   const [parentQuery, setParentQuery] = useState("");
   const [searchType, setSearchType] = useState("asin");
-  let filteredAsinDataList = asinDataListRef.current;
-  // const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
-  //   asinDataListRef.current
-  // );
+  const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
+    asinDataListRef.current
+  );
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -75,25 +74,29 @@ function Top() {
     setSearchType("parent");
   };
 
-  filteredAsinDataList = asinDataListRef.current.filter(
-    (asinData: AsinData) => {
-      // クエリが空の場合は
-      // 全ての処理にtrueを与えて全てを表示
-      if (!asinQuery && !nameQuery && !parentQuery) {
-        return true;
-      }
+  // filteredAsinDataListを更新、再描画する関数
+  useEffect(() => {
+    const newFilteredList = asinDataListRef.current.filter(
+      (asinData: AsinData) => {
+        // 各クエリの結果を以下のように取得する
+        // ① クエリが空の場合はTrue
+        // ② クエリがある場合は包含要素を返す（=True）
+        const asinMatch = !asinQuery || asinData.asin.includes(asinQuery);
+        const nameMatch = !nameQuery || asinData.name.includes(nameQuery);
+        const parentMatch =
+          !parentQuery || asinData.asinParent.includes(parentQuery);
 
-      // searchTypeに基づいてフィルタリングを行う
-      if (searchType === "asin") {
-        return asinData.asin.includes(asinQuery);
-      } else if (searchType === "name") {
-        return asinData.name.includes(nameQuery);
-      } else if (searchType === "parent")
-        return asinData.asinParent.includes(parentQuery);
-      {
+        // 各結果がすべてTrueの場合のみ
+        // つまり、3つのクエリ全てに合致する要素のみtrueを返し
+        // 新規配列に追加する
+        return asinMatch && nameMatch && parentMatch;
       }
-    }
-  );
+    );
+
+    setFilteredAsinDataList(newFilteredList);
+    // 各クエリと元データのasinDataListの変更を追跡して
+    // 最新のフィルター状態を反映する。
+  }, [asinQuery, nameQuery, parentQuery, searchType, asinDataList]);
 
   /// スクレイピングボタンを押した際の
   /// 条件分岐を管理する関数
