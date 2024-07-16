@@ -73,7 +73,7 @@ const createMainWindow = () => {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -362,7 +362,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    prefWindow.webContents.openDevTools();
+    // prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -402,7 +402,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    loginPromptWindow.webContents.openDevTools();
+    // loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -444,7 +444,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    StockDetailWindow.webContents.openDevTools();
+    // StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
