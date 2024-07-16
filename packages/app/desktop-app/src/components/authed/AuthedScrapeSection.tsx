@@ -20,7 +20,7 @@ const AuthedScrapeSection = () => {
   // かつ
   // ログイン中の場合に
   // 定時スクレイピングを実行します
-  const handlescheduledScraping = () => {
+  const handleScheduledScraping = () => {
     if (![1, 2, 3].includes(systemStatus) && user.isAuthed === true) {
       window.myAPI.scheduledScraping(time, asinDataList);
       setIsScrapeTimeChanged(true);
@@ -57,7 +57,7 @@ const AuthedScrapeSection = () => {
         </div>
         <button
           onClick={() => {
-            handlescheduledScraping();
+            handleScheduledScraping();
           }}
         >
           保存
@@ -66,7 +66,7 @@ const AuthedScrapeSection = () => {
           {isScrapeTimeChanged === null
             ? ""
             : isScrapeTimeChanged
-            ? "設定しました（指定時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）"
+            ? "時刻を保存しました（指定の時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）"
             : "システムエラーです。運営者にお問い合わせください。"}
         </p>
       </div>
