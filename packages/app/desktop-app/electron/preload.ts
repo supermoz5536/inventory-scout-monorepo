@@ -37,9 +37,6 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
 
-  // removeScrapingResult: (callback) =>
-  //   ipcRenderer.removeListener("scraping-result", callback),
-
   saveData: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("save-data", asinDataList),
 
@@ -62,6 +59,9 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   loadTransferData: (callback) =>
     ipcRenderer.on("load-transfer-data", callback),
+
+  disposeListener: (channel, callback) =>
+    ipcRenderer.removeListener(channel, callback),
 
   disposeAllListeners: () => {
     ipcRenderer.removeAllListeners("scraping-result");

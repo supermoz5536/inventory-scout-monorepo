@@ -38,7 +38,3 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
 };
 
 export default Table;
-
-// export const Table = ({ columnHeader, data }: StockDetailProps) => {
-//   return <div>Table</div>;
-// };

@@ -14,25 +14,24 @@ declare global {
           isEnd: boolean
         ) => void
       ) => void;
-      // removeScrapingResult: (
-      //   callback: (
-      //     event: Electron.IpcRendererEvent,
-      //     data: AsinData,
-      //     isEnd: boolean
-      //   ) => void
-      // ) => void;
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;
       saveUser: (user: User) => Promise<void>;
       openLoginPrompt: () => void;
       openStockDetail: (asinDataList: AsinData) => void;
-      receiveAsinData: (callback: (asinData: AsinData) => void) => void;
+      receiveAsinData: (
+        callback: (event: any, asinData: AsinData) => void
+      ) => void;
       initLogout: (callback: () => void) => void;
       scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
       loadTransferData: (
         callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
       ) => void;
       disposeAllListeners: () => void;
+      disposeListener: (
+        channel: string,
+        callback: (event: any, asinData: AsinData) => void
+      ) => void;
     };
   }
 

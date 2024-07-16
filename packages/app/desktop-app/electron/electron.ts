@@ -161,9 +161,6 @@ ipcMain.handle(
       scheduledTask.stop();
     }
 
-    console.log("in main time =", time);
-    console.log("in main time type =", typeof time);
-
     const [hour, minute] = time.split(":");
     const cronTime = `${minute} ${hour} * * *`;
 
@@ -218,6 +215,7 @@ ipcMain.handle("open-login-prompt", () => {
 });
 
 ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
+  console.log("open-stock-detail の asinData =", asinData);
   openStockDetail(asinData);
 });
 
@@ -231,7 +229,7 @@ app.whenReady().then(() => {
   // darwin はmacOXの意味
   const isMac = process.platform === "darwin";
   // メニューバーのアプリ変更はパッケージ化するまで反映されません
-  app.setName("在庫スカウター");
+  app.setName("Lスカウター");
 
   // ■ macOS用のカスタムメニューアイテムを作成
   if (isMac) {
@@ -423,7 +421,6 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.focus();
     return;
   }
-
   StockDetailWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -435,7 +432,6 @@ function openStockDetail(asinData: AsinData) {
       sandbox: false,
     },
   });
-
   // ローカルファイルを指定するパスを指定したいだけなので
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
   StockDetailWindow.loadURL(`${appURL}#/StockDetail`);

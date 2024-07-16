@@ -13,12 +13,45 @@ const StockDetail = () => {
 
   // コンポーネントマウント時に
   // 表示するasinDataをメインプロセスから取得
-  const [targetAsinData, setTargetAsinData] = useState<AsinData>();
+  const [targetAsinData, setTargetAsinData] = useState<AsinData>({
+    id: "",
+    isDeleteCheck: false,
+    asin: "",
+    imageURL: "",
+    name: "",
+    amazonStock: null,
+    fbaSellerNOP: 0,
+    totalStock: 0,
+    cartPrice: "",
+    decrease1: 0,
+    decrease2: 0,
+    fetchLatestDate: "",
+    fetchLatestTime: "",
+    asinParent: "",
+    fbaSellerDatas: [],
+    isScraping: false,
+  });
+
+  // console.log("■ 1 targetAsinData =", targetAsinData);
+
   useEffect(() => {
-    window.myAPI.receiveAsinData((asinData: AsinData) => {
+    const handleAsinData = (event: any, asinData: AsinData) => {
+      console.log("handleAsinDataが実行されました asinData =", asinData);
+      console.log(
+        "handleAsinDataが実行されました typeof asinData =",
+        typeof asinData
+      );
       setTargetAsinData(asinData);
-    });
-  }, [targetAsinData]);
+    };
+
+    window.myAPI.receiveAsinData(handleAsinData);
+
+    return () => {
+      window.myAPI.disposeListener("receive-asin-data", handleAsinData);
+    };
+  }, []);
+
+  // console.log("■ 2 targetAsinData =", targetAsinData);
 
   // 手動で日付の変更操作があった場合に
   // 親コンポーネントの日付範囲を格納した変数を
@@ -69,7 +102,9 @@ const StockDetail = () => {
     // のオブジェクトを、スプレット関数で連結させればいい。
     // 配列には、セラーごとのオブジェクトを格納する必要があるから
     // asinDataのセラーの値が格納されてるプロパティでmap処理すればいい
-    const newData = targetAsinData?.fbaSellerDatas.map((fbaSellerData) => {
+
+    // console.log("■ 3 targetAsinData =", targetAsinData);
+    const newData = targetAsinData.fbaSellerDatas.map((fbaSellerData) => {
       // イテレートな処理で各rowのdataオブジェクトを作成する
       // まず、セラー名のみのオブジェクトを作成
       const sellerData: { "": string; [key: string]: number | string } = {

@@ -185,6 +185,7 @@ function Top() {
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
       dispatch(changeSystemStatus(4));
+      dispatch(changeShowButtonStatus(0));
     } else {
       // ■ 同日に前回の処理が中断されている場合の処理
       // 以下２点を満たすとTrue
@@ -257,6 +258,18 @@ function Top() {
     const asinDataListCount = asinDataListRef.current.length;
     setAsinDataListCount(asinDataListCount);
   }, [asinDataListRef.current.length]);
+
+  /// runScrapingの完了時に「取得停止」の表示の状態を
+  /// 「取得開始」の表示の状態切り替える関数
+  useEffect(() => {
+    // systemStatusの変更が 5 の場合は
+    // メインプロセスからの取得データの結果を
+    // 受信したコールバックでの変更なので
+    // そのコールバックでボタンを初期化する
+    if (systemStatus === 5) {
+      dispatch(changeShowButtonStatus(0));
+    }
+  }, [systemStatus]);
 
   return (
     <div className="App">
