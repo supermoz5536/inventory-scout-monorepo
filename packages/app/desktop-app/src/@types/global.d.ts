@@ -55,7 +55,7 @@ declare global {
     asin: string;
     imageURL: string;
     name: string;
-    amazonStock: number | null;
+    amazonSellerNOP: number | null;
     fbaSellerNOP: number | null;
     totalStock: number | null;
     cartPrice: string;

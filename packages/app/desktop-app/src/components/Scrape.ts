@@ -296,6 +296,7 @@ const scrapePromise = (async () => {
     fetchAndCountSellerOnDrawer: async (
       page: Page,
       asinData: AsinData,
+      totalAmazonSeller: { value: number },
       totalFbaSeller: { value: number }
     ) => {
       // 各コンテナ情報を取得
@@ -373,34 +374,35 @@ const scrapePromise = (async () => {
           (asinData) => asinData.sellerId === sellerId
         );
 
+        console.log("■ foundSellerData =", foundSellerData);
+        console.log("■ sellerId =", sellerId);
+        console.log("■ sellerName =", sellerName);
+        console.log("■ shippingSource =", shippingSource);
+
         // 既存のリストに含まれてるセラーで
         // かつ
         // 最新の出品者名の取得が成功した場合
         if (
-          (foundSellerData && sellerName && shippingSource == "Amazon") ||
-          (foundSellerData && sellerName && shippingSource == "Amazon.co.jp")
+          foundSellerData &&
+          sellerId &&
+          sellerName &&
+          shippingSource === "Amazon"
         ) {
           // 取得したデータの出品者名を上書きする
           foundSellerData.sellerName = sellerName;
 
           // Amazon本体以外のFBAセラーの場合に
           // fbaSellerNOPにカウント
-          if (shippingSource !== "Amazon.co.jp") {
-            ++totalFbaSeller.value;
-          }
+          ++totalFbaSeller.value;
 
           // 既存のリストに含まれない新規のセラーの場合
           // かつ
           // 最新の出品者名の取得が成功した場合
         } else if (
-          (!foundSellerData &&
-            sellerId &&
-            sellerName &&
-            shippingSource == "Amazon") ||
-          (!foundSellerData &&
-            sellerId &&
-            sellerName &&
-            shippingSource == "Amazon.co.jp")
+          !foundSellerData &&
+          sellerId &&
+          sellerName &&
+          shippingSource === "Amazon"
         ) {
           // FbaSellerData型オブジェクト（出品者）を追加する。
           const newSellerData: FbaSellerData = {
@@ -409,12 +411,9 @@ const scrapePromise = (async () => {
             stockCountDatas: [],
           };
           asinData.fbaSellerDatas.push(newSellerData);
-
-          // Amazon本体以外のFBAセラーの場合に
-          // fbaSellerNOPにカウント
-          if (shippingSource !== "Amazon.co.jp") {
-            ++totalFbaSeller.value;
-          }
+          ++totalFbaSeller.value;
+        } else if (sellerName && shippingSource === "Amazon.co.jp") {
+          ++totalAmazonSeller.value;
         }
       }
     },
@@ -504,6 +503,7 @@ const scrapePromise = (async () => {
     fetchAndCountSellerOnTop: async (
       page: Page,
       asinData: AsinData,
+      totalAmazonSeller: { value: number },
       totalFbaSeller: { value: number }
     ) => {
       console.log("B 0.0.0");
@@ -574,8 +574,10 @@ const scrapePromise = (async () => {
       // かつ
       // 最新の出品者名の取得が成功した場合
       if (
-        (foundSellerData && sellerName && shippingSource == "Amazon") ||
-        (foundSellerData && sellerName && shippingSource == "Amazon.co.jp")
+        foundSellerData &&
+        sellerId &&
+        sellerName &&
+        shippingSource == "Amazon"
       ) {
         console.log("B 0.0.8");
         // 取得したデータの出品者名を上書きする
@@ -583,22 +585,16 @@ const scrapePromise = (async () => {
         console.log("B 0.0.9");
         // Amazon本体以外のFBAセラーの場合に
         // fbaSellerNOPにカウント
-        if (shippingSource !== "Amazon.co.jp") {
-          ++totalFbaSeller.value;
-        }
+        ++totalFbaSeller.value;
 
         // 既存のリストに含まれない新規のセラーの場合
         // かつ
         // 最新の出品者名の取得が成功した場合
       } else if (
-        (!foundSellerData &&
-          sellerId &&
-          sellerName &&
-          shippingSource == "Amazon") ||
-        (!foundSellerData &&
-          sellerId &&
-          sellerName &&
-          shippingSource == "Amazon.co.jp")
+        !foundSellerData &&
+        sellerId &&
+        sellerName &&
+        shippingSource == "Amazon"
       ) {
         // FbaSellerData型オブジェクト（出品者）を追加する。
         const newSellerData: FbaSellerData = {
@@ -610,9 +606,9 @@ const scrapePromise = (async () => {
 
         // Amazon本体以外のFBAセラーの場合に
         // fbaSellerNOPにカウント
-        if (shippingSource !== "Amazon.co.jp") {
-          ++totalFbaSeller.value;
-        }
+        ++totalFbaSeller.value;
+      } else if (sellerName && shippingSource === "Amazon.co.jp") {
+        ++totalAmazonSeller.value;
       }
     },
 
@@ -811,7 +807,7 @@ const scrapePromise = (async () => {
       sellerId: string | null
     ) {
       if (sellerId === "AN1VRQENFRJN5" && stockCount) {
-        asinData.amazonStock = stockCount;
+        asinData.amazonSellerNOP = stockCount;
       }
     },
 
@@ -872,6 +868,13 @@ const scrapePromise = (async () => {
         console.log("6.0.5 after push", foundFbaSellerData.stockCountDatas);
       }
       console.log("6.0.6");
+    },
+
+    updateAmazonSellerNOP: async (
+      asinData: AsinData,
+      totalAmazonSeller: { value: number }
+    ) => {
+      asinData.amazonSellerNOP = totalAmazonSeller.value;
     },
 
     updateFbaSellerNOP: async (
@@ -945,6 +948,8 @@ const scrapePromise = (async () => {
 
       try {
         for (let asinData of filteredAsinDataList) {
+          // 集計中のAmmazonセラー数の格納変数
+          let totalAmazonSeller = { value: 0 };
           // 集計中のFBAセラー数の格納変数
           let totalFbaSeller = { value: 0 };
           // 集計中の合計在庫数の格納変数
@@ -965,6 +970,7 @@ const scrapePromise = (async () => {
                 await scrape.fetchAndCountSellerOnDrawer(
                   page,
                   asinData,
+                  totalAmazonSeller,
                   totalFbaSeller
                 );
                 await scrape.addToCartOnDrawer(page);
@@ -976,6 +982,7 @@ const scrapePromise = (async () => {
                 await scrape.fetchAndCountSellerOnTop(
                   page,
                   asinData,
+                  totalAmazonSeller,
                   totalFbaSeller
                 );
                 await scrape.reloadPage(page);
@@ -994,7 +1001,7 @@ const scrapePromise = (async () => {
                 const stockCount = await scrape.fetchStockCount(page);
                 await scrape.countTotalStock(totalStock, stockCount);
                 const sellerId = await scrape.fetchSellerId(page, item);
-                await scrape.updateAmazonStock(asinData, stockCount, sellerId);
+                // await scrape.updateAmazonStock(asinData, stockCount, sellerId);
                 await scrape.updateStockCount(
                   asinData,
                   stockCount,
@@ -1003,6 +1010,9 @@ const scrapePromise = (async () => {
                 );
               }
 
+              // asinData.amazonSellerNOPの更新
+              console.log("totalAmazonSeller = ", totalAmazonSeller);
+              await scrape.updateAmazonSellerNOP(asinData, totalAmazonSeller);
               // asinData.fbaSellerNOPの更新
               console.log("totalFbaSeller = ", totalFbaSeller);
               await scrape.updateFbaSellerNOP(asinData, totalFbaSeller);

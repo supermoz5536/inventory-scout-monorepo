@@ -19,7 +19,7 @@ const StockDetail = () => {
     asin: "",
     imageURL: "",
     name: "",
-    amazonStock: null,
+    amazonSellerNOP: 0,
     fbaSellerNOP: 0,
     totalStock: 0,
     cartPrice: "",

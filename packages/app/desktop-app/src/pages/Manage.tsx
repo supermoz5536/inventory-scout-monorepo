@@ -87,7 +87,7 @@ function Manage() {
         asin,
         imageURL: "",
         name: "",
-        amazonStock: null,
+        amazonSellerNOP: null,
         fbaSellerNOP: null,
         totalStock: null,
         cartPrice: "",

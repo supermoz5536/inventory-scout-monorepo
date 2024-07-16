@@ -494,9 +494,9 @@ function Top() {
                 {<p>{asinData.name}</p>}
               </div>
 
-              {/* 要素5 Amazon在庫数 */}
+              {/* 要素5 Amazon数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.amazonStock}</p>
+                <p>{asinData.amazonSellerNOP}</p>
               </div>
 
               {/* 要素6 FBAセラー数 */}
