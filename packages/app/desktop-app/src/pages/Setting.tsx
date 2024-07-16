@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Setting.css";
 import GuestSetting from "../components/guest/GuestSetting";
 import AuthedSetting from "../components/authed/AuthedSetting";
@@ -8,15 +8,19 @@ const Setting = () => {
   const user = useSelector((state: RootState) => state.user.value);
 
   // 「次回からは自動でログインする」のチェックボックスの真偽値の状態を格納する変数を宣言
-  let isChecked: boolean = false;
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   // 子コンポーネント(GuestLoginSection)にpropsで渡し
   // 親コンポーネント(Setting)のisChecked変数を更新して
   // 子コンポーネント(AuthedLoginSection)に伝播させるための
   // 変更関数を宣言
   const handleCheckBoxChange = (value: boolean) => {
-    isChecked = value;
+    setIsChecked(value);
   };
+
+  useEffect(() => {
+    console.log("isChecked =", isChecked);
+  }, [isChecked]);
 
   return (
     <div>

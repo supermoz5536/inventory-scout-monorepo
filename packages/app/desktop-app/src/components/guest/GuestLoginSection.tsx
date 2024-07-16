@@ -41,11 +41,12 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
 
   // ログインボタンのコールバック
   const handleLogIn = async (inputEmail: string, inputPassword: string) => {
+    console.log("1 handleLogIn");
     const userCredential = await logInWithEmailAndPassword(
       inputEmail,
       inputPassword
     );
-
+    console.log("2 handleLogIn");
     // オブジェクトが存在し
     // string型（エラーメッセージ）ではない場合は
     // 取得成功してる
@@ -56,8 +57,10 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
       const userDocData: DocumentData | undefined = await getUserDoc(
         userCredential.user.uid
       );
+      console.log("3 handleLogIn");
 
       if (userDocData) {
+        console.log("4 handleLogIn");
         // 最新のUserオブジェクトを生成
         const newUser: User = {
           uid: userCredential.user.uid,
@@ -68,13 +71,14 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
           plan: userDocData["plan"],
           createdAt: userDocData["created_at"],
         };
-
+        console.log("5 handleLogIn");
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
       }
-
+      console.log("6 handleLogIn");
       // ログイン失敗時のエラーハンドリング
     } else if (userCredential && typeof userCredential === "string") {
+      console.log("7 handleLogIn");
       setErrorFlag(userCredential);
     }
   };
@@ -86,6 +90,7 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
       // AuthedLoginSectionに
       // 渡すpropes（isChecked）を変更
       handleCheckBoxChange(event.target.checked);
+      console.log("handleCheckBoxChange 実行");
     }
   };
 

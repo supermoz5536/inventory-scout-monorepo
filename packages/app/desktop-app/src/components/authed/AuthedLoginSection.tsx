@@ -26,11 +26,15 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
   // Trueならstore管理のuserのisAutoLoginもTrueに
   // falseならstore管理のuserのisAutoLoginもfalseに
   useEffect(() => {
+    console.log("▲ 1 isChecked =", isChecked);
     if (isChecked === true) {
+      // console.log("▲ 2 changeIsAutoLogIn 起動");
       dispatch(changeIsAutoLogIn(true));
     } else {
+      // console.log("▲ 3 changeIsAutoLogIn 起動");
       dispatch(changeIsAutoLogIn(false));
     }
+    // console.log("▲ 4 user.isAutoLogIn", user.isAutoLogIn);
   });
 
   return (

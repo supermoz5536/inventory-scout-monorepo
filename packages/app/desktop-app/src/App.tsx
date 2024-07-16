@@ -76,12 +76,19 @@ const App: React.FC = () => {
         // ⑤
         const unsubscribe = await listenAuthState();
 
+        console.log("init login done 0");
+        console.log(
+          "userRef.current.isAutoLogIn =",
+          userRef.current.isAutoLogIn
+        );
+
         // ⑥
         if (userRef.current.isAutoLogIn === true && userRef.current.email) {
           console.log("init login done 1");
           await handleLogIn(userRef.current.email, userRef.current.password);
           console.log("init login done 2");
         }
+        console.log("init login done 3");
 
         // ⑦
         // ■ 同日に前回の処理が中断されている場合の自動処理

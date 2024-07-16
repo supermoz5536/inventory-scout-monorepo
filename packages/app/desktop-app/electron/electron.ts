@@ -24,91 +24,6 @@ let loginPromptWindow: any;
 let StockDetailWindow: any;
 let isLoggedOut: boolean = false;
 
-/// メイン画面を生成する関数です
-const createMainWindow = () => {
-  mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 975,
-    // resizable: false, // ウィンドウサイズを変更できないようにする
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
-      // preload.tsの読み込みに失敗します。
-      sandbox: false,
-    },
-  });
-
-  // アプリケーションがパッケージ化された状態かどうかを判別します
-  appURL = app.isPackaged
-    ? // パッケージ化されてる場合
-      // url.format() を使用して、
-      // ローカルファイルシステム上に配置された
-      // build/index.html へのURLを生成します。
-      url.format({
-        // pathname には、
-        // app.getAppPath() で取得したアプリケーションのパスと、
-        // build/index.html が結合されます。
-        pathname: path.resolve(app.getAppPath(), "build/index.html"),
-        // protocol: 'file:' と slashes: true は、
-        // ローカルファイルシステムの URL であることを示します。
-        protocol: "file:",
-        slashes: true,
-      })
-    : // パッケージ化されていない場合、
-      // 開発用ローカルサーバー (localhost:3000) に
-      // アクセスするための URL を生成します。
-      "http://localhost:3000";
-
-  mainWindow.loadURL(appURL);
-
-  // 初回起動時のみログアウト処理を実行
-  // ウィンドウの読み込みが完了した後に処理します
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isLoggedOut === false) {
-      mainWindow.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
-      isLoggedOut = true; // ログアウト処理が実行されたことを記録
-    }
-  });
-
-  if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
-  } else {
-    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
-  }
-
-  // 該当のウインドウに対して
-  // onメソッドでリスナーを設置する
-  // 閉じた時(closed)にトリガーされる
-  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
-  mainWindow.on("closed", () => {
-    mainWindow = null;
-  });
-};
-
-// app.on メソッドは、
-// Electronのライフサイクルに関連するイベントリスナーを
-// 設定するために使用されます。
-// これにより、アプリケーションが特定のイベント
-// （例：起動、終了、ウィンドウが閉じられたときなど）
-// に対して特定のアクションを実行することができます。
-
-// macOS以外のプラットフォームでは
-// 窓を全部閉じたら、アプリケーションも終了させる関数です
-app.on("window-all-closed", () => {
-  // window-all-closedは、
-  // Electronのappオブジェクトのイベントの1つ。
-  // darwin は macOSのこと
-  if (process.platform !== "darwin") app.quit();
-});
-
-// アプリケーション終了前に状態を保存する
-app.on("before-quit", async (event) => {
-  event.preventDefault(); // プロセスの終了を防ぐ
-  await persistor.flush();
-  console.log("State has been flushed to persistent storage before app quit");
-  app.exit(); // フラッシュ完了後にアプリケーションを終了
-});
-
 /// アプリ起動時にウインドウがない場合に
 /// 新しいウィンドウを生成する関数
 /// (Macだと表示されないことがあるので)
@@ -118,108 +33,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
 });
-
-//====================================================================
-
-// ipcMain.handle メソッドは、メインプロセスで
-// 特定のIPC (Inter-Process Communication) チャンネルを設定し、
-// そのチャンネルに対する非同期のリクエストを
-// ハンドルするために使用されます。
-// これにより、レンダラープロセスからメインプロセスに対して
-// 非同期でメッセージを送信し、応答を受け取ることができます。
-ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
-  try {
-    scrape = await scrapePromis;
-    browser = await scrape.launchBrowser();
-    scrape.runScraping(
-      scrape,
-      browser,
-      updateGlobalBrowser,
-      event,
-      asinDataList
-    );
-  } catch (error) {
-    console.error("runScraping ERROR", error);
-    return "runScraping ERROR"; // エラーメッセージを返す
-  }
-});
-
-ipcMain.handle("stopScraping", async () => {
-  try {
-    browser.close();
-  } catch (error) {
-    console.error("stopScraping ERROR", error);
-    return "stopScraping ERROR"; // エラーメッセージを返す
-  }
-});
-
-/// 定時スクレイピングの実行関数
-ipcMain.handle(
-  "schedule-scraping",
-  async (event, time: string, asinDataList: AsinData[]) => {
-    if (scheduledTask) {
-      scheduledTask.stop();
-    }
-
-    const [hour, minute] = time.split(":");
-    const cronTime = `${minute} ${hour} * * *`;
-
-    scheduledTask = cron.schedule(cronTime, async () => {
-      try {
-        scrape = await scrapePromis;
-        browser = await scrape.launchBrowser();
-        await scrape.runScraping(
-          scrape,
-          browser,
-          updateGlobalBrowser,
-          event,
-          asinDataList
-        );
-      } catch (error) {
-        console.error("schedule-scraping ERROR", error);
-        return "schedule-scraping ERROR"; // エラーメッセージを返す
-      }
-    });
-
-    return "Scraping scheduled";
-  }
-);
-
-ipcMain.handle("save-data", (event, data) => {
-  saveDataToStorage(data);
-});
-
-ipcMain.handle("load-data", async () => {
-  const data = await loadJsonData();
-  const parsedData = await parseJsonToJS(data);
-  return parsedData;
-});
-
-ipcMain.handle("save-user", (event, data: User) => {
-  // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "user.json");
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(storagePath, JSON.stringify(data, null, 2), (err) => {
-      if (err) {
-        console.error("save-user Failed :");
-        return reject(err);
-      }
-      console.log("save-user success:", data);
-      resolve();
-    });
-  });
-});
-
-ipcMain.handle("open-login-prompt", () => {
-  openLoginPrompt();
-});
-
-ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
-  console.log("open-stock-detail の asinData =", asinData);
-  openStockDetail(asinData);
-});
-
-//====================================================================
 
 /// 初期化処理として
 /// メニュー部分を生成する関数です。
@@ -329,9 +142,176 @@ app.whenReady().then(() => {
 
 //====================================================================
 
-// メインプロセス内で通常利用できる関数
-function updateGlobalBrowser(newBrowser: any) {
-  browser = newBrowser;
+// app.on メソッドは、
+// Electronのライフサイクルに関連するイベントリスナーを
+// 設定するために使用されます。
+// これにより、アプリケーションが特定のイベント
+// （例：起動、終了、ウィンドウが閉じられたときなど）
+// に対して特定のアクションを実行することができます。
+
+// macOS以外のプラットフォームでは
+// 窓を全部閉じたら、アプリケーションも終了させる関数です
+app.on("window-all-closed", () => {
+  // window-all-closedは、
+  // Electronのappオブジェクトのイベントの1つ。
+  // darwin は macOSのこと
+  if (process.platform !== "darwin") app.quit();
+});
+
+// アプリケーション終了前に状態を保存する
+app.on("before-quit", async (event) => {
+  event.preventDefault(); // プロセスの終了を防ぐ
+  await persistor.flush();
+  console.log("State has been flushed to persistent storage before app quit");
+  app.exit(); // フラッシュ完了後にアプリケーションを終了
+});
+
+//====================================================================
+
+// ipcMain.handle メソッドは、メインプロセスで
+// 特定のIPC (Inter-Process Communication) チャンネルを設定し、
+// そのチャンネルに対する非同期のリクエストを
+// ハンドルするために使用されます。
+// これにより、レンダラープロセスからメインプロセスに対して
+// 非同期でメッセージを送信し、応答を受け取ることができます。
+ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
+  try {
+    scrape = await scrapePromis;
+    browser = await scrape.launchBrowser();
+    scrape.runScraping(
+      scrape,
+      browser,
+      updateGlobalBrowser,
+      event,
+      asinDataList
+    );
+  } catch (error) {
+    console.error("runScraping ERROR", error);
+    return "runScraping ERROR"; // エラーメッセージを返す
+  }
+});
+
+ipcMain.handle("stopScraping", async () => {
+  try {
+    browser.close();
+  } catch (error) {
+    console.error("stopScraping ERROR", error);
+    return "stopScraping ERROR"; // エラーメッセージを返す
+  }
+});
+
+/// 定時スクレイピングの実行関数
+ipcMain.handle(
+  "schedule-scraping",
+  async (event, time: string, asinDataList: AsinData[]) => {
+    if (scheduledTask) {
+      scheduledTask.stop();
+    }
+
+    const [hour, minute] = time.split(":");
+    const cronTime = `${minute} ${hour} * * *`;
+
+    scheduledTask = cron.schedule(cronTime, async () => {
+      try {
+        scrape = await scrapePromis;
+        browser = await scrape.launchBrowser();
+        await scrape.runScraping(
+          scrape,
+          browser,
+          updateGlobalBrowser,
+          event,
+          asinDataList
+        );
+      } catch (error) {
+        console.error("schedule-scraping ERROR", error);
+        return "schedule-scraping ERROR"; // エラーメッセージを返す
+      }
+    });
+
+    return "Scraping scheduled";
+  }
+);
+
+ipcMain.handle("save-data", (event, data) => {
+  saveDataToStorage(data);
+});
+
+ipcMain.handle("load-data", async () => {
+  const data = await loadJsonData();
+  const parsedData = await parseJsonToJS(data);
+  return parsedData;
+});
+
+ipcMain.handle("open-login-prompt", () => {
+  openLoginPrompt();
+});
+
+ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
+  console.log("open-stock-detail の asinData =", asinData);
+  openStockDetail(asinData);
+});
+
+//====================================================================
+
+/// メイン画面を生成する関数です
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1400,
+    height: 975,
+    // resizable: false, // ウィンドウサイズを変更できないようにする
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
+      // preload.tsの読み込みに失敗します。
+      sandbox: false,
+    },
+  });
+
+  // アプリケーションがパッケージ化された状態かどうかを判別します
+  appURL = app.isPackaged
+    ? // パッケージ化されてる場合
+      // url.format() を使用して、
+      // ローカルファイルシステム上に配置された
+      // build/index.html へのURLを生成します。
+      url.format({
+        // pathname には、
+        // app.getAppPath() で取得したアプリケーションのパスと、
+        // build/index.html が結合されます。
+        pathname: path.resolve(app.getAppPath(), "build/index.html"),
+        // protocol: 'file:' と slashes: true は、
+        // ローカルファイルシステムの URL であることを示します。
+        protocol: "file:",
+        slashes: true,
+      })
+    : // パッケージ化されていない場合、
+      // 開発用ローカルサーバー (localhost:3000) に
+      // アクセスするための URL を生成します。
+      "http://localhost:3000";
+
+  mainWindow.loadURL(appURL);
+
+  // 初回起動時のみログアウト処理を実行
+  // ウィンドウの読み込みが完了した後に処理します
+  mainWindow.webContents.once("did-finish-load", () => {
+    if (isLoggedOut === false) {
+      mainWindow.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
+      isLoggedOut = true; // ログアウト処理が実行されたことを記録
+    }
+  });
+
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+  }
+
+  // 該当のウインドウに対して
+  // onメソッドでリスナーを設置する
+  // 閉じた時(closed)にトリガーされる
+  // 変数をクリアし 新規ウインドウ作成可能な状態に戻す
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 }
 
 // Preferencesがクリックされた際の
@@ -362,7 +342,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // prefWindow.webContents.openDevTools();
+    prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -402,7 +382,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // loginPromptWindow.webContents.openDevTools();
+    loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -444,7 +424,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // StockDetailWindow.webContents.openDevTools();
+    StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -456,9 +436,14 @@ function openStockDetail(asinData: AsinData) {
   });
 }
 
+// メインプロセス内で通常利用できる関数
+function updateGlobalBrowser(newBrowser: any) {
+  browser = newBrowser;
+}
+
 // ローカルストレージからJsonデータを取得する関数
 function loadJsonData(): Promise<string> {
-  const storagePath = path.join(__dirname, "asinDataList.json");
+  const storagePath = path.join(app.getPath("appData"), "asinDataList.json");
   return new Promise((resolve, reject) => {
     // fs.readFile メソッドで "utf8" を指定すると
     // ファイルの内容をUTF-8エンコーディングとして読み取ります。
@@ -670,7 +655,7 @@ async function loadTransferData() {
 
 function saveDataToStorage(data: any) {
   // ローカルストレージのpathを取得
-  const storagePath = path.join(__dirname, "asinDataList.json");
+  const storagePath = path.join(app.getPath("appData"), "asinDataList.json");
   return new Promise<void>((resolve, reject) => {
     // fs.writeFile: node.jsのファイル書き込みメソッド
     // 構文: fs.writeFile(path, data, callback)
