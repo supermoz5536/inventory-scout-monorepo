@@ -328,11 +328,14 @@ function Top() {
         </div>
 
         <div className="top-square-space-menu-container-center">
+          <p className="top-square-space-menu-container-center-total-stock">
+            FBA合計在庫: Amazon在庫数(非公開)は含みません
+          </p>
           <p className="top-square-space-menu-container-center-decrease1">
-            減少１：最新取得分の減少数
+            減少１: 最新取得分の減少数(開発中)
           </p>
           <p className="top-square-space-menu-container-center-decrease2">
-            減少２：直近１週間の減少数
+            減少２: 直近１週間の減少数(開発中)
           </p>
           <input
             onChange={(event) => {
@@ -392,7 +395,7 @@ function Top() {
 
           {/* 要素5 Amazon在庫数 */}
           <div className="top-square-space-amazon-num">
-            <p>AMAZON</p>
+            <p>AMAZON数</p>
           </div>
 
           {/* 要素6 FBAセラー数 */}
@@ -402,7 +405,7 @@ function Top() {
 
           {/* 要素7 合計在庫 */}
           <div className="top-square-space-amazon-num">
-            <p>合計在庫</p>
+            <p>FBA合計在庫</p>
           </div>
 
           {/* 要素8 カート価格 */}

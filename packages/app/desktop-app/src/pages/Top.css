@@ -78,18 +78,25 @@
   left: 1%;
 }
 
+.top-square-space-menu-container-center-total-stock {
+  position: absolute;
+  top: 75%;
+  left: 38%;
+  font-size: 13.5px;
+}
+
 .top-square-space-menu-container-center-decrease1 {
   position: absolute;
-  top: 55%;
-  left: 72%;
-  font-size: 15px;
+  top: 35%;
+  left: 38%;
+  font-size: 13.5px;
 }
 
 .top-square-space-menu-container-center-decrease2 {
   position: absolute;
-  top: 75%;
-  left: 72%;
-  font-size: 15px;
+  top: 55%;
+  left: 38%;
+  font-size: 13.5px;
 }
 
 .top-square-space-menu-container-right {
