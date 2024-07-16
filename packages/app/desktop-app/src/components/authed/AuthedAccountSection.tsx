@@ -12,9 +12,7 @@ const AuthedAccountSection = () => {
   const [inputCurrentPassword, setInputCurrentPassword] = useState("");
   const [inputNewPassword, setInputNewPassword] = useState("");
   const [inputConfirmedPassword, setInputConfirmedPassword] = useState("");
-  const [isPasswordChanged, setIsPasswordChanged] = useState<boolean | null>(
-    null
-  );
+  const [isPasswordChanged, setIsPasswordChanged] = useState<number>(0);
 
   // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
   const handleChangeEmailAdress = async () => {
@@ -27,19 +25,30 @@ const AuthedAccountSection = () => {
   // パスワードの「変更」でトリガーされるメールアドレス変更関数
   const handleChangePassword = async () => {
     if (
-      inputCurrentPassword &&
-      inputNewPassword &&
-      inputConfirmedPassword &&
-      inputNewPassword === inputConfirmedPassword
+      inputCurrentPassword === "" ||
+      inputNewPassword === "" ||
+      inputConfirmedPassword === ""
     ) {
+      setIsPasswordChanged(1);
+    } else if (inputCurrentPassword !== user.password) {
+      setIsPasswordChanged(2);
+    } else if (inputNewPassword !== inputConfirmedPassword) {
+      setIsPasswordChanged(3);
+    } else if (inputNewPassword.length < 6) {
+      setIsPasswordChanged(4);
+    } else {
       const result: boolean = await changePassword(
         inputCurrentPassword,
         inputNewPassword
       );
-      setIsPasswordChanged(result);
-      setInputCurrentPassword("");
-      setInputNewPassword("");
-      setInputConfirmedPassword("");
+      if (result) {
+        setIsPasswordChanged(5);
+        setInputCurrentPassword("");
+        setInputNewPassword("");
+        setInputConfirmedPassword("");
+      } else {
+        setIsPasswordChanged(6);
+      }
     }
   };
 
@@ -105,14 +114,29 @@ const AuthedAccountSection = () => {
               }}
             ></input>
           </div>
-          <div className="authed-account-section-password-item">
-            <button onClick={handleChangePassword}>変更</button>
+          <div className="authed-account-section-password-item-bottom">
+            <button
+              className="authed-account-section-password-item-button"
+              onClick={handleChangePassword}
+            >
+              変更
+            </button>
             <p className="authed-account-section-password-item-result">
-              {isPasswordChanged === null
+              {isPasswordChanged === 0
                 ? ""
-                : isPasswordChanged
+                : isPasswordChanged === 1
+                ? "未入力の項目があります。"
+                : isPasswordChanged === 2
+                ? "入力したパスワードが現在のパスワードと一致しません。"
+                : isPasswordChanged === 3
+                ? "確認用パスワードが一致していません"
+                : isPasswordChanged === 4
+                ? "パスワードは最低でも6文字以上が必要です。"
+                : isPasswordChanged === 5
                 ? "パスワードが変更されました"
-                : "パスワード変更に失敗しました"}
+                : isPasswordChanged === 6
+                ? "新しいパスワードの入力内容に誤りがあります。解決しない場合は運営者にお問い合わせください。"
+                : null}
             </p>
           </div>
         </div>

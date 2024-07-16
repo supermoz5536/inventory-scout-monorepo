@@ -62,13 +62,26 @@
   justify-content: start;
 }
 
+.authed-account-section-password-item-bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.authed-account-section-password-item-button {
+  min-width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .authed-account-section-password-item input {
   margin-left: 50px;
   width: 220px;
 }
 
 .authed-account-section-password-item-result {
-  margin-top: 7px;
+  margin-top: 10px;
   padding-left: 150px;
   font-size: 12.5px;
   font-weight: bold;
