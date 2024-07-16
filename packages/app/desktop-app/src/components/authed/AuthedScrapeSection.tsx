@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AuthedScrapeSection.css";
 import { useSelector } from "react-redux";
 
@@ -12,14 +12,18 @@ const AuthedScrapeSection = () => {
     (state: RootState) => state.systemStatus.value.systemStatus
   );
   const user = useSelector((state: RootState) => state.user.value);
+  const [isScrapeTimeChanged, setIsScrapeTimeChanged] = useState<
+    boolean | null
+  >(null);
 
   // システムステータスがスクレピングを実行中ではない場合
   // かつ
   // ログイン中の場合に
   // 定時スクレイピングを実行します
-  const handlescheduledScraping = () => {
+  const handleScheduledScraping = () => {
     if (![1, 2, 3].includes(systemStatus) && user.isAuthed === true) {
       window.myAPI.scheduledScraping(time, asinDataList);
+      setIsScrapeTimeChanged(true);
     }
   };
 
@@ -53,11 +57,18 @@ const AuthedScrapeSection = () => {
         </div>
         <button
           onClick={() => {
-            handlescheduledScraping();
+            handleScheduledScraping();
           }}
         >
           保存
         </button>
+        <p className="authed-scrape-section-result">
+          {isScrapeTimeChanged === null
+            ? ""
+            : isScrapeTimeChanged
+            ? "時刻を保存しました（指定の時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）"
+            : "システムエラーです。運営者にお問い合わせください。"}
+        </p>
       </div>
     </>
   );

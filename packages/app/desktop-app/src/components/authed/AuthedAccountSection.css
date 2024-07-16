@@ -37,6 +37,14 @@
   justify-content: start;
 }
 
+.authed-account-section-email-item-bottom {
+  margin-top: 5px;
+  min-width: 45px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
 .authed-account-section-email-item-value-email {
   margin-left: 20px;
 }
@@ -49,8 +57,16 @@
   width: 220px;
 }
 
-.authed-account-section-password {
+.authed-account-section-email-item-result {
   margin-top: 10px;
+  padding-left: 150px;
+  font-size: 12.5px;
+  font-weight: bold;
+  color: rgb(255, 89, 89);
+}
+
+.authed-account-section-password {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
 }
@@ -62,7 +78,29 @@
   justify-content: start;
 }
 
+.authed-account-section-password-item-bottom {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.authed-account-section-password-item-button {
+  min-width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .authed-account-section-password-item input {
   margin-left: 50px;
   width: 220px;
+}
+
+.authed-account-section-password-item-result {
+  margin-top: 10px;
+  padding-left: 150px;
+  font-size: 12.5px;
+  font-weight: bold;
+  color: rgb(255, 89, 89);
 }

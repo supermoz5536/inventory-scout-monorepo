@@ -18,11 +18,25 @@
   margin-top: 8px;
   margin-bottom: 4px;
   display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+.authed-login-section-email-line {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: flex;
   flex-direction: row;
   justify-content: start;
 }
 
 .authed-login-section-email-adress {
+  margin-left: 100px;
+  height: 20px;
+  width: 220px;
+}
+
+.authed-login-section-email-plan {
   margin-left: 100px;
   height: 20px;
   width: 220px;

@@ -40,3 +40,10 @@
   align-items: center;
   justify-content: center;
 }
+
+.authed-scrape-section-result {
+  margin-top: 7px;
+  font-size: 12.5px;
+  font-weight: bold;
+  color: rgb(255, 89, 89);
+}

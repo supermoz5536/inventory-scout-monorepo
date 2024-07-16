@@ -346,7 +346,7 @@ function openPreferences() {
 
   prefWindow = new BrowserWindow({
     width: 450,
-    height: 850,
+    height: 900,
     resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

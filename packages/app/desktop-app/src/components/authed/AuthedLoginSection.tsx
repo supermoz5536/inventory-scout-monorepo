@@ -38,8 +38,22 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
       <h2 className="authed-login-section-h2">ログイン設定</h2>
       <div className="authed-login-section">
         <div className="authed-login-section-email">
-          <p className="authed-login-section-email-text">ログイン中：</p>
-          <p className="authed-login-section-email-adress">{user.email}</p>
+          <div className="authed-login-section-email-line">
+            <p className="authed-login-section-email-text">ログイン中：</p>
+            <p className="authed-login-section-email-adress">{user.email}</p>
+          </div>
+          <div className="authed-login-section-email-line">
+            <p className="authed-login-section-email-text">ご利用状況：</p>
+            <p className="authed-login-section-email-adress">
+              {user.plan === "f"
+                ? "未加入です。"
+                : user.plan === "s"
+                ? "月額課金プランに加入中です"
+                : user.plan === "p"
+                ? "永久利用プランに加入中です。"
+                : null}
+            </p>
+          </div>
         </div>
         <button
           className="authed-login-section-login-button"
