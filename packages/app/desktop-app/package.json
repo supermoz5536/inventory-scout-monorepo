@@ -111,5 +111,13 @@
     "gatekeeperAssess": false,
     "executableName": "desktop-app",
     "productName": "desktop-app"
+  },
+  "win": {
+    "target": [
+      "nsis",
+      "zip"
+    ],
+    "icon": "assets/icon.ico"
   }
+  
 }
