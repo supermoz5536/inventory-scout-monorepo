@@ -111,13 +111,32 @@ export const changeEmailAdress = async (
       await updateEmail(user, newEmail);
       store.dispatch(changeEmail(newEmail));
       console.log("メールアドレスの更新に成功しました");
-      return true;
+      return "e0";
     } else {
       throw new Error("サインインしているユーザーがいません");
     }
-  } catch (error) {
-    console.error("メールアドレスの更新に失敗しました:", error);
-    return false;
+  } catch (e: any) {
+    console.log("updateEmail( ): e.message", e.code.message);
+
+    if (e.code == "auth/invalid-email") {
+      console.log("updateEmail( ): failed e0", e.code);
+      // 無効なメールアドレスです
+      return "e1";
+    } else if (e.code == "auth/user-not-found") {
+      console.log("updateEmail( ): failed e1", e.code);
+      // メールアドレスが見つかりません。
+      return "e2";
+    } else if (e.code == "auth/user-disabled") {
+      console.log("updateEmail( ): failed e2", e.code);
+      // このユーザーは無効化されています。
+      return "e3";
+    } else if (e.code == "auth/network-request-failed") {
+      console.log("updateEmail( ): failed e3", e.code);
+      // ネットワークエラーが発生しました。
+      return "e4";
+    } else {
+      console.log("updateEmail( ): failed", e.code);
+    }
   }
 };
 

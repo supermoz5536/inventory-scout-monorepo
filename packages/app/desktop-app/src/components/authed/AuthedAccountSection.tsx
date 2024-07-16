@@ -13,12 +13,20 @@ const AuthedAccountSection = () => {
   const [inputNewPassword, setInputNewPassword] = useState("");
   const [inputConfirmedPassword, setInputConfirmedPassword] = useState("");
   const [isPasswordChanged, setIsPasswordChanged] = useState<number>(0);
+  const [isEmailChanged, setIsEmailChanged] = useState<string | null>(null);
 
   // メールアドレスの「変更」でトリガーされるメールアドレス変更関数
   const handleChangeEmailAdress = async () => {
     if (inputEmail) {
-      changeEmailAdress(inputEmail, user.password);
-      setInputEmail("");
+      const result = await changeEmailAdress(inputEmail, user.password);
+      if (result) {
+        if (result === "e0") {
+          setIsEmailChanged(result);
+          setInputEmail("");
+        } else {
+          setIsEmailChanged(result);
+        }
+      }
     }
   };
 
@@ -76,7 +84,24 @@ const AuthedAccountSection = () => {
               }}
             ></input>
           </div>
-          <button onClick={handleChangeEmailAdress}>変更</button>
+          <div className="authed-account-section-email-item-bottom">
+            <button onClick={handleChangeEmailAdress}>変更</button>
+            <p className="authed-account-section-email-item-result">
+              {isEmailChanged === null
+                ? ""
+                : isEmailChanged === "e0"
+                ? "メールアドレスの更新に成功しました。"
+                : isEmailChanged === "e1"
+                ? "無効なメールアドレスです。"
+                : isEmailChanged === "e2"
+                ? "メールアドレスが見つかりません。"
+                : isEmailChanged === "e3"
+                ? "このユーザーは無効化されています。"
+                : isEmailChanged === "e4"
+                ? "ネットワークエラーが発生しました。"
+                : null}
+            </p>
+          </div>
         </div>
         {/* パスワードセクション */}
         <div className="authed-account-section-password">
