@@ -317,12 +317,12 @@ function Manage() {
             >
               選択したASINを削除
             </button>
-            <button className="manage-delete-no-fba-asin-button">
+            {/* <button className="manage-delete-no-fba-asin-button">
               FBAセラーのいないASINを削除
             </button>
             <button className="manage-delete-no-protected-asin-button">
               保護されたASIN以外を削除
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

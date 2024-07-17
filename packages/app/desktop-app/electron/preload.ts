@@ -52,6 +52,11 @@ contextBridge.exposeInMainWorld("myAPI", {
   initLogout: (callback) => {
     ipcRenderer.on("init-logout", callback);
   },
+
+  initLogin: (callback) => {
+    ipcRenderer.on("init-login", callback);
+  },
+
   scheduledScraping: (time: string, asinDataList: AsinData[]) =>
     ipcRenderer.invoke("schedule-scraping", time, asinDataList),
 

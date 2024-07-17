@@ -77,10 +77,15 @@ const App: React.FC = () => {
         // ⑤
         const unsubscribe = await listenAuthState();
 
-        // ■■■■■■■■■■■■ ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので ■■■■■■■■■■
-        // メインプロセス起動時の呼び出しで１回だけトリガーされるように改修
-        if (userRef.current.isAutoLogIn === true && userRef.current.email) {
-          await handleLogIn(userRef.current.email, userRef.current.password);
+        // ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので
+        if (
+          userRef.current.isAutoLogIn === true &&
+          userRef.current.email &&
+          userRef.current.password
+        ) {
+          window.myAPI.initLogin(async () => {
+            await handleLogIn();
+          });
         }
 
         // ⑦
@@ -137,11 +142,11 @@ const App: React.FC = () => {
   // handleScrapingResultの宣言の後にuseEffectを再配置する
 
   // 自動ログインのコールバック
-  const handleLogIn = async (savedEmail: string, savedPassword: string) => {
+  const handleLogIn = async () => {
     console.log("init login done");
     const userCredential = await logInWithEmailAndPassword(
-      savedEmail,
-      savedPassword
+      userRef.current.email!,
+      userRef.current.password!
     );
 
     // オブジェクトが存在し
