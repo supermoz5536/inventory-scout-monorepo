@@ -10,7 +10,11 @@ import {
   updateEmail,
   updatePassword,
 } from "firebase/auth";
-import { changeIsAuthed, changeEmail } from "../slices/userSlice";
+import {
+  changeIsAuthed,
+  changeEmailOnStore,
+  changePasswordOnStore,
+} from "../slices/userSlice";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -112,7 +116,7 @@ export const changeEmailAdress = async (
 
       // メールアドレスを更新する
       await updateEmail(user, newEmail);
-      store.dispatch(changeEmail(newEmail));
+      store.dispatch(changeEmailOnStore(newEmail));
       console.log("メールアドレスの更新に成功しました");
       return "e0";
     } else {
@@ -160,6 +164,7 @@ export const changePassword = async (
 
       // パスワードを更新する
       await updatePassword(user, newPassword);
+      store.dispatch(changeEmailOnStore(newPassword));
       console.log("パスワードの更新に成功しました");
       return true;
     } else {

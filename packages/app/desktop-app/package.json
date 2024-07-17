@@ -109,8 +109,8 @@
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.plist",
     "gatekeeperAssess": false,
-    "executableName": "desktop-app",
-    "productName": "desktop-app"
+    "executableName": "在庫スカウター",
+    "productName": "在庫スカウター"
   },
   "win": {
     "target": [
@@ -119,5 +119,4 @@
     ],
     "icon": "assets/icon.ico"
   }
-  
 }

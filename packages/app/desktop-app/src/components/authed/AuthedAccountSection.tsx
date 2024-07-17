@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AuthedAccountSection.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   changeEmailAdress,
   changePassword,
@@ -8,6 +8,7 @@ import {
 
 const AuthedAccountSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
+  const dispatch = useDispatch<AppDispatch>();
   const [inputEmail, setInputEmail] = useState("");
   const [inputCurrentPassword, setInputCurrentPassword] = useState("");
   const [inputNewPassword, setInputNewPassword] = useState("");
