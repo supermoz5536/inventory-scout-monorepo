@@ -3,6 +3,7 @@ import { format, parseISO, subDays } from "date-fns";
 import Calender from "../components/stock-detail/Calender";
 import Table from "../components/stock-detail/Table";
 import { AppBar, Toolbar, Typography } from "@mui/material";
+import Chart from "../components/stock-detail/Chart";
 
 const StockDetail = () => {
   // startDateとendDateの時間部分をリセットする関数
@@ -155,6 +156,7 @@ const StockDetail = () => {
       </AppBar>
       <Calender onChange={setDateRange} />
       <Table columnHeader={columnHeader} data={data} />
+      <Chart />
     </>
   );
 };
