@@ -47,9 +47,10 @@ const App: React.FC = () => {
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② 移行データの取得リスナーの配置と削除
   /// ③ ローカルストレージデータのロード
-  /// ④ メインプロセス起動時にログアウト処理をトリガーする関数
+  /// ④ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
   /// ⑤ サーバーサイドの認証ステータスと常に同期するリスナーを設置
   /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
+  /// ■■■■■■■■■■ → メインプロセスのwhenReadyでトリガーするリスナー関数に変更、メインウインドウを開くたびにログイン処理が発生してる
   /// ⑦ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     (async () => {
@@ -76,19 +77,11 @@ const App: React.FC = () => {
         // ⑤
         const unsubscribe = await listenAuthState();
 
-        console.log("init login done 0");
-        console.log(
-          "userRef.current.isAutoLogIn =",
-          userRef.current.isAutoLogIn
-        );
-
-        // ⑥
+        // ■■■■■■■■■■■■ ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので ■■■■■■■■■■
+        // メインプロセス起動時の呼び出しで１回だけトリガーされるように改修
         if (userRef.current.isAutoLogIn === true && userRef.current.email) {
-          console.log("init login done 1");
           await handleLogIn(userRef.current.email, userRef.current.password);
-          console.log("init login done 2");
         }
-        console.log("init login done 3");
 
         // ⑦
         // ■ 同日に前回の処理が中断されている場合の自動処理
@@ -145,6 +138,7 @@ const App: React.FC = () => {
 
   // 自動ログインのコールバック
   const handleLogIn = async (savedEmail: string, savedPassword: string) => {
+    console.log("init login done");
     const userCredential = await logInWithEmailAndPassword(
       savedEmail,
       savedPassword
@@ -177,10 +171,6 @@ const App: React.FC = () => {
         dispatch(updateUser(newUser));
       }
     }
-    //  // ログイン失敗時のエラーハンドリング
-    // else if (userCredential && typeof userCredential === "string") {
-    //   setErrorFlag(userCredential);
-    // }
   };
 
   /// メインプロセスからスクレイピングデータを

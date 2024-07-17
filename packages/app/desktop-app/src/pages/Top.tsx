@@ -100,10 +100,7 @@ function Top() {
 
   /// スクレイピングボタンを押した際の
   /// 条件分岐を管理する関数
-  const handleScrapingButton = (
-    asinDataList: AsinData[],
-    showButtonStatus: number
-  ) => {
+  const handleScrapingButton = () => {
     // ■ ログインウインドウの表示
     if (user.isAuthed === false) {
       console.log("1");
@@ -123,7 +120,7 @@ function Top() {
     ) {
       // スクレイピングを開始
       dispatch(changeShowButtonStatus(1));
-      handleRunScraping(asinDataList);
+      handleRunScraping();
 
       // スクレイピング中の「取得停止」のクリック
     } else if (
@@ -150,14 +147,20 @@ function Top() {
 
   /// スクレイピングを実行する際の
   /// 「データの下準備と実行」の管理をする関数
-  const handleRunScraping = async (asinDataList: AsinData[]) => {
+  const handleRunScraping = async () => {
     const today = new Date();
     const todayFormatted = `${today.getFullYear()}-${String(
       today.getMonth() + 1
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     // 全てのasinDataが取得完了の状態
-    const isScrapingFalseAll = asinDataListRef.current.every(
+    // everyメソッドは配列の各要素に対してコールバック関数を実行し、
+    // その関数がtrueを返した場合にのみ、
+    // その要素が条件を満たすと見なします。
+    // すべての要素が条件を満たす
+    // （つまり、すべてのコールバック関数がtrueを返す）場合にのみ、
+    // everyメソッドはtrueを返します。
+    const isScrapingFalseAll: boolean = asinDataListRef.current.every(
       (asinData: AsinData) => {
         return asinData.isScraping === false;
       }
@@ -176,21 +179,39 @@ function Top() {
     );
 
     // fetchLatestDateが空文字のアイテムが少なくとも1つ存在するかを確認
+    // 意図：まだスクレイピングされたことのない登録したばかりのデータがあるかの確認
     const hasNewItems = asinDataListRef.current.some((asinData: AsinData) => {
       return asinData.fetchLatestDate === "";
     });
 
     if (isScrapingFalseAll && isDoneTodayAtLeast1) {
-      // 当日のデータ取得が完了してるので
+      console.log("■ 1 handleRunScraping");
+      // 日付データの一貫性は保たれているので、
+      // 全てのデータ取得が完了状態で
+      // かつ
+      // 1つでも今日の日付のものがあるなら
+      // 本日のデータ取得を完了していることを意味するので
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
       dispatch(changeSystemStatus(4));
       dispatch(changeShowButtonStatus(0));
+    } else if (isScrapingFalseAll && !isDoneTodayAtLeast1) {
+      console.log("■ 2 handleRunScraping");
+      // 全てのデータ取得が完了状態で
+      // かつ
+      // 取得状態が本日付のデータが1つもないなら
+      // 全てのデータをrunScrapingにかければ良い
+      dispatch(updateIsScrapingTrueAll());
+      await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
+      window.myAPI.runScraping(asinDataListRef.current);
+      dispatch(changeShowButtonStatus(1));
     } else {
+      console.log("■ 3 handleRunScraping");
       // ■ 同日に前回の処理が中断されている場合の処理
       // 以下２点を満たすとTrue
-      // ・スクレイピングが取得中
-      // ・今日の日付のStockCountDataが存在してる
+      //「スクレイピングが取得中のデータが存在し」
+      // かつ
+      //「本日付の取得完了データがある or 初回スクレイピングが中断されて取得状態のないデータがある
       const checkArray = asinDataListRef.current.find((asinData: AsinData) => {
         return (
           asinData.isScraping === true &&
@@ -199,26 +220,27 @@ function Top() {
       });
 
       if (checkArray) {
+        console.log("■ 4 handleRunScraping");
         console.log("同日に前回の処理が中断されている場合の処理");
         // システムメッセージ表示フラグ
         //「アプリ終了で中断された取得処理を自動で...」
         window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(2));
       } else if (hasNewItems) {
-        // ■ 同日にデータ取得が無事完了している && 新規アイテムの追加がある場合
-        // 新規アイテムのみを isScraping === trueに変更して引数に渡す
-
-        // fetchlatestdateが空文字のアイテムが少なくとも1つある場合
-        // trueの場合にisScraping = true;
+        console.log("■ 5 handleRunScraping");
         console.log("同日データ取得が無事完了 && 新規アイテムの追加がある場合");
-        // 追加された新規ASINのみの
-        // isScrapingをTrueにするメソッド
+        // ■ 同日にデータ取得が無事完了している && 新規アイテムの追加がある場合
+        // fetchlatestdateが空文字のアイテムが少なくとも1つある場合
+        // 新規アイテムのみを isScraping === trueに変更して引数に渡す
         dispatch(setIsScrapingTrueForNewItems());
+        await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
         window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(3));
       } else {
+        console.log("■ 6 handleRunScraping");
         dispatch(updateIsScrapingTrueAll());
-        window.myAPI.runScraping(asinDataList);
+        await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
+        window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(1));
       }
     }
@@ -300,7 +322,7 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <button
             className="top-square-space-menu-container-left-scraping"
-            onClick={() => handleScrapingButton(asinDataList, showButtonStatus)}
+            onClick={() => handleScrapingButton()}
           >
             {showButtonStatus === 0
               ? "取得開始"

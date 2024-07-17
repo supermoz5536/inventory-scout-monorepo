@@ -73,9 +73,11 @@ export const listenAuthState = async () => {
   const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
     // ログイン状態の場合
     if (user) {
+      console.log("listenAuthState changeIsAuthed(true)");
       store.dispatch(changeIsAuthed(true));
     } else {
       // ログアウト状態の場合
+      console.log("listenAuthState changeIsAuthed(false)");
       store.dispatch(changeIsAuthed(false));
     }
   });
@@ -83,6 +85,7 @@ export const listenAuthState = async () => {
 };
 
 export const initLogoutCallBack = async () => {
+  console.log("initLogoutCallBackがトリガーされました");
   try {
     await signOut(auth);
     store.dispatch(changeIsAuthed(false));

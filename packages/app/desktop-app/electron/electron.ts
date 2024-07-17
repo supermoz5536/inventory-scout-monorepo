@@ -22,7 +22,7 @@ let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
-let isLoggedOut: boolean = false;
+let isFirstLogoutDone: boolean = false;
 
 /// アプリ起動時にウインドウがない場合に
 /// 新しいウィンドウを生成する関数
@@ -293,9 +293,9 @@ function createMainWindow() {
   // 初回起動時のみログアウト処理を実行
   // ウィンドウの読み込みが完了した後に処理します
   mainWindow.webContents.once("did-finish-load", () => {
-    if (isLoggedOut === false) {
+    if (isFirstLogoutDone === false) {
       mainWindow.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
-      isLoggedOut = true; // ログアウト処理が実行されたことを記録
+      isFirstLogoutDone = true; // ログアウト処理が実行されたことを記録
     }
   });
 

@@ -78,6 +78,8 @@ const scrapePromise = (async () => {
       // // 36e5は1時間のms単位の秒数 3600000 を意味します。
       // // .getTimeでms単位でのそのオブジェクトの現在時刻の値を取得します。
       // const hoursDiff = (now.getTime() - lastFetchDate.getTime()) / 36e5;
+      console.log("asinData.isScraping =", asinData.isScraping);
+      console.log("asinData.fetchLatestDate =", asinData.fetchLatestDate);
 
       return (
         // // toDateSringで日付の値をString型で取得します。
@@ -935,6 +937,7 @@ const scrapePromise = (async () => {
       let retryCount = 0;
       // スクレイプの必要のあるasinDataのみを抽出
       const filteredAsinDataList = getFilteredAsinDataList(asinDataList);
+      console.log("filteredAsinDataList =", filteredAsinDataList);
       // 引数が渡されていない場合にのみ、todayを新たに生成
       if (!today) {
         today = new Date();
