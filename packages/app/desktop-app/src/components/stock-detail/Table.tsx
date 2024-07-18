@@ -14,7 +14,13 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
   const safeData = data ? data : [];
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        width: 1100,
+        height: 300,
+      }}
+    >
       <MUITable>
         <TableHead>
           <TableRow>
