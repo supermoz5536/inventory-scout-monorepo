@@ -98,7 +98,7 @@ const Calender = ({ onChange }: StockDetailProps) => {
               </InputAdornment>
             ),
           }}
-          sx={{ marginTop: 4, marginLeft: 115, marginBottom: 3 }}
+          sx={{ marginTop: 4, marginLeft: 95, marginBottom: 3 }}
         />
         <TextField
           label="終了日"

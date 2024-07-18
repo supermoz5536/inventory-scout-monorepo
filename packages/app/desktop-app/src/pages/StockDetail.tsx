@@ -4,6 +4,7 @@ import Calender from "../components/stock-detail/Calender";
 import Table from "../components/stock-detail/Table";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import Chart from "../components/stock-detail/Chart";
+import DecreaseMetrics from "../components/stock-detail/DecreaseMetrics";
 
 const StockDetail = () => {
   // コンポーネントマウント時に
@@ -209,7 +210,16 @@ const StockDetail = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Calender onChange={setDateRange} />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "start",
+        }}
+      >
+        <DecreaseMetrics />
+        <Calender onChange={setDateRange} />
+      </div>
       <Table columnHeader={tableColumnHeader} data={tableData} />
       <Chart data={chartDataList} />
     </>
