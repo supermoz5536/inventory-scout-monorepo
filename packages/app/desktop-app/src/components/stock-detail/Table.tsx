@@ -7,6 +7,8 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Card,
+  Grid,
 } from "@mui/material";
 
 const Table = ({ columnHeader, data }: StockDetailProps) => {
@@ -16,9 +18,15 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
   return (
     <TableContainer
       component={Paper}
+      elevation={2}
+      // variant="outlined"
+      square
       sx={{
-        width: 1100,
+        width: 1087.5,
         height: 300,
+        marginLeft: 8,
+        marginBottom: 1,
+        bgcolor: "background.paper", // 背景色を設定
       }}
     >
       <MUITable>

@@ -39,18 +39,27 @@ const Chart = ({ data }: StockDetailProps) => {
   return (
     <>
       <LineChart
-        width={1100}
+        width={1150}
         height={300}
         data={data}
         margin={{
-          top: 5,
-          right: 5,
+          top: 0,
+          right: 0,
           left: 5,
-          bottom: 5,
+          bottom: 0,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
+        <XAxis
+          dataKey="date"
+          interval={0}
+          dx={-2.5}
+          dy={7.5}
+          tick={{
+            fontSize: 12,
+            fill: "#666666",
+          }}
+        />
         <YAxis
           label={{ value: "在庫数", angle: -90, position: "insideLeft" }}
         />
@@ -63,7 +72,7 @@ const Chart = ({ data }: StockDetailProps) => {
             stroke={colors[index % colors.length]} // 配列の色を順番に使う
           />
         ))}
-        <Legend />
+        <Legend wrapperStyle={{ paddingTop: 10, paddingBottom: 7.5 }} />
         <Tooltip />
       </LineChart>
     </>
