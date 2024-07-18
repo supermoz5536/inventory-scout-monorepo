@@ -39,7 +39,7 @@ const Chart = ({ data }: StockDetailProps) => {
   return (
     <>
       <LineChart
-        width={1150}
+        width={1170}
         height={300}
         data={data}
         margin={{
@@ -70,6 +70,7 @@ const Chart = ({ data }: StockDetailProps) => {
             type="monotone"
             dataKey={key}
             stroke={colors[index % colors.length]} // 配列の色を順番に使う
+            strokeWidth={index === 0 ? 1.5 : 0.5}
           />
         ))}
         <Legend wrapperStyle={{ paddingTop: 10, paddingBottom: 7.5 }} />

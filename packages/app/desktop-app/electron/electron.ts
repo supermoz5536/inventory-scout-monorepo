@@ -413,8 +413,8 @@ function openStockDetail(asinData: AsinData) {
     return;
   }
   StockDetailWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1225,
+    height: 885,
     resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

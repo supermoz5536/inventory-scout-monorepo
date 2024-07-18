@@ -22,11 +22,15 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
       // variant="outlined"
       square
       sx={{
-        width: 1087.5,
+        width: 1073.5,
         height: 300,
         marginLeft: 8,
-        marginBottom: 1,
-        bgcolor: "background.paper", // 背景色を設定
+        marginBottom: 2,
+        // bgcolor: "background.paper", // 背景色を設定
+        boxShadow: "0 1px 7px rgba(0, 0, 0, 0.25)", // 影のスタイル
+        backgroundColor: "#FEFEFE", // 背景色
+        padding: "16px", // パディング
+        borderRadius: "0px", // 角の丸み
       }}
     >
       <MUITable>

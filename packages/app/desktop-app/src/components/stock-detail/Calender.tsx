@@ -98,7 +98,7 @@ const Calender = ({ onChange }: StockDetailProps) => {
               </InputAdornment>
             ),
           }}
-          sx={{ marginTop: 4, marginLeft: 95, marginBottom: 3 }}
+          sx={{ marginTop: 10, marginLeft: 74, marginBottom: 2.5 }}
         />
         <TextField
           label="終了日"
@@ -124,7 +124,7 @@ const Calender = ({ onChange }: StockDetailProps) => {
               </InputAdornment>
             ),
           }}
-          sx={{ marginTop: 4, marginBottom: 3 }}
+          sx={{ marginTop: 10, marginBottom: 2.5 }}
         />
         <Popover
           open={open}
