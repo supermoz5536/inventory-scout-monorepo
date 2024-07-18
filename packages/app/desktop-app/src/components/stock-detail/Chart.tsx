@@ -23,7 +23,18 @@ const Chart = ({ data }: StockDetailProps) => {
     )
   );
 
-  const colors = ["#8884d8", "#3ba2f6", "#ff0092"];
+  const colors = [
+    "#ff0092",
+    "#8884d8",
+    "#3ba2f6",
+    "#82ca9d",
+    "#ff8042",
+    "#ffbb28",
+    "#a4de6c",
+    "#d0ed57",
+    "#8dd1e1",
+    "#d885f7",
+  ];
 
   return (
     <>

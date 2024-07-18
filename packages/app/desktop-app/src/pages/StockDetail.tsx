@@ -134,9 +134,6 @@ const StockDetail = () => {
   >([
     {
       date: "10/01",
-      問題数: 120,
-      正解数: 105,
-      正解率: 88,
     },
   ]);
 
@@ -152,29 +149,44 @@ const StockDetail = () => {
     // 日付のキーと値だけ設定されてる
     // チャートの各グリッドに割り当てるデータを用意
     while (currentDate <= endDate) {
-      // 必要な情報は
-      // 該当の日付(currentDate)
-      // 各々のセラーのstockCountDatas配列内の要素で
-      // currentDateと一致するキーを持つオブジェクトを探し
-      // その値を代入
       const formattedDate = format(currentDate, "yyyy-MM-dd");
-      let newChartData: any = { date: formattedDate };
+      let newEachDayData: any = { date: formattedDate };
 
+      // 必要な情報は
+      // 各日付(currentDate)に対して
+      // 各セラーのstockCountDatas配列内の要素で
+      // currentDateと一致するキーを持つオブジェクトを見つけ
+      // セラー名をキーとするプロパティを追加して、そのキーの値(在庫数)を代入
       targetAsinData.fbaSellerDatas.forEach((fbaSellerData) => {
         return fbaSellerData.stockCountDatas.forEach(
           (stockCountData: StockCountData) => {
-            // もしキーがcurrentDateと一致するなら
-            // セラー名とそのキーの値でオブジェクトを生成しリターンする
-            // 一致しないなら、nullを返し、一致する場合のみで配列を生成
             if (Object.keys(stockCountData)[0] === formattedDate) {
-              newChartData[fbaSellerData.sellerName] =
+              newEachDayData[fbaSellerData.sellerName] =
                 stockCountData[formattedDate];
             }
           }
         );
       });
 
-      newChartDataList.push(newChartData);
+      // 最後にASIN全体の在庫分のチャートライン用データを用意する
+      // dateキーを除く全てのキーを取得し
+      const keysWithoutDate: string[] = Object.keys(newEachDayData).filter(
+        (key) => key !== "date"
+      );
+
+      // それぞれの値を合計する
+      const totalStock: number | null = keysWithoutDate.reduce((acc, key) => {
+        return acc + newEachDayData[key];
+      }, null);
+
+      // 同じくnewChartDataの新規プロパティ("在庫合計")に値を代入する
+      newEachDayData = { FBA全体在庫: totalStock, ...newEachDayData };
+
+      // 該当の日付の各セラーの販売数を格納したオブジェクトを
+      // Chartコンポーネントに渡す配列に追加
+      newChartDataList.push(newEachDayData);
+
+      // 次の日付の処理へ
       currentDate.setDate(currentDate.getDate() + 1);
     }
     setChartDataList(newChartDataList);
