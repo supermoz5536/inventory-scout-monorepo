@@ -217,7 +217,7 @@ const StockDetail = () => {
           justifyContent: "start",
         }}
       >
-        <DecreaseMetrics />
+        <DecreaseMetrics data={chartDataList} />
         <Calender onChange={setDateRange} />
       </div>
       <Table columnHeader={tableColumnHeader} data={tableData} />
