@@ -35,22 +35,61 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
 
         // 現在処理してる日付のオブジェクトとその前の日のオブジェクトの差分をとる
         const prevData = array[index - 1];
-        const currentStock = currentData["FBA全体在庫"] ?? null;
-        const prevStock = prevData["FBA全体在庫"] ?? null;
+        const currentTotalStock = currentData["FBA全体在庫"] ?? null;
+        const prevTotalStock = prevData["FBA全体在庫"] ?? null;
 
-        if (currentStock && prevStock) {
-          const difference = prevStock - currentStock;
-          if (difference >= 0) {
-            // 減少 or 同じ値の場合
-            ++decreaseCount;
-            return (acc = acc + difference);
-          } else {
-            // 増加（補充）の場合はスキップ
-            ++increaseCount;
-            return acc;
-          }
+        // ■ 各セラーでの増加（補充）フィルター処理
+        // オブジェクト内の "FBA全体在庫"以外の全てのセラーキーを取得し
+        // 「currentStock」「prevStock」を算出して
+        // そのうち一人でも、在庫が増えてるセラーがいたら
+        // ++increaseCount; を実行してスキップ
+        // イテレートな処理で真偽値が帰ってくるようにすればいい
+        const keys = Object.keys(currentData).filter(
+          (key) => key !== "FBA全体在庫" && key !== "date"
+        );
+        // console.log("keys =", keys);
+        const isDecreaseAll = keys.every((key) => {
+          // console.log("key =", key);
+          const prevSellerStock = prevData[key] ?? null;
+          const currentSellerStock = currentData[key] ?? null;
+          // console.log("prevData =", prevData[key]);
+          // console.log("currentSellerStock =", currentSellerStock[key]);
+          return (
+            prevSellerStock &&
+            currentSellerStock &&
+            prevSellerStock >= currentSellerStock
+          );
+        });
+
+        // console.log("isDecreaseAll =", isDecreaseAll);
+        if (!isDecreaseAll && prevData["FBA全体在庫"] !== null) {
+          ++increaseCount;
+          return acc;
+        }
+
+        // ■ 合算処理
+        // 増加（補充）してるセラーがいない
+        // かつ
+        // "FBA全体在庫" の値が前日と当日にある
+        // その場合は合算処理
+        if (
+          prevTotalStock &&
+          currentTotalStock &&
+          prevTotalStock >= currentTotalStock
+        ) {
+          const difference = prevTotalStock - currentTotalStock;
+          // if (difference >= 0) {
+          // 減少 or 同じ値の場合
+          ++decreaseCount;
+          return (acc = acc + difference);
+          // } else {
+          //   // 増加（補充）の場合はスキップ
+          //   ++increaseCount;
+          //   return acc;
+          // }
         } else {
-          // 在庫データが日付はスキップ
+          // "FBA全体在庫" の値が
+          // 前日と当日のどちらかで欠けてる場合はスキップ
           return acc;
         }
       },
@@ -60,14 +99,13 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
     console.log("result =", result);
     console.log("decreaseCount =", decreaseCount);
     console.log("increaseCount =", increaseCount);
-    console.log("data.length =", data.length);
 
     // 日次の平均減少数を算出する、その際に
     // 指定期間の最初の日付はスキップしてるので -1 する。
     // 算出した値を増加日をスキップした回数分だけ加える。
     // これで増加日の減少数を
     // 日次の平均減少数シミュレートしたことになる。
-    const newDayAverage = result / (data.length - increaseCount - 1);
+    const newDayAverage = result / decreaseCount;
     console.log("newDayAverage =", newDayAverage);
     const newTotalDecrease = result + newDayAverage * increaseCount;
     // Math.round : 小数点以下を四捨五入

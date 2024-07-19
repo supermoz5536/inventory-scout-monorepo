@@ -15,6 +15,12 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
   const safecolumnHeader = columnHeader ? columnHeader : [];
   const safeData = data ? data : [];
 
+  // 日付をフォーマットする関数
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
+
   return (
     <TableContainer
       component={Paper}
@@ -22,10 +28,10 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
       // variant="outlined"
       square
       sx={{
-        width: 1073.5,
+        width: 1083.5,
         height: 300,
         marginLeft: 8,
-        marginBottom: 2,
+        marginBottom: 0,
         // bgcolor: "background.paper", // 背景色を設定
         boxShadow: "0 1px 7px rgba(0, 0, 0, 0.25)", // 影のスタイル
         backgroundColor: "#FEFEFE", // 背景色
@@ -37,7 +43,9 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
         <TableHead>
           <TableRow>
             {safecolumnHeader.map((column) => (
-              <TableCell key={column}>{column}</TableCell>
+              <TableCell key={column}>
+                {column.includes("-") ? formatDate(column) : column}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>

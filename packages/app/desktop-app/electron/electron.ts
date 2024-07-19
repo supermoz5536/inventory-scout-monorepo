@@ -414,8 +414,8 @@ function openStockDetail(asinData: AsinData) {
   }
   StockDetailWindow = new BrowserWindow({
     width: 1225,
-    height: 885,
-    resizable: false, // ウィンドウサイズを変更できないようにする
+    height: 925,
+    resizable: true, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
