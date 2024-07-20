@@ -12,6 +12,7 @@ import {
 import Chart from "../components/stock-detail/Chart";
 import DecreaseMetrics from "../components/stock-detail/DecreaseMetrics";
 import InfoIcon from "@mui/icons-material/Info";
+import EachSellerDecreaseMetrics from "../components/stock-detail/EachSellerDecreaseMetrics";
 
 const StockDetail = () => {
   // コンポーネントマウント時に
@@ -200,6 +201,16 @@ const StockDetail = () => {
     setChartDataList(newChartDataList);
   }, [targetAsinData, dateRange]);
 
+  // ======================================================================
+
+  // EachSellerDecreaseMetricsコンポーネントで選択されたセラー情報を格納する変数
+  // Chat.tsx > <Legend> との共通単位がindexなので、それをpropsで受け渡し
+  const [selectedSellerIndex, setSelectedSellerIndex] = useState<number>(0);
+
+  useEffect(() => {
+    console.log("selectedSellerIndex in StockDetail =", selectedSellerIndex);
+  }, [selectedSellerIndex]);
+
   // startDateとendDateの時間部分をリセットする関数
   const resetTime = (date: Date) => {
     date.setHours(0, 0, 0, 0);
@@ -225,15 +236,19 @@ const StockDetail = () => {
         }}
       >
         <DecreaseMetrics data={chartDataList} />
-        <Tooltip title="This is a tooltip description" arrow>
+        <EachSellerDecreaseMetrics
+          data={chartDataList}
+          setSelectedSellerIndex={setSelectedSellerIndex}
+        />
+        {/* <Tooltip title="This is a tooltip description" arrow>
           <IconButton>
             <InfoIcon />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
         <Calender onChange={setDateRange} />
       </div>
       <Table columnHeader={tableColumnHeader} data={tableData} />
-      <Chart data={chartDataList} />
+      <Chart data={chartDataList} selectedSellerIndex={selectedSellerIndex} />
     </>
   );
 };

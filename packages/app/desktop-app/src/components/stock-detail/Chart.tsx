@@ -10,7 +10,8 @@ import {
   YAxis,
 } from "recharts";
 
-const Chart = ({ data }: StockDetailProps) => {
+const Chart = ({ data, selectedSellerIndex }: StockDetailProps) => {
+  console.log("selectedSellerIndex =", selectedSellerIndex);
   // date以外のキーを取得して、出品者全員のキーを格納した配列を得る。
   // data.flatMapを使用して、data内のすべてのオブジェクトのキーを収集します。
   // filter(key => key !== 'date')でdateキーを除外します。
@@ -88,7 +89,15 @@ const Chart = ({ data }: StockDetailProps) => {
                 type="monotone"
                 dataKey={key}
                 stroke={colors[index % colors.length]} // 配列の色を順番に使う
-                strokeWidth={index === 0 ? 1.5 : 0.5}
+                strokeWidth={
+                  index === 0 && selectedSellerIndex === 0
+                    ? 1.75
+                    : index === 0 && selectedSellerIndex !== 0
+                    ? 0.25
+                    : index === selectedSellerIndex!
+                    ? 1.75
+                    : 0.25
+                }
               />
             ))}
             <Legend

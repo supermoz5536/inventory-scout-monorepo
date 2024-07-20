@@ -10,13 +10,21 @@ import {
   TableHead,
   TableRow,
   Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-const DecreaseMetrics = ({ data }: StockDetailProps) => {
+const EachSellerDecreaseMetrics = ({
+  data,
+  setSelectedSellerIndex,
+}: StockDetailProps) => {
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [totalDecrease, settotalDecrease] = useState<number>(0);
   const [dayAverage, setDayAverage] = useState<number>(0);
-  const columnHeader = ["FBA全体在庫の減少数", "日次", "週次", "月次"];
+  const columnHeader = ["各セラーの減少数", "日次", "週次", "月次"];
   const decreaseMetricsData = [
     {
       在庫変動数: totalDecrease,
@@ -25,8 +33,20 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
       月次: dayAverage * 30,
     },
   ];
+  const keys = Array.from(
+    new Set(
+      data.flatMap((item: any) =>
+        Object.keys(item).filter(
+          (key) => key !== "FBA全体在庫" && key !== "date"
+        )
+      )
+    )
+  );
+  const keysFixed = ["　", ...keys];
+
   let decreaseCount: number = 0;
   let increaseCount: number = 0;
+  // ========================================================================
 
   useEffect(() => {
     const result = data.reduce(
@@ -47,13 +67,9 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
         const keys = Object.keys(currentData).filter(
           (key) => key !== "FBA全体在庫" && key !== "date"
         );
-        // console.log("keys =", keys);
         const isDecreaseAll = keys.every((key) => {
-          // console.log("key =", key);
           const prevSellerStock = prevData[key] ?? null;
           const currentSellerStock = currentData[key] ?? null;
-          // console.log("prevData =", prevData[key]);
-          // console.log("currentSellerStock =", currentSellerStock[key]);
           return (
             prevSellerStock &&
             currentSellerStock &&
@@ -61,7 +77,6 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
           );
         });
 
-        // console.log("isDecreaseAll =", isDecreaseAll);
         if (!isDecreaseAll && prevData["FBA全体在庫"] !== null) {
           ++increaseCount;
           return acc;
@@ -103,6 +118,16 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
     settotalDecrease(Math.round(newTotalDecrease));
   }, [data]);
 
+  // ========================================================================
+
+  const handleMenu = (event: any) => {
+    setSelectedIndex(event.target.value);
+    if (setSelectedSellerIndex) {
+      setSelectedSellerIndex(event.target.value);
+      console.log("handleMenu トリガー");
+    }
+  };
+
   return (
     <div>
       <TableContainer
@@ -110,7 +135,7 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
         sx={{
           marginTop: 5,
           marginBottom: 0,
-          marginLeft: 8,
+          marginLeft: 14,
           padding: "12px", // パディング
           boxShadow: "0 2px 5px rgba(0, 0, 0, 0.25)", // 影のスタイル
           backgroundColor: "#FEFEFE", // 背景色
@@ -130,10 +155,28 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
                     lineHeight: "1rem", // Line height adjustment
                     border: "1px solid #ccc", // Border style
                     textAlign: "center", // Center align text
-                    color: index === 0 ? "#ff0092" : null,
                   }}
                 >
-                  {column}
+                  {index === 0 ? (
+                    <FormControl fullWidth>
+                      <InputLabel id="demo-simple-select-label"></InputLabel>
+                      <Select
+                        value={
+                          selectedIndex === 0 ? "" : keysFixed[selectedIndex]
+                        }
+                        onChange={(event) => {
+                          handleMenu(event);
+                        }}
+                        sx={{}}
+                      >
+                        {keysFixed.map((key: any, sellerIndex) => {
+                          return <MenuItem value={sellerIndex}>{key}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    column
+                  )}
                 </TableCell>
               ))}
             </TableRow>
@@ -164,4 +207,4 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
   );
 };
 
-export default DecreaseMetrics;
+export default EachSellerDecreaseMetrics;
