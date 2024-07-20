@@ -11,7 +11,6 @@ import {
 } from "recharts";
 
 const Chart = ({ data, selectedSellerIndex }: StockDetailProps) => {
-  console.log("selectedSellerIndex =", selectedSellerIndex);
   // date以外のキーを取得して、出品者全員のキーを格納した配列を得る。
   // data.flatMapを使用して、data内のすべてのオブジェクトのキーを収集します。
   // filter(key => key !== 'date')でdateキーを除外します。
@@ -93,10 +92,10 @@ const Chart = ({ data, selectedSellerIndex }: StockDetailProps) => {
                   index === 0 && selectedSellerIndex === 0
                     ? 1.75
                     : index === 0 && selectedSellerIndex !== 0
-                    ? 0.25
+                    ? 0.2
                     : index === selectedSellerIndex!
-                    ? 1.75
-                    : 0.25
+                    ? 2
+                    : 0.3
                 }
               />
             ))}

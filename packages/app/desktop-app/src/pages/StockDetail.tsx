@@ -207,10 +207,6 @@ const StockDetail = () => {
   // Chat.tsx > <Legend> との共通単位がindexなので、それをpropsで受け渡し
   const [selectedSellerIndex, setSelectedSellerIndex] = useState<number>(0);
 
-  useEffect(() => {
-    console.log("selectedSellerIndex in StockDetail =", selectedSellerIndex);
-  }, [selectedSellerIndex]);
-
   // startDateとendDateの時間部分をリセットする関数
   const resetTime = (date: Date) => {
     date.setHours(0, 0, 0, 0);

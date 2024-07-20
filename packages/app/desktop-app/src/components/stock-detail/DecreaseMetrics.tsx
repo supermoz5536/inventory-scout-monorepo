@@ -47,13 +47,9 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
         const keys = Object.keys(currentData).filter(
           (key) => key !== "FBA全体在庫" && key !== "date"
         );
-        // console.log("keys =", keys);
-        const isDecreaseAll = keys.every((key) => {
-          // console.log("key =", key);
+        const isDecrease = keys.every((key) => {
           const prevSellerStock = prevData[key] ?? null;
           const currentSellerStock = currentData[key] ?? null;
-          // console.log("prevData =", prevData[key]);
-          // console.log("currentSellerStock =", currentSellerStock[key]);
           return (
             prevSellerStock &&
             currentSellerStock &&
@@ -62,7 +58,7 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
         });
 
         // console.log("isDecreaseAll =", isDecreaseAll);
-        if (!isDecreaseAll && prevData["FBA全体在庫"] !== null) {
+        if (!isDecrease && prevData["FBA全体在庫"] !== null) {
           ++increaseCount;
           return acc;
         }
