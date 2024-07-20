@@ -110,7 +110,9 @@ declare global {
   interface StockDetailProps {
     columnHeader?: string[];
     data?: any;
+    selectedSellerIndex?: number | null;
     onChange?: (dates: [Date, Date]) => void;
+    setSelectedSellerIndex?: (index: number) => void;
   }
 }
 
