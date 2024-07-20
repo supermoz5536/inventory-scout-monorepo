@@ -21,6 +21,16 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
+  // 日付文字列を1日前にする関数
+  const getPreviousDateString = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() - 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+
   return (
     <TableContainer
       component={Paper}
@@ -50,11 +60,30 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {safeData.map((row: any, rowIndex: any) => (
+          {safeData.map((row: any, rowIndex: number) => (
             <TableRow key={rowIndex}>
-              {safecolumnHeader.map((column) => (
-                <TableCell key={column}>{row[column]}</TableCell>
-              ))}
+              {safecolumnHeader.map((column, index) => {
+                const currentData = row[column];
+                const previousDate = getPreviousDateString(column);
+                const previousData =
+                  rowIndex > 0 ? safeData[rowIndex][previousDate] : undefined;
+                const isIncrease =
+                  typeof currentData === "number" &&
+                  typeof previousData === "number" &&
+                  currentData > previousData;
+
+                return (
+                  <TableCell
+                    key={column}
+                    sx={{
+                      color: index > 1 && isIncrease ? "#ff6666" : "#000000",
+                      fontWeight: index > 1 && isIncrease ? "bold" : null,
+                    }}
+                  >
+                    {currentData}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))}
         </TableBody>
