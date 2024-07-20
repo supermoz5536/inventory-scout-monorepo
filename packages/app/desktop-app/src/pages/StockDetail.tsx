@@ -2,9 +2,16 @@ import React, { useEffect, useState } from "react";
 import { format, parseISO, subDays } from "date-fns";
 import Calender from "../components/stock-detail/Calender";
 import Table from "../components/stock-detail/Table";
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Chart from "../components/stock-detail/Chart";
 import DecreaseMetrics from "../components/stock-detail/DecreaseMetrics";
+import InfoIcon from "@mui/icons-material/Info";
 
 const StockDetail = () => {
   // コンポーネントマウント時に
@@ -218,6 +225,11 @@ const StockDetail = () => {
         }}
       >
         <DecreaseMetrics data={chartDataList} />
+        <Tooltip title="This is a tooltip description" arrow>
+          <IconButton>
+            <InfoIcon />
+          </IconButton>
+        </Tooltip>
         <Calender onChange={setDateRange} />
       </div>
       <Table columnHeader={tableColumnHeader} data={tableData} />
