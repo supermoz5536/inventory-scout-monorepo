@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import React from "react";
 import {
   CartesianGrid,
@@ -36,45 +37,70 @@ const Chart = ({ data }: StockDetailProps) => {
     "#d885f7",
   ];
 
+  // データの長さに応じてチャートの幅を決定する
+  const chartWidth = Math.max(1180, data.length * 60);
   return (
     <>
-      <LineChart
-        width={1150}
-        height={300}
-        data={data}
-        margin={{
-          top: 0,
-          right: 0,
-          left: 5,
-          bottom: 0,
+      <Box
+        sx={{
+          overflowX: "auto",
+          overflowY: "hidden",
+          width: 1180,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          interval={0}
-          dx={-2.5}
-          dy={7.5}
-          tick={{
-            fontSize: 12,
-            fill: "#666666",
-          }}
-        />
-        <YAxis
-          label={{ value: "在庫数", angle: -90, position: "insideLeft" }}
-        />
+        <Box sx={{ minWidth: 1180, width: chartWidth }}>
+          <LineChart
+            width={chartWidth} // データ数に応じて幅を動的に変更
+            height={340}
+            data={data}
+            margin={{
+              top: 20,
+              right: 0,
+              left: 5,
+              bottom: 0,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="date"
+              interval={0}
+              dx={-2.5}
+              dy={7.5}
+              tick={{
+                fontSize: 12,
+                fill: "#666666",
+              }}
+              tickSize={5} // メモリのサイズを調整
+              tickMargin={5} // メモリとラベルの間隔を調整
+              tickFormatter={(tick) => {
+                // ラベルのフォーマットを調整して、表示内容を短縮
+                const date = new Date(tick);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+              }}
+            />
+            <YAxis
+              label={{ value: "在庫数", angle: -90, position: "insideLeft" }}
+            />
 
-        {keys.map((key: any, index: any) => (
-          <Line
-            key={index}
-            type="monotone"
-            dataKey={key}
-            stroke={colors[index % colors.length]} // 配列の色を順番に使う
-          />
-        ))}
-        <Legend wrapperStyle={{ paddingTop: 10, paddingBottom: 7.5 }} />
-        <Tooltip />
-      </LineChart>
+            {keys.map((key: any, index: any) => (
+              <Line
+                key={index}
+                type="monotone"
+                dataKey={key}
+                stroke={colors[index % colors.length]} // 配列の色を順番に使う
+                strokeWidth={index === 0 ? 1.5 : 0.5}
+              />
+            ))}
+            <Legend
+              wrapperStyle={{
+                paddingTop: 10,
+                paddingBottom: 7.5,
+              }}
+            />
+            <Tooltip />
+          </LineChart>
+        </Box>
+      </Box>
     </>
   );
 };
