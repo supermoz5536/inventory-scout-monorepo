@@ -22,9 +22,9 @@ const EachSellerDecreaseMetrics = ({
   setSelectedSellerIndex,
 }: StockDetailProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [totalDecrease, settotalDecrease] = useState<number>(0);
+  const [totalDecrease, setTotalDecrease] = useState<number>(0);
   const [dayAverage, setDayAverage] = useState<number>(0);
-  const columnHeader = ["各セラーの減少数", "日次", "週次", "月次"];
+  const columnHeader = ["space-holder", "日次", "週次", "月次"];
   const decreaseMetricsData = [
     {
       在庫変動数: totalDecrease,
@@ -46,77 +46,15 @@ const EachSellerDecreaseMetrics = ({
 
   let decreaseCount: number = 0;
   let increaseCount: number = 0;
+
   // ========================================================================
 
   useEffect(() => {
-    const result = data.reduce(
-      (acc: number, currentData: any, index: number, array: any) => {
-        if (index === 0) return acc; // 最初の要素には前日がないためスキップ
-
-        // 現在処理してる日付のオブジェクトとその前の日のオブジェクトの差分をとる
-        const prevData = array[index - 1];
-        const currentTotalStock = currentData["FBA全体在庫"] ?? null;
-        const prevTotalStock = prevData["FBA全体在庫"] ?? null;
-
-        // ■ 各セラーでの増加（補充）フィルター処理
-        // オブジェクト内の "FBA全体在庫"以外の全てのセラーキーを取得し
-        // 「currentStock」「prevStock」を算出して
-        // そのうち一人でも、在庫が増えてるセラーがいたら
-        // ++increaseCount; を実行してスキップ
-        // イテレートな処理で真偽値が帰ってくるようにすればいい
-        const keys = Object.keys(currentData).filter(
-          (key) => key !== "FBA全体在庫" && key !== "date"
-        );
-        const isDecreaseAll = keys.every((key) => {
-          const prevSellerStock = prevData[key] ?? null;
-          const currentSellerStock = currentData[key] ?? null;
-          return (
-            prevSellerStock &&
-            currentSellerStock &&
-            prevSellerStock >= currentSellerStock
-          );
-        });
-
-        if (!isDecreaseAll && prevData["FBA全体在庫"] !== null) {
-          ++increaseCount;
-          return acc;
-        }
-
-        // ■ 合算処理
-        // 増加（補充）してるセラーがいない
-        // かつ
-        // "FBA全体在庫" の値が前日と当日にある
-        // その場合は合算処理
-        if (
-          prevTotalStock &&
-          currentTotalStock &&
-          prevTotalStock >= currentTotalStock
-        ) {
-          const difference = prevTotalStock - currentTotalStock;
-          // if (difference >= 0) {
-          // 減少 or 同じ値の場合
-          ++decreaseCount;
-          return (acc = acc + difference);
-        } else {
-          // "FBA全体在庫" の値が
-          // 前日と当日のどちらかで欠けてる場合はスキップ
-          return acc;
-        }
-      },
-      0
-    );
-
-    // 日次の平均減少数を算出する、その際に
-    // 指定期間の最初の日付はスキップしてるので -1 する。
-    // 算出した値を増加日をスキップした回数分だけ加える。
-    // これで増加日の減少数を
-    // 日次の平均減少数シミュレートしたことになる。
-    const newDayAverage = result / decreaseCount;
-    const newTotalDecrease = result + newDayAverage * increaseCount;
-    // Math.round : 小数点以下を四捨五入
-    setDayAverage(Math.round(newDayAverage));
-    settotalDecrease(Math.round(newTotalDecrease));
-  }, [data]);
+    if (selectedIndex === 0) {
+      setTotalDecrease(0);
+      setDayAverage(0);
+    }
+  }, [data, selectedIndex]);
 
   // ========================================================================
 
@@ -124,7 +62,6 @@ const EachSellerDecreaseMetrics = ({
     setSelectedIndex(event.target.value);
     if (setSelectedSellerIndex) {
       setSelectedSellerIndex(event.target.value);
-      console.log("handleMenu トリガー");
     }
   };
 
@@ -133,9 +70,10 @@ const EachSellerDecreaseMetrics = ({
       <TableContainer
         component={Paper}
         sx={{
-          marginTop: 5,
+          maxWidth: "375px",
+          marginTop: 3.25,
           marginBottom: 0,
-          marginLeft: 14,
+          marginLeft: 10,
           padding: "12px", // パディング
           boxShadow: "0 2px 5px rgba(0, 0, 0, 0.25)", // 影のスタイル
           backgroundColor: "#FEFEFE", // 背景色
@@ -150,8 +88,10 @@ const EachSellerDecreaseMetrics = ({
                   key={column}
                   sx={{
                     maxHeight: "5px",
+                    maxWidth: "120px", // Select自体の横を設定
                     minWidth: "40px",
-                    padding: "4px", // Padding adjustment
+                    paddingY: "4px", // Padding adjustment
+                    paddingX: "4px", // Padding adjustment
                     lineHeight: "1rem", // Line height adjustment
                     border: "1px solid #ccc", // Border style
                     textAlign: "center", // Center align text
@@ -161,16 +101,28 @@ const EachSellerDecreaseMetrics = ({
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label"></InputLabel>
                       <Select
-                        value={
-                          selectedIndex === 0 ? "" : keysFixed[selectedIndex]
-                        }
+                        value={selectedIndex}
                         onChange={(event) => {
                           handleMenu(event);
                         }}
-                        sx={{}}
+                        sx={{
+                          height: "30px", // Select自体の高さを設定
+                          width: "150px", // Select自体の横を設定
+                          maxHeight: "30px", // Select自体の高さを設定
+                          maxWidth: "150px", // Select自体の横を設定
+                        }}
                       >
                         {keysFixed.map((key: any, sellerIndex) => {
-                          return <MenuItem value={sellerIndex}>{key}</MenuItem>;
+                          return (
+                            <MenuItem
+                              value={sellerIndex}
+                              sx={{
+                                maxWidth: "120px", // Select自体の横を設定
+                              }}
+                            >
+                              {key}
+                            </MenuItem>
+                          );
                         })}
                       </Select>
                     </FormControl>

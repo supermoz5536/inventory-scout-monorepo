@@ -33,7 +33,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
         marginLeft: 8,
         marginBottom: 0,
         // bgcolor: "background.paper", // 背景色を設定
-        boxShadow: "0 1px 7px rgba(0, 0, 0, 0.25)", // 影のスタイル
+        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.25)", // 影のスタイル
         backgroundColor: "#FEFEFE", // 背景色
         padding: "16px", // パディング
         borderRadius: "0px", // 角の丸み
