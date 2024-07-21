@@ -148,7 +148,7 @@ const EachSellerDecreaseMetrics = ({
       <TableContainer
         component={Paper}
         sx={{
-          maxWidth: "400px",
+          maxWidth: "350px",
           marginTop: 3.25,
           marginBottom: 0,
           marginLeft: 7.5,
@@ -162,34 +162,11 @@ const EachSellerDecreaseMetrics = ({
           <TableHead>
             <TableRow>
               {columnHeader.map((column, index) => (
-                // <Tooltip
-                //   title={
-                //     index === 0
-                //       ? "各セラーの指定期間内の在庫減少数の推測値です。在庫の増加している日付では、FBA全体在庫と同様の計算をします。個別最適値を算出するため各セラーの減少数の合計は、FBA全体在庫の減少数と必ずしも一致しません。"
-                //       : index === 1
-                //       ? "指定期間内の１日あたりの減少数の平均値です。"
-                //       : index === 2
-                //       ? "指定期間内の1週間あたりの減少数の平均値です。"
-                //       : "指定期間内の1ヶ月あたりの減少数の平均値です。"
-                //   }
-                //   placement="top"
-                //   arrow
-                //   PopperProps={{
-                //     modifiers: [
-                //       {
-                //         name: "offset",
-                //         options: {
-                //           offset: [0, -5], // ここでピクセル単位で位置を調整
-                //         },
-                //       },
-                //     ],
-                //   }}
-                // >
                 <TableCell
                   key={column}
                   sx={{
                     maxHeight: "5px",
-                    maxWidth: "120px", // Select自体の横を設定
+                    maxWidth: "130px", // Select自体の横を設定
                     minWidth: "40px",
                     paddingY: "4px", // Padding adjustment
                     paddingX: "4px", // Padding adjustment
@@ -253,7 +230,7 @@ const EachSellerDecreaseMetrics = ({
                       >
                         <IconButton
                           sx={{
-                            marginLeft: "-40px",
+                            marginLeft: "-39.5px",
                             width: "35px", // 必要に応じて幅を固定
                             height: "35px", // 必要に応じて高さを固定
                             borderRadius: "50%", // 円形にする
@@ -273,7 +250,6 @@ const EachSellerDecreaseMetrics = ({
                     column
                   )}
                 </TableCell>
-                // </Tooltip>
               ))}
             </TableRow>
           </TableHead>

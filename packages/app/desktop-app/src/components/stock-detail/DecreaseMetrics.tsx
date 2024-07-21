@@ -78,7 +78,7 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
                   <TableCell
                     key={column}
                     sx={{
-                      height: "30px",
+                      height: "35px",
                       maxHeight: "5px",
                       minWidth: "40px",
                       padding: "4px", // Padding adjustment
