@@ -14,8 +14,9 @@ import {
 } from "../slices/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 import {
-  calculateDecreaseTodayTo7DaysAgo,
+  CalculateDecrease,
   calculateDecreaseTodayToYesterday,
+  prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 
 function Top() {
@@ -262,6 +263,11 @@ function Top() {
 
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
+  };
+
+  const handleDecrease2 = (asinData: AsinData) => {
+    const data = prepareDataForCalculateDecrease(asinData);
+    return CalculateDecrease(data).newTotalDecrease;
   };
 
   /// スクレイピング残り時間の表示を動的に変更します。
@@ -551,11 +557,7 @@ function Top() {
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>
-                  {calculateDecreaseTodayTo7DaysAgo(asinData) === -1
-                    ? ""
-                    : calculateDecreaseTodayTo7DaysAgo(asinData)}
-                </p>
+                <p>{handleDecrease2(asinData)}</p>
               </div>
 
               {/* 要素11 最新取得 */}
