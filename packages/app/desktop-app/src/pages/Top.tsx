@@ -13,6 +13,10 @@ import {
   changeShowButtonStatus,
 } from "../slices/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
+import {
+  calculateDecreaseTodayTo7DaysAgo,
+  calculateDecreaseTodayToYesterday,
+} from "../util/calculateDecrease";
 
 function Top() {
   const asinDataList = useSelector(
@@ -538,12 +542,20 @@ function Top() {
 
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease1 === -1 ? "" : asinData.decrease1}</p>
+                <p>
+                  {calculateDecreaseTodayToYesterday(asinData) === -1
+                    ? ""
+                    : calculateDecreaseTodayToYesterday(asinData)}
+                </p>
               </div>
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease2 === -1 ? "" : asinData.decrease2}</p>
+                <p>
+                  {calculateDecreaseTodayTo7DaysAgo(asinData) === -1
+                    ? ""
+                    : calculateDecreaseTodayTo7DaysAgo(asinData)}
+                </p>
               </div>
 
               {/* 要素11 最新取得 */}
