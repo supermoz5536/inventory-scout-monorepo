@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { CalculateDecrease } from "../../util/calculateDecrease";
@@ -37,7 +38,7 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
       <TableContainer
         component={Paper}
         sx={{
-          maxWidth: "375px",
+          maxWidth: "350px",
           marginTop: 3.25,
           marginBottom: 0,
           marginLeft: 8,
@@ -51,21 +52,45 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
           <TableHead>
             <TableRow>
               {columnHeader.map((column, index) => (
-                <TableCell
-                  key={column}
-                  sx={{
-                    height: "30px",
-                    maxHeight: "5px",
-                    minWidth: "40px",
-                    padding: "4px", // Padding adjustment
-                    lineHeight: "1rem", // Line height adjustment
-                    border: "1px solid #ccc", // Border style
-                    textAlign: "center", // Center align text
-                    color: index === 0 ? "#ff0092" : null,
+                <Tooltip
+                  title={
+                    index === 0
+                      ? "全体在庫"
+                      : index === 1
+                      ? "日"
+                      : index === 2
+                      ? "週"
+                      : "月"
+                  }
+                  placement="top"
+                  arrow
+                  PopperProps={{
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -5], // ここでピクセル単位で位置を調整
+                        },
+                      },
+                    ],
                   }}
                 >
-                  {column}
-                </TableCell>
+                  <TableCell
+                    key={column}
+                    sx={{
+                      height: "30px",
+                      maxHeight: "5px",
+                      minWidth: "40px",
+                      padding: "4px", // Padding adjustment
+                      lineHeight: "1rem", // Line height adjustment
+                      border: "1px solid #ccc", // Border style
+                      textAlign: "center", // Center align text
+                      color: index === 0 ? "#ff0092" : null,
+                    }}
+                  >
+                    {column}
+                  </TableCell>
+                </Tooltip>
               ))}
             </TableRow>
           </TableHead>

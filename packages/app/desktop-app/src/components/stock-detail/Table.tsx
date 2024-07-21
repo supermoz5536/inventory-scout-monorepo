@@ -9,7 +9,10 @@ import {
   Paper,
   Card,
   Grid,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 
 const Table = ({ columnHeader, data }: StockDetailProps) => {
   const safecolumnHeader = columnHeader ? columnHeader : [];
@@ -54,7 +57,43 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
           <TableRow>
             {safecolumnHeader.map((column) => (
               <TableCell key={column}>
-                {column.includes("-") ? formatDate(column) : column}
+                {column.includes("-") ? (
+                  formatDate(column)
+                ) : (
+                  <Tooltip
+                    title="ぷらぷらー"
+                    arrow
+                    placement="right"
+                    PopperProps={{
+                      modifiers: [
+                        {
+                          name: "offset",
+                          options: {
+                            offset: [0, -5], // ここでピクセル単位で位置を調整
+                          },
+                        },
+                      ],
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        marginTop: "-45px",
+                        marginLeft: "-32px",
+                        width: "35px", // 必要に応じて幅を固定
+                        height: "35px", // 必要に応じて高さを固定
+                        borderRadius: "50%", // 円形にする
+                        top: "1%",
+                        left: "6%",
+                      }}
+                    >
+                      <InfoIcon
+                        sx={{
+                          color: "#E0E0E0",
+                        }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </TableCell>
             ))}
           </TableRow>
@@ -80,7 +119,13 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                       fontWeight: index > 1 && isIncrease ? "bold" : null,
                     }}
                   >
-                    {currentData}
+                    {index > 1 && isIncrease ? (
+                      <Tooltip title="This is a tooltip description" arrow>
+                        <span>{currentData}</span>
+                      </Tooltip>
+                    ) : (
+                      currentData
+                    )}
                   </TableCell>
                 );
               })}

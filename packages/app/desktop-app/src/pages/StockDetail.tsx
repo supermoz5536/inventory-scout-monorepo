@@ -186,11 +186,6 @@ const StockDetail = () => {
           data={chartDataList}
           setSelectedSellerIndex={setSelectedSellerIndex}
         />
-        {/* <Tooltip title="This is a tooltip description" arrow>
-          <IconButton>
-            <InfoIcon />
-          </IconButton>
-        </Tooltip> */}
         <Calender onChange={setDateRange} />
       </div>
       <Table columnHeader={tableColumnHeader} data={tableData} />
