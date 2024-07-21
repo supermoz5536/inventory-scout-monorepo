@@ -160,78 +160,78 @@ const EachSellerDecreaseMetrics = ({
           <TableHead>
             <TableRow>
               {columnHeader.map((column, index) => (
-                <Tooltip
-                  title={
-                    index === 0
-                      ? "全体在庫"
-                      : index === 1
-                      ? "日"
-                      : index === 2
-                      ? "週"
-                      : "月"
-                  }
-                  placement="top"
-                  arrow
-                  PopperProps={{
-                    modifiers: [
-                      {
-                        name: "offset",
-                        options: {
-                          offset: [0, -5], // ここでピクセル単位で位置を調整
-                        },
-                      },
-                    ],
+                // <Tooltip
+                //   title={
+                //     index === 0
+                //       ? "選択したセラーの指定期間内の在庫減少数です。在庫の増加している日付では、近似値として１日あたりの平均減少数(右隣の日次)の値に差し替えて計算しています。"
+                //       : index === 1
+                //       ? "指定期間内の１日あたりの減少数の平均値です。"
+                //       : index === 2
+                //       ? "指定期間内の1週間あたりの減少数の平均値です。"
+                //       : "指定期間内の1ヶ月あたりの減少数の平均値です。"
+                //   }
+                //   placement="top"
+                //   arrow
+                //   PopperProps={{
+                //     modifiers: [
+                //       {
+                //         name: "offset",
+                //         options: {
+                //           offset: [0, -5], // ここでピクセル単位で位置を調整
+                //         },
+                //       },
+                //     ],
+                //   }}
+                // >
+                <TableCell
+                  key={column}
+                  sx={{
+                    maxHeight: "5px",
+                    maxWidth: "120px", // Select自体の横を設定
+                    minWidth: "40px",
+                    paddingY: "4px", // Padding adjustment
+                    paddingX: "4px", // Padding adjustment
+                    lineHeight: "1rem", // Line height adjustment
+                    border: "1px solid #ccc", // Border style
+                    textAlign: "center", // Center align text
                   }}
                 >
-                  <TableCell
-                    key={column}
-                    sx={{
-                      maxHeight: "5px",
-                      maxWidth: "120px", // Select自体の横を設定
-                      minWidth: "40px",
-                      paddingY: "4px", // Padding adjustment
-                      paddingX: "4px", // Padding adjustment
-                      lineHeight: "1rem", // Line height adjustment
-                      border: "1px solid #ccc", // Border style
-                      textAlign: "center", // Center align text
-                    }}
-                  >
-                    {index === 0 ? (
-                      <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label"></InputLabel>
-                        <Select
-                          value={selectedIndex}
-                          onChange={(event) => {
-                            handleMenu(event);
-                          }}
-                          sx={{
-                            height: "30px", // Select自体の高さを設定
-                            width: "150px", // Select自体の横を設定
-                            maxHeight: "30px", // Select自体の高さを設定
-                            maxWidth: "150px", // Select自体の横を設定
-                            color: colors[selectedIndex],
-                          }}
-                        >
-                          {keysFixed.map((key: any, sellerIndex) => {
-                            return (
-                              <MenuItem
-                                value={sellerIndex}
-                                sx={{
-                                  color: colors[sellerIndex],
-                                  maxWidth: "120px", // Select自体の横を設定
-                                }}
-                              >
-                                {key}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                    ) : (
-                      column
-                    )}
-                  </TableCell>
-                </Tooltip>
+                  {index === 0 ? (
+                    <FormControl fullWidth>
+                      <InputLabel id="demo-simple-select-label"></InputLabel>
+                      <Select
+                        value={selectedIndex}
+                        onChange={(event) => {
+                          handleMenu(event);
+                        }}
+                        sx={{
+                          height: "30px", // Select自体の高さを設定
+                          width: "150px", // Select自体の横を設定
+                          maxHeight: "30px", // Select自体の高さを設定
+                          maxWidth: "150px", // Select自体の横を設定
+                          color: colors[selectedIndex],
+                        }}
+                      >
+                        {keysFixed.map((key: any, sellerIndex) => {
+                          return (
+                            <MenuItem
+                              value={sellerIndex}
+                              sx={{
+                                color: colors[sellerIndex],
+                                maxWidth: "120px", // Select自体の横を設定
+                              }}
+                            >
+                              {key}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    column
+                  )}
+                </TableCell>
+                // {/* </Tooltip> */}
               ))}
             </TableRow>
           </TableHead>

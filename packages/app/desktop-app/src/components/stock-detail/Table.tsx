@@ -61,7 +61,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                   formatDate(column)
                 ) : (
                   <Tooltip
-                    title="ぷらぷらー"
+                    title="各セラーの日付別の在庫数一覧です。"
                     arrow
                     placement="right"
                     PopperProps={{
@@ -120,7 +120,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                     }}
                   >
                     {index > 1 && isIncrease ? (
-                      <Tooltip title="This is a tooltip description" arrow>
+                      <Tooltip title="在庫が増加しています。" arrow>
                         <span>{currentData}</span>
                       </Tooltip>
                     ) : (
