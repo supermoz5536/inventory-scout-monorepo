@@ -13,6 +13,11 @@ import {
   changeShowButtonStatus,
 } from "../slices/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
+import {
+  CalculateDecrease,
+  calculateDecreaseTodayToYesterday,
+  prepareDataForCalculateDecrease,
+} from "../util/calculateDecrease";
 
 function Top() {
   const asinDataList = useSelector(
@@ -258,6 +263,11 @@ function Top() {
 
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
+  };
+
+  const handleDecrease2 = (asinData: AsinData) => {
+    const data = prepareDataForCalculateDecrease(asinData);
+    return CalculateDecrease(data).newTotalDecrease;
   };
 
   /// スクレイピング残り時間の表示を動的に変更します。
@@ -538,12 +548,16 @@ function Top() {
 
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease1 === -1 ? "" : asinData.decrease1}</p>
+                <p>
+                  {calculateDecreaseTodayToYesterday(asinData) === -1
+                    ? ""
+                    : calculateDecreaseTodayToYesterday(asinData)}
+                </p>
               </div>
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{asinData.decrease2 === -1 ? "" : asinData.decrease2}</p>
+                <p>{handleDecrease2(asinData)}</p>
               </div>
 
               {/* 要素11 最新取得 */}

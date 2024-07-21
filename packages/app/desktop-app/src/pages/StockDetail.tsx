@@ -13,6 +13,8 @@ import Chart from "../components/stock-detail/Chart";
 import DecreaseMetrics from "../components/stock-detail/DecreaseMetrics";
 import InfoIcon from "@mui/icons-material/Info";
 import EachSellerDecreaseMetrics from "../components/stock-detail/EachSellerDecreaseMetrics";
+import { resetTime } from "../util/dateFormatter";
+import { prepareDataForCalculateDecrease } from "../util/calculateDecrease";
 
 const StockDetail = () => {
   // コンポーネントマウント時に
@@ -148,57 +150,11 @@ const StockDetail = () => {
 
   // Chartコンポーネントに渡すデータの生成関数です
   useEffect(() => {
-    // ① 変更された日付範囲において、各日のオブジェクトを処理
-    const startDate = resetTime(new Date(dateRange[0]));
-    const endDate = resetTime(new Date(dateRange[1]));
-
-    let newChartDataList: any[] = [];
-    let currentDate = new Date(startDate); // startDateのコピーを作成
-
-    // 日付のキーと値だけ設定されてる
-    // チャートの各グリッドに割り当てるデータを用意
-    while (currentDate <= endDate) {
-      const formattedDate = format(currentDate, "yyyy-MM-dd");
-      let newEachDayData: any = { date: formattedDate };
-
-      // 必要な情報は
-      // 各日付(currentDate)に対して
-      // 各セラーのstockCountDatas配列内の要素で
-      // currentDateと一致するキーを持つオブジェクトを見つけ
-      // セラー名をキーとするプロパティを追加して、そのキーの値(在庫数)を代入
-      targetAsinData.fbaSellerDatas.forEach((fbaSellerData) => {
-        return fbaSellerData.stockCountDatas.forEach(
-          (stockCountData: StockCountData) => {
-            if (Object.keys(stockCountData)[0] === formattedDate) {
-              newEachDayData[fbaSellerData.sellerName] =
-                stockCountData[formattedDate];
-            }
-          }
-        );
-      });
-
-      // 最後にASIN全体の在庫分のチャートライン用データを用意する
-      // dateキーを除く全てのキーを取得し
-      const keysWithoutDate: string[] = Object.keys(newEachDayData).filter(
-        (key) => key !== "date"
-      );
-
-      // それぞれの値を合計する
-      const totalStock: number | null = keysWithoutDate.reduce((acc, key) => {
-        return acc + newEachDayData[key];
-      }, null);
-
-      // 同じくnewChartDataの新規プロパティ("在庫合計")に値を代入する
-      newEachDayData = { FBA全体在庫: totalStock, ...newEachDayData };
-
-      // 該当の日付の各セラーの販売数を格納したオブジェクトを
-      // Chartコンポーネントに渡す配列に追加
-      newChartDataList.push(newEachDayData);
-
-      // 次の日付の処理へ
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    setChartDataList(newChartDataList);
+    const newPreparedDataList = prepareDataForCalculateDecrease(
+      targetAsinData,
+      dateRange
+    );
+    setChartDataList(newPreparedDataList);
   }, [targetAsinData, dateRange]);
 
   // ======================================================================
@@ -206,12 +162,6 @@ const StockDetail = () => {
   // EachSellerDecreaseMetricsコンポーネントで選択されたセラー情報を格納する変数
   // Chat.tsx > <Legend> との共通単位がindexなので、それをpropsで受け渡し
   const [selectedSellerIndex, setSelectedSellerIndex] = useState<number>(0);
-
-  // startDateとendDateの時間部分をリセットする関数
-  const resetTime = (date: Date) => {
-    date.setHours(0, 0, 0, 0);
-    return date;
-  };
 
   return (
     <>
