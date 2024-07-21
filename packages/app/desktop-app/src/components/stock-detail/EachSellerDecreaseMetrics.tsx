@@ -15,8 +15,10 @@ import {
   Select,
   MenuItem,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import InfoIcon from "@mui/icons-material/Info";
 
 const EachSellerDecreaseMetrics = ({
   data,
@@ -146,7 +148,7 @@ const EachSellerDecreaseMetrics = ({
       <TableContainer
         component={Paper}
         sx={{
-          maxWidth: "350px",
+          maxWidth: "400px",
           marginTop: 3.25,
           marginBottom: 0,
           marginLeft: 7.5,
@@ -163,7 +165,7 @@ const EachSellerDecreaseMetrics = ({
                 // <Tooltip
                 //   title={
                 //     index === 0
-                //       ? "選択したセラーの指定期間内の在庫減少数です。在庫の増加している日付では、近似値として１日あたりの平均減少数(右隣の日次)の値に差し替えて計算しています。"
+                //       ? "各セラーの指定期間内の在庫減少数の推測値です。在庫の増加している日付では、FBA全体在庫と同様の計算をします。個別最適値を算出するため各セラーの減少数の合計は、FBA全体在庫の減少数と必ずしも一致しません。"
                 //       : index === 1
                 //       ? "指定期間内の１日あたりの減少数の平均値です。"
                 //       : index === 2
@@ -197,41 +199,81 @@ const EachSellerDecreaseMetrics = ({
                   }}
                 >
                   {index === 0 ? (
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label"></InputLabel>
-                      <Select
-                        value={selectedIndex}
-                        onChange={(event) => {
-                          handleMenu(event);
-                        }}
-                        sx={{
-                          height: "30px", // Select自体の高さを設定
-                          width: "150px", // Select自体の横を設定
-                          maxHeight: "30px", // Select自体の高さを設定
-                          maxWidth: "150px", // Select自体の横を設定
-                          color: colors[selectedIndex],
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label"></InputLabel>
+                        <Select
+                          value={selectedIndex}
+                          onChange={(event) => {
+                            handleMenu(event);
+                          }}
+                          sx={{
+                            marginTop: "2.5px",
+                            height: "30px", // Select自体の高さを設定
+                            width: "130px", // Select自体の横を設定
+                            maxHeight: "30px", // Select自体の高さを設定
+                            maxWidth: "150px", // Select自体の横を設定
+                            color: colors[selectedIndex],
+                          }}
+                        >
+                          {keysFixed.map((key: any, sellerIndex) => {
+                            return (
+                              <MenuItem
+                                value={sellerIndex}
+                                sx={{
+                                  color: colors[sellerIndex],
+                                  maxWidth: "120px", // Select自体の横を設定
+                                }}
+                              >
+                                {key}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                      <Tooltip
+                        title="各セラーの指定期間内の在庫減少数の推測値です。在庫の増加している日付ではFBA全体在庫と同様の計算をします。個別最適値を算出するため、各セラーの減少数の合計は、FBA全体在庫の減少数と必ずしも一致しません。"
+                        arrow
+                        placement="right"
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: "offset",
+                              options: {
+                                offset: [0, -5], // ここでピクセル単位で位置を調整
+                              },
+                            },
+                          ],
                         }}
                       >
-                        {keysFixed.map((key: any, sellerIndex) => {
-                          return (
-                            <MenuItem
-                              value={sellerIndex}
-                              sx={{
-                                color: colors[sellerIndex],
-                                maxWidth: "120px", // Select自体の横を設定
-                              }}
-                            >
-                              {key}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </FormControl>
+                        <IconButton
+                          sx={{
+                            marginLeft: "-40px",
+                            width: "35px", // 必要に応じて幅を固定
+                            height: "35px", // 必要に応じて高さを固定
+                            borderRadius: "50%", // 円形にする
+                            top: "1%",
+                            left: "6%",
+                          }}
+                        >
+                          <InfoIcon
+                            sx={{
+                              color: "#E0E0E0",
+                            }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
                   ) : (
                     column
                   )}
                 </TableCell>
-                // {/* </Tooltip> */}
+                // </Tooltip>
               ))}
             </TableRow>
           </TableHead>
