@@ -96,6 +96,10 @@ const scrapePromise = (async () => {
     launchBrowser: async () => {
       const browser = await puppeteer.launch({
         headless: false,
+        executablePath:
+          process.platform === "win32"
+            ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+            : undefined,
         args: [
           "--no-sandbox", // サンドボックスはセキュリティ機能であり、これを無効にすることでブラウザがより軽量に実行されます。
           "--disable-setuid-sandbox", // --no-sandboxと一緒に使われ、同様の理由でサンドボックスを無効にします。
@@ -548,6 +552,7 @@ const scrapePromise = (async () => {
         : // セラーIDのタグが見つからなかった場合
           null;
       console.log("B 0.0.4");
+
       // 出荷元名の抽出処理
       // 要素が存在する場合は
       // そのテキストを取得しトリムする
@@ -558,6 +563,7 @@ const scrapePromise = (async () => {
           }, shippingSourceElement)
         : null;
       console.log("B 0.0.5");
+
       // 販売元の名前を抽出
       // テキストコンテンツを取得しトリムする
       const sellerName = sellerNameElement
@@ -567,11 +573,13 @@ const scrapePromise = (async () => {
           }, sellerNameElement)
         : null;
       console.log("B 0.0.6");
+
       // 既存のリスト内に、fetchしたセラーIdがあるかを確認する
       const foundSellerData = asinData.fbaSellerDatas.find(
         (asinData) => asinData.sellerId === sellerId
       );
       console.log("B 0.0.7");
+
       // 既存のリストに含まれてるセラーで
       // かつ
       // 最新の出品者名の取得が成功した場合
@@ -582,9 +590,11 @@ const scrapePromise = (async () => {
         shippingSource == "Amazon"
       ) {
         console.log("B 0.0.8");
+
         // 取得したデータの出品者名を上書きする
         foundSellerData.sellerName = sellerName;
         console.log("B 0.0.9");
+
         // Amazon本体以外のFBAセラーの場合に
         // fbaSellerNOPにカウント
         ++totalFbaSeller.value;
@@ -598,6 +608,7 @@ const scrapePromise = (async () => {
         sellerName &&
         shippingSource == "Amazon"
       ) {
+        console.log("B 0.1.0");
         // FbaSellerData型オブジェクト（出品者）を追加する。
         const newSellerData: FbaSellerData = {
           sellerId: sellerId,
@@ -610,8 +621,10 @@ const scrapePromise = (async () => {
         // fbaSellerNOPにカウント
         ++totalFbaSeller.value;
       } else if (sellerName && shippingSource === "Amazon.co.jp") {
+        console.log("B 0.1.1");
         ++totalAmazonSeller.value;
       }
+      console.log("B 0.1.2");
     },
 
     reloadPage: async (page: Page) => {
@@ -888,9 +901,14 @@ const scrapePromise = (async () => {
 
     updateTotalStock: async (
       asinData: AsinData,
-      totalStock: { value: number }
+      totalStock: { value: number },
+      totalFbaSeller: { value: number }
     ) => {
-      asinData.totalStock = totalStock.value;
+      // 現在の仕様だと
+      // 出荷元が自社発送の場合でもカート画面に遷移して
+      // 在庫数を取得しているので
+      // FBAセラーが0人の場合は在庫合計を 0 に上書き
+      asinData.totalStock = totalFbaSeller.value === 0 ? 0 : totalStock.value;
     },
 
     updateFetchLatestDate: async (asinData: AsinData) => {
@@ -1020,7 +1038,11 @@ const scrapePromise = (async () => {
               console.log("totalFbaSeller = ", totalFbaSeller);
               await scrape.updateFbaSellerNOP(asinData, totalFbaSeller);
               // asinData.totalStockの更新
-              await scrape.updateTotalStock(asinData, totalStock);
+              await scrape.updateTotalStock(
+                asinData,
+                totalStock,
+                totalFbaSeller
+              );
               console.log("totalStock = ", totalStock);
               // asinData.fetchLatestDateの更新
               await scrape.updateFetchLatestDate(asinData);

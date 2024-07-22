@@ -43,7 +43,7 @@ app.whenReady().then(() => {
   // darwin はmacOXの意味
   const isMac = process.platform === "darwin";
   // メニューバーのアプリ変更はパッケージ化するまで反映されません
-  app.setName("Lスカウター");
+  app.setName("在庫スカウター（ベータ版）");
 
   // ■ macOS用のカスタムメニューアイテムを作成
   if (isMac) {
@@ -112,8 +112,15 @@ app.whenReady().then(() => {
       label: "ファイル",
       submenu: [
         {
+          label: "読み込み",
+          submenu: [{ label: "移行データ...", click: loadTransferData }],
+        },
+        {
           label: "書き出し",
-          submenu: [{ label: "CSV...", click: saveDataWithCSV }],
+          submenu: [
+            { label: "CSV...", click: saveDataWithCSV },
+            { label: "移行データ...", click: saveTransferData },
+          ],
         },
       ],
     });
@@ -195,6 +202,7 @@ ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
 ipcMain.handle("stopScraping", async () => {
   try {
     browser.close();
+    console.log("stopScrapingが実行されました");
   } catch (error) {
     console.error("stopScraping ERROR", error);
     return "stopScraping ERROR"; // エラーメッセージを返す
@@ -313,7 +321,7 @@ function createMainWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -353,7 +361,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // prefWindow.webContents.openDevTools();
+    prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -393,7 +401,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // loginPromptWindow.webContents.openDevTools();
+    loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -435,7 +443,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // StockDetailWindow.webContents.openDevTools();
+    StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して

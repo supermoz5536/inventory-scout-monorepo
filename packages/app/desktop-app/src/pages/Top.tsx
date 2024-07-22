@@ -267,22 +267,31 @@ function Top() {
 
   const handleDecrease2 = (asinData: AsinData) => {
     const data = prepareDataForCalculateDecrease(asinData);
-    return CalculateDecrease(data).newTotalDecrease;
+    const result = CalculateDecrease(data).newTotalDecrease;
+    return result;
   };
 
   /// スクレイピング残り時間の表示を動的に変更します。
   useEffect(() => {
     // asinDataListRef.currentをイテレート処理
     // isScraping === trueの要素の時に
-    // const remainingCount をインクリメント
-    // 要素1つにつき１分なのでそのまま表示
-    const remainingCount: number = asinDataListRef.current.reduce(
-      (totalCount: number, asinData: AsinData) => {
-        return asinData.isScraping === true ? ++totalCount : totalCount;
+    // const isScrapingCount をインクリメント
+    // 要素1つにつき１分なのでそのまま
+    const isScrapingTrueCount: number = asinDataListRef.current.reduce(
+      (acc: number, asinData: AsinData) => {
+        return asinData.isScraping === true ? ++acc : acc;
       },
       0
     );
-    setScrapeTimeLeft(remainingCount);
+
+    const isScrapingNullCount: number = asinDataListRef.current.reduce(
+      (acc: number, asinData: AsinData) => {
+        return asinData.isScraping === null ? ++acc : acc;
+      },
+      0
+    );
+
+    setScrapeTimeLeft(isScrapingTrueCount + isScrapingNullCount);
   }, [asinDataList]);
 
   /// ASIN数のカウント関数
@@ -294,11 +303,14 @@ function Top() {
   /// runScrapingの完了時に「取得停止」の表示の状態を
   /// 「取得開始」の表示の状態切り替える関数
   useEffect(() => {
-    // systemStatusの変更が 5 の場合は
-    // メインプロセスからの取得データの結果を
-    // 受信したコールバックでの変更なので
-    // そのコールバックでボタンを初期化する
-    if (systemStatus === 5) {
+    if (systemStatus === 2) {
+      dispatch(changeShowButtonStatus(1));
+
+      // systemStatusの変更が 5 の場合は
+      // メインプロセスからの取得データの結果を
+      // 受信したコールバックでの変更なので
+      // そのコールバックでボタンを初期化する
+    } else if (systemStatus === 5) {
       dispatch(changeShowButtonStatus(0));
     }
   }, [systemStatus]);
@@ -361,13 +373,13 @@ function Top() {
 
         <div className="top-square-space-menu-container-center">
           <p className="top-square-space-menu-container-center-total-stock">
-            FBA合計在庫: Amazon在庫数(非公開)は含みません
+            FBA合計在庫：Amazon本体の在庫数(非公開)は含みません
           </p>
           <p className="top-square-space-menu-container-center-decrease1">
-            減少１: 最新取得分の減少数(開発中)
+            減少１：「最新の取得分」と「その1つ前の取得分」における減少数
           </p>
           <p className="top-square-space-menu-container-center-decrease2">
-            減少２: 直近１週間の減少数(開発中)
+            減少２： 直近７日間の減少数
           </p>
           <input
             onChange={(event) => {
@@ -557,7 +569,12 @@ function Top() {
 
               {/* 要素10 週間の減少数 */}
               <div className="top-square-space-amazon-num">
-                <p>{handleDecrease2(asinData)}</p>
+                <p>
+                  {/* Number.isNaN(decreaseValue) を使用して NaN のチェックを行っています。 */}
+                  {Number.isNaN(handleDecrease2(asinData))
+                    ? ""
+                    : handleDecrease2(asinData)}
+                </p>
               </div>
 
               {/* 要素11 最新取得 */}
@@ -594,7 +611,7 @@ function Top() {
             : systemStatus === 2
             ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 3
-            ? `追加されたASINのデータを取得しています`
+            ? `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
             : systemStatus === 4
             ? `本日分のデータ取得は既に完了しています。`
             : systemStatus === 5

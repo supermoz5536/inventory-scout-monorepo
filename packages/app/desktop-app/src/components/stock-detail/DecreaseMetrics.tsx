@@ -109,7 +109,7 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
                       textAlign: "center", // Center align text
                     }}
                   >
-                    {value}
+                    {Number.isNaN(value) ? 0 : value}
                   </TableCell>
                 ))}
               </TableRow>
