@@ -88,42 +88,42 @@ const App: React.FC = () => {
           });
         }
 
-        // ⑦
-        // ■ 同日に前回の処理が中断されている場合の自動処理
-        if (
-          asinDataListRef.current.length > 0 &&
-          userRef.current.isAuthed === true
-        ) {
-          const today = new Date();
-          const todayFormatted = `${today.getFullYear()}-${String(
-            today.getMonth() + 1
-          ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        // // ⑦
+        // // ■ 同日に前回の処理が中断されている場合の自動処理
+        // if (
+        //   asinDataListRef.current.length > 0 &&
+        //   userRef.current.isAuthed === true
+        // ) {
+        //   const today = new Date();
+        //   const todayFormatted = `${today.getFullYear()}-${String(
+        //     today.getMonth() + 1
+        //   ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-          const checkArray = asinDataListRef.current.find(
-            (asinData: AsinData) => {
-              // 以下２点を満たすとTrue
-              // ・スクレイピングが取得中
-              // ・今日の日付のStockCountDataが存在してる
-              return (
-                asinData.isScraping === true &&
-                (asinData.fbaSellerDatas.some((fbaSellerData) =>
-                  fbaSellerData.stockCountDatas.some((stockCountData) =>
-                    Object.keys(stockCountData).includes(todayFormatted)
-                  )
-                ) ||
-                  asinData.fetchLatestDate === "")
-              );
-            }
-          );
+        //   const checkArray = asinDataListRef.current.find(
+        //     (asinData: AsinData) => {
+        //       // 以下２点を満たすとTrue
+        //       // ・スクレイピングが取得中
+        //       // ・今日の日付のStockCountDataが存在してる
+        //       return (
+        //         asinData.isScraping === true &&
+        //         (asinData.fbaSellerDatas.some((fbaSellerData) =>
+        //           fbaSellerData.stockCountDatas.some((stockCountData) =>
+        //             Object.keys(stockCountData).includes(todayFormatted)
+        //           )
+        //         ) ||
+        //           asinData.fetchLatestDate === "")
+        //       );
+        //     }
+        //   );
 
-          if (checkArray) {
-            console.log("同日に前回処理が中断された際の自動フォローアップ起動");
-            // システムメッセージ表示フラグ
-            //「アプリ終了で中断された取得処理を自動で...」
-            dispatch(changeSystemStatus(2));
-            window.myAPI.runScraping(asinDataListRef.current);
-          }
-        }
+        //   if (checkArray) {
+        //     console.log("同日に前回処理が中断された際の自動フォローアップ起動");
+        //     // システムメッセージ表示フラグ
+        //     //「アプリ終了で中断された取得処理を自動で...」
+        //     dispatch(changeSystemStatus(2));
+        //     window.myAPI.runScraping(asinDataListRef.current);
+        //   }
+        // }
 
         return () => {
           // preload.tsの登録関数で設置したリスナーを全てdispose

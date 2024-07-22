@@ -203,6 +203,7 @@ ipcMain.handle("stopScraping", async () => {
   try {
     browser.close();
     console.log("stopScrapingが実行されました");
+    browser = null;
   } catch (error) {
     console.error("stopScraping ERROR", error);
     return "stopScraping ERROR"; // エラーメッセージを返す
