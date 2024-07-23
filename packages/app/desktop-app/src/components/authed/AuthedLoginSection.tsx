@@ -3,7 +3,7 @@ import "./AuthedLoginSection.css";
 import { getFirstUserEmail } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
-import { changeIsAuthed, changeIsAutoLogIn } from "../../slices/userSlice";
+import { changeIsAutoLogIn, updateUser } from "../../slices/userSlice";
 
 export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
   const user: User = useSelector((state: RootState) => state.user.value);
@@ -17,8 +17,18 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
     const signOutResult: boolean = await logOut();
 
     if (signOutResult === true) {
-      dispatch(changeIsAuthed(false));
-      dispatch(changeIsAutoLogIn(false));
+      // 手動でログアウトしたらローカルのユーザー情報を初期化
+      dispatch(
+        updateUser({
+          uid: "",
+          email: "",
+          password: "",
+          isAuthed: false,
+          isAutoLogIn: false,
+          plan: "",
+          createdAt: "",
+        })
+      );
     }
   };
 

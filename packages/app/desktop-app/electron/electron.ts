@@ -201,9 +201,13 @@ ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
 
 ipcMain.handle("stopScraping", async () => {
   try {
-    browser.close();
-    console.log("stopScrapingが実行されました");
-    browser = null;
+    console.log("Received stopScraping request");
+    if (browser) {
+      await browser.close();
+      browser = null;
+    } else {
+      console.log("No scraping process is running.");
+    }
   } catch (error) {
     console.error("stopScraping ERROR", error);
     return "stopScraping ERROR"; // エラーメッセージを返す
