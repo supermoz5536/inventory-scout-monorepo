@@ -22,5 +22,6 @@ root.render(
         </HashRouter>
       </PersistGate>
     </Provider>
+    //{" "}
   </React.StrictMode>
 );

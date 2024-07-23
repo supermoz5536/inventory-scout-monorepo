@@ -24,6 +24,7 @@ let loginPromptWindow: any;
 let StockDetailWindow: any;
 let isInitLogoutDone: boolean = false;
 let isInitLoginDone: boolean = false;
+let isInitScraping: boolean = false;
 
 /// アプリ起動時にウインドウがない場合に
 /// 新しいウィンドウを生成する関数
@@ -320,6 +321,17 @@ function createMainWindow() {
     if (isInitLoginDone === false) {
       mainWindow.webContents.send("init-login"); // レンダラープロセスにメッセージを送信
       isInitLoginDone = true; // ログイン処理が実行されたことを記録
+    }
+  });
+
+  // 初回起動時のみ、ログイン状態の場合で
+  // 前回にスクレイピングが断されてる場合は
+  // 自動でスクレイピングを開始します。
+  // ウィンドウの読み込みが完了した後に処理します
+  mainWindow.webContents.once("did-finish-load", () => {
+    if (isInitScraping === false) {
+      mainWindow.webContents.send("init-scraping"); // レンダラープロセスにメッセージを送信
+      isInitScraping = true; // ログイン処理が実行されたことを記録
     }
   });
 

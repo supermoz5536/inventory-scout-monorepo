@@ -41,99 +41,81 @@ const App: React.FC = () => {
   }, [user]);
 
   const dispatch = useDispatch<AppDispatch>();
+  let isInitialized: boolean = false;
 
   /// アプリ立ち上げの初期化処理
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② 移行データの取得リスナーの配置と削除
   /// ③ ローカルストレージデータのロード
-  /// ④ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
-  /// ⑤ サーバーサイドの認証ステータスと常に同期するリスナーを設置
+  /// ④ サーバーサイドの認証ステータスと常に同期するリスナーを設置
+  /// ⑤ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
   /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
   /// ■■■■■■■■■■ → メインプロセスのwhenReadyでトリガーするリスナー関数に変更、メインウインドウを開くたびにログイン処理が発生してる
   /// ⑦ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
-    (async () => {
-      try {
-        // ①
-        console.log("scrapingResult called");
-        window.myAPI.scrapingResult(handleScrapingResult);
+    if (isInitialized === false) {
+      isInitialized = true;
+      (async () => {
+        try {
+          // ①
+          console.log("scrapingResult called");
+          window.myAPI.scrapingResult(handleScrapingResult);
 
-        // ②
-        window.myAPI.loadTransferData((event, loadedTransferData) => {
-          dispatch(updateWithLoadedData(loadedTransferData));
-        });
-
-        // ③
-        const loadedData = await window.myAPI.loadData();
-        dispatch(updateWithLoadedData(loadedData));
-
-        // ④
-        // 引数はリスナーのコールバック関数で
-        // 関数自体を渡す必要があるため
-        // ()なしで関数名のみ記述
-        window.myAPI.initLogout(initLogoutCallBack);
-
-        // ⑤
-        const unsubscribe = await listenAuthState();
-
-        // ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので
-        if (
-          userRef.current.isAutoLogIn === true &&
-          userRef.current.email &&
-          userRef.current.password
-        ) {
-          window.myAPI.initLogin(async () => {
-            await handleLogIn();
+          // ②
+          window.myAPI.loadTransferData((event, loadedTransferData) => {
+            dispatch(updateWithLoadedData(loadedTransferData));
           });
-        }
 
-        // ⑦
-        // ■ 同日に前回の処理が中断されている場合の自動処理
-        if (
-          asinDataListRef.current.length > 0 &&
-          userRef.current.isAuthed === true
-        ) {
-          const today = new Date();
-          const todayFormatted = `${today.getFullYear()}-${String(
-            today.getMonth() + 1
-          ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+          // ③
+          const loadedData = await window.myAPI.loadData();
+          dispatch(updateWithLoadedData(loadedData));
 
-          const checkArray = asinDataListRef.current.find(
-            (asinData: AsinData) => {
-              // 以下２点を満たすとTrue
-              // ・スクレイピングが取得中
-              // ・今日の日付のStockCountDataが存在してる
-              return (
-                asinData.isScraping === true &&
-                (asinData.fbaSellerDatas.some((fbaSellerData) =>
-                  fbaSellerData.stockCountDatas.some((stockCountData) =>
-                    Object.keys(stockCountData).includes(todayFormatted)
-                  )
-                ) ||
-                  asinData.fetchLatestDate === "")
-              );
-            }
-          );
+          // ④
+          const unsubscribe = await listenAuthState();
 
-          if (checkArray) {
-            console.log("同日に前回処理が中断された際の自動フォローアップ起動");
-            // システムメッセージ表示フラグ
-            //「アプリ終了で中断された取得処理を自動で...」
-            dispatch(changeSystemStatus(2));
-            window.myAPI.runScraping(asinDataListRef.current);
+          // ⑤
+          // 引数はリスナーのコールバック関数で
+          // 関数自体を渡す必要があるため
+          // ()なしで関数名のみ記述
+          await window.myAPI.initLogout(initLogoutCallBack);
+
+          // ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので
+          // isAutoLogInがtrueの場合のみログイン処理を実行
+          if (
+            userRef.current.isAutoLogIn === true &&
+            userRef.current.email &&
+            userRef.current.password
+          ) {
+            await window.myAPI.initLogin(async () => {
+              await handleLogIn();
+            });
           }
-        }
 
-        return () => {
-          // preload.tsの登録関数で設置したリスナーを全てdispose
-          window.myAPI.disposeAllListeners();
-          // ⑤ のリスナーをdispose
-          unsubscribe();
-        };
-      } catch (error) {
-        console.log("アプリ立ち上げの初期化処理エラー:", error);
-      }
-    })();
+          // ⑦
+          // 有料プランにログインしてる場合に実行
+          // ■ 同日に前回の処理が中断されている場合の自動処理
+          if (
+            asinDataListRef.current.length > 0 &&
+            userRef.current.isAutoLogIn === true &&
+            userRef.current.isAuthed === true &&
+            (userRef.current.plan === "s" || userRef.current.plan === "p")
+          ) {
+            await window.myAPI.initScraping(async () => {
+              await handleInitScraping();
+            });
+          }
+
+          return () => {
+            // preload.tsの登録関数で設置したリスナーを全てdispose
+            window.myAPI.disposeAllListeners();
+            // ④ のリスナーをdispose
+            unsubscribe();
+          };
+        } catch (error) {
+          console.log("アプリ立ち上げの初期化処理エラー:", error);
+        }
+      })();
+    }
   }, []);
   // }, [handleScrapingResult]);
   // 不具合が生じた際は、,[]の追跡を
@@ -174,6 +156,36 @@ const App: React.FC = () => {
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
       }
+    }
+  };
+
+  const handleInitScraping = async () => {
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const checkArray = asinDataListRef.current.find((asinData: AsinData) => {
+      // 以下２点を満たすとTrue
+      // ・スクレイピングが取得中
+      // ・今日の日付のStockCountDataが存在してる
+      return (
+        asinData.isScraping === true &&
+        (asinData.fbaSellerDatas.some((fbaSellerData) =>
+          fbaSellerData.stockCountDatas.some((stockCountData) =>
+            Object.keys(stockCountData).includes(todayFormatted)
+          )
+        ) ||
+          asinData.fetchLatestDate === "")
+      );
+    });
+
+    if (checkArray) {
+      console.log("同日に前回処理が中断された際の自動フォローアップ起動");
+      // システムメッセージ表示フラグ
+      //「アプリ終了で中断された取得処理を自動で...」
+      dispatch(changeSystemStatus(2));
+      window.myAPI.runScraping(asinDataListRef.current);
     }
   };
 

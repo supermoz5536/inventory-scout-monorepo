@@ -22,14 +22,15 @@ declare global {
       receiveAsinData: (
         callback: (event: any, asinData: AsinData) => void
       ) => void;
-      initLogout: (callback: () => void) => void;
+      initLogout: (callback: () => void) => Promise<void>;
       initLogin: (
         callback: (
           event: any,
           savedEmail: string,
           savedPassword: string
         ) => Promise<void>
-      ) => void;
+      ) => Promise<void>;
+      initScraping: (callback: () => void) => Promise<void>;
       scheduledScraping: (time: string, asinDataList: AsinData[]) => void;
       loadTransferData: (
         callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
