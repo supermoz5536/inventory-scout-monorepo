@@ -172,7 +172,20 @@ const scrapePromise = (async () => {
       console.log("4.1.1");
       await page.waitForSelector("body", { timeout: 10000 });
       console.log("4.1.2");
-      await page.mouse.click(10, 10);
+
+      // ランダマイズ用の座標を用意します。
+      const coordinates = [
+        { x: 10, y: 10 },
+        { x: 9, y: 11 },
+        { x: 11, y: 9 },
+        { x: 10, y: 11 },
+      ];
+      // Math.floor関数は、この浮動小数点数の小数部分を切り捨てて整数に変換します。
+      const randomIndex = Math.floor(Math.random() * coordinates.length);
+
+      // 分割代入して変数を用意します。
+      const { x, y } = coordinates[randomIndex];
+      await page.mouse.click(x, y);
       console.log("4.1.3");
       await sleep(1000, 2000);
     },
