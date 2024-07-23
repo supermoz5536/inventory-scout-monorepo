@@ -174,7 +174,7 @@ const scrapePromise = (async () => {
       console.log("4.1.2");
       await page.mouse.click(10, 10);
       console.log("4.1.3");
-      await sleep(1000, 0);
+      await sleep(1000, 2000);
     },
 
     fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
@@ -267,7 +267,7 @@ const scrapePromise = (async () => {
     },
 
     scrollOnDrawer: async (page: Page) => {
-      await sleep(750, 0);
+      await sleep(2000, 4000);
       const drawerSelector = "#all-offers-display";
       const drawerElement = await page.$(drawerSelector);
 
@@ -294,7 +294,7 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1500, 0);
+            await sleep(1500, 2000);
           }
         }
       }
@@ -435,7 +435,7 @@ const scrapePromise = (async () => {
       for (let i = 0; i < offers.length; i++) {
         console.log("i=", i);
         // console.log("3.8.0");
-        await sleep(500, 0);
+        await sleep(1000, 2000);
 
         // console.log("3.8.1");
         let addCartButton = await offers[i].$(
@@ -494,7 +494,7 @@ const scrapePromise = (async () => {
 
     closeDrawer: async (page: Page) => {
       await page.click("#aod-close");
-      await sleep(1000, 0);
+      await sleep(1000, 2000);
     },
 
     /// 「カートに移動」をクリック
@@ -504,7 +504,7 @@ const scrapePromise = (async () => {
 
       // // 「ショッピンカートページ」への画面遷移を待機します。
       // await page.waitForNavigation({ waitUntil: "networkidle2" });
-      await sleep(2000, 0);
+      await sleep(2000, 2000);
       console.log("3.9.2");
     },
 
@@ -649,7 +649,7 @@ const scrapePromise = (async () => {
         }, addCartButton);
       }
 
-      await sleep(2000, 0);
+      await sleep(2000, 2000);
     },
 
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
@@ -1019,6 +1019,7 @@ const scrapePromise = (async () => {
                 `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
               );
               for (const item of items) {
+                await sleep(1000, 3500);
                 await scrape.avoidPopupClick(page);
                 await scrape.setQuantity(page, item);
                 const stockCount = await scrape.fetchStockCount(page);
@@ -1073,7 +1074,7 @@ const scrapePromise = (async () => {
             retryCount < maxRetries)
         ) {
           retryCount++;
-          await sleep(3000, 0);
+          await sleep(3000, 2000);
           await browser.close();
           const newBrowser = await scrape.launchBrowser();
           // 他のメインプロセス関数のstopScrapingで
