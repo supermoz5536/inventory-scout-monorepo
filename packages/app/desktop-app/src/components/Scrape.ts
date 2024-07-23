@@ -11,7 +11,8 @@ const scrapePromise = (async () => {
   // 即時関数で立ち上げ直後に読み込まれる初期化処理
 
   /// ■ 指定された時間だけ処理を遅延させる関数の宣言
-  const sleep = (time: number) =>
+  const sleep = (minTime: number, range: number) => {
+    const waitTime = Math.floor(minTime + Math.random() * range);
     // new Promiseは、コンストラクタ関数で
     // Promise(非同期)オブジェクトを生成します。
     //
@@ -25,7 +26,8 @@ const scrapePromise = (async () => {
     // resolve関数をsetTimeoutに渡し
     // setTimeoutが指定された時間後にresolveを呼び出し、
     // Promiseを完了します。
-    new Promise((resolve) => setTimeout(resolve, time));
+    return new Promise((resolve) => setTimeout(resolve, waitTime));
+  };
 
   // ■ タイムアウトを設定する関数
   const withTimeout = (
@@ -172,7 +174,7 @@ const scrapePromise = (async () => {
       console.log("4.1.2");
       await page.mouse.click(10, 10);
       console.log("4.1.3");
-      await sleep(1000);
+      await sleep(1000, 0);
     },
 
     fetchAndUpdateProductData: async (page: Page, asinData: AsinData) => {
@@ -265,7 +267,7 @@ const scrapePromise = (async () => {
     },
 
     scrollOnDrawer: async (page: Page) => {
-      await sleep(750);
+      await sleep(750, 0);
       const drawerSelector = "#all-offers-display";
       const drawerElement = await page.$(drawerSelector);
 
@@ -292,7 +294,7 @@ const scrapePromise = (async () => {
               document.querySelector(selector);
             }, drawerSelector);
 
-            await sleep(1500);
+            await sleep(1500, 0);
           }
         }
       }
@@ -433,7 +435,7 @@ const scrapePromise = (async () => {
       for (let i = 0; i < offers.length; i++) {
         console.log("i=", i);
         // console.log("3.8.0");
-        await sleep(500);
+        await sleep(500, 0);
 
         // console.log("3.8.1");
         let addCartButton = await offers[i].$(
@@ -456,18 +458,18 @@ const scrapePromise = (async () => {
           (addCartButton && shippingSource == "Amazon.co.jp")
         ) {
           // 要素が安定するまで少し待つ
-          await sleep(500);
+          await sleep(500, 0);
           try {
             await addCartButton.click();
             if (i == 0) {
-              await sleep(2000);
+              await sleep(2000, 0);
               await addCartButton.click();
             }
           } catch (error) {
             console.error(`Failed to add offer ${i} to cart:`, error);
 
             // エラーが発生した場合、要素を再取得して再試行
-            await sleep(1000);
+            await sleep(1000, 0);
             addCartButton = await offers[i].$(
               "span.a-button-inner .a-button-input"
             );
@@ -492,7 +494,7 @@ const scrapePromise = (async () => {
 
     closeDrawer: async (page: Page) => {
       await page.click("#aod-close");
-      await sleep(1000);
+      await sleep(1000, 0);
     },
 
     /// 「カートに移動」をクリック
@@ -502,7 +504,7 @@ const scrapePromise = (async () => {
 
       // // 「ショッピンカートページ」への画面遷移を待機します。
       // await page.waitForNavigation({ waitUntil: "networkidle2" });
-      await sleep(2000);
+      await sleep(2000, 0);
       console.log("3.9.2");
     },
 
@@ -647,7 +649,7 @@ const scrapePromise = (async () => {
         }, addCartButton);
       }
 
-      await sleep(2000);
+      await sleep(2000, 0);
     },
 
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
@@ -668,7 +670,7 @@ const scrapePromise = (async () => {
       // ポップオーバーメニューが表示されるまで待機
       const popoverSelector =
         "body > div.a-popover.a-dropdown.a-dropdown-common.a-declarative";
-      await sleep(500);
+      await sleep(500, 0);
       console.log("4.2.5.5");
 
       // 最後に追加生成されたポップオーバーメニューのコンテナを取得
@@ -690,7 +692,7 @@ const scrapePromise = (async () => {
         console.log("4.2.6 element10", element10);
 
         if (element10) {
-          await sleep(500);
+          await sleep(500, 0);
           await page.evaluate((button) => button.click(), element10);
           console.log("4.2.8");
         }
@@ -719,7 +721,7 @@ const scrapePromise = (async () => {
       }
       console.log("4.3.3");
 
-      await sleep(500);
+      await sleep(500, 0);
 
       // 更新ボタン要素のセレクタの宣言
       const updateButtonSelector = `span.a-button-inner > a[data-action="update"].a-button-text`;
@@ -741,7 +743,7 @@ const scrapePromise = (async () => {
       console.log("4.3.5");
 
       // 在庫数を表示するポップアップの表示完了を待機します。
-      await sleep(750);
+      await sleep(750, 0);
     },
 
     fetchStockCount: async (page: Page) => {
@@ -1071,7 +1073,7 @@ const scrapePromise = (async () => {
             retryCount < maxRetries)
         ) {
           retryCount++;
-          await sleep(3000);
+          await sleep(3000, 0);
           await browser.close();
           const newBrowser = await scrape.launchBrowser();
           // 他のメインプロセス関数のstopScrapingで
