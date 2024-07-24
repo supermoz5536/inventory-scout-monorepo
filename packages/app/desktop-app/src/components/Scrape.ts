@@ -909,7 +909,7 @@ const scrapePromise = (async () => {
         foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
 
         // 在庫数を取得できない場合は
-        // エラーフラグ（-100）で
+        // エラーフラグ（-1）で
         // 該当オブジェクトを更新
       } else if (foundFbaSellerData && stockCount === null) {
         console.log("6.0.3");

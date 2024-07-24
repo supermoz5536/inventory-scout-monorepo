@@ -104,8 +104,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
               {safecolumnHeader.map((column, index) => {
                 const currentData = row[column];
                 const previousDate = getPreviousDateString(column);
-                const previousData =
-                  rowIndex > 0 ? safeData[rowIndex][previousDate] : undefined;
+                const previousData = safeData[rowIndex][previousDate];
                 const isIncrease =
                   typeof currentData === "number" &&
                   typeof previousData === "number" &&
