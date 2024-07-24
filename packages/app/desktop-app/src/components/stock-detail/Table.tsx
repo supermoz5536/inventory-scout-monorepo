@@ -115,14 +115,26 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                   <TableCell
                     key={column}
                     sx={{
-                      color: index > 1 && isIncrease ? "#ff6666" : "#000000",
-                      fontWeight: index > 1 && isIncrease ? "bold" : null,
+                      color:
+                        index > 1 && isIncrease
+                          ? "#ff6666"
+                          : currentData === -1
+                          ? "#AFAFAF"
+                          : "#000000",
+                      fontWeight:
+                        index > 1 && isIncrease
+                          ? "bold"
+                          : currentData === -1
+                          ? "bold"
+                          : null,
                     }}
                   >
                     {index > 1 && isIncrease ? (
                       <Tooltip title="在庫が増加しています。" arrow>
                         <span>{currentData}</span>
                       </Tooltip>
+                    ) : currentData === -1 ? (
+                      "-"
                     ) : (
                       currentData
                     )}

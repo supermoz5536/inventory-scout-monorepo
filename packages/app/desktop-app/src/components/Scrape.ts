@@ -892,7 +892,7 @@ const scrapePromise = (async () => {
         // 該当オブジェクトを更新
       } else if (foundFbaSellerData && stockCount === null) {
         console.log("6.0.3");
-        const stockCountAndDate = { todayFormatted: -100 };
+        const stockCountAndDate = { [todayFormatted]: -1 };
         console.log("6.0.4");
         foundFbaSellerData.stockCountDatas.push(stockCountAndDate);
         console.log("6.0.5 after push", foundFbaSellerData.stockCountDatas);
