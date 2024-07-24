@@ -61,7 +61,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                   formatDate(column)
                 ) : (
                   <Tooltip
-                    title="各セラーの日付別の在庫数一覧です。"
+                    title="各セラーの日付別の在庫数一覧です。カート画面の同時販売個数に「999」を設定した際の表示値を集計しています。数量制限を設定しているセラーの在庫数は取得不可で - で表示されます。"
                     arrow
                     placement="right"
                     PopperProps={{
