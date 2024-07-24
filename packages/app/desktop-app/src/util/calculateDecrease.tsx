@@ -93,7 +93,15 @@ export const prepareDataForCalculateDecrease = (
 
     // それぞれの値を合計する
     const totalStock: number | null = keysWithoutDate.reduce((acc, key) => {
-      return acc + newCurrentDayData[key];
+      // 在庫取得に失敗した際フラグ -1 の場合は
+      // 計算から外した上で
+      // チャートの在庫数に-1が表示されないようにnullを設定
+      if (newCurrentDayData[key] === -1) {
+        newCurrentDayData[key] = null;
+        return acc;
+      } else {
+        return acc + newCurrentDayData[key];
+      }
     }, null);
 
     // 同じくnewChartDataの新規プロパティ("在庫合計")に値を代入する
