@@ -9,6 +9,7 @@ import {
 } from "../slices/asinDataListSlice";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { calculateRemainingTime } from "../util/calculateRemainingTime";
 
 function Manage() {
   // グローバル変数のASINリストの値を取得
@@ -153,17 +154,8 @@ function Manage() {
 
   /// スクレイピング残り時間の表示を動的に変更します。
   useEffect(() => {
-    // asinDataListRef.currentをイテレート処理
-    // isScraping === trueの要素の時に
-    // const remainingCount をインクリメント
-    // 要素1つにつき１分なのでそのまま表示
-    const remainingCount: number = asinDataListRef.current.reduce(
-      (totalCount: number, asinData: AsinData) => {
-        return asinData.isScraping === true ? ++totalCount : totalCount;
-      },
-      0
-    );
-    setScrapeTimeLeft(remainingCount);
+    const remainingTime = calculateRemainingTime(asinDataListRef.current);
+    setScrapeTimeLeft(remainingTime);
   }, [asinDataList]);
 
   return (

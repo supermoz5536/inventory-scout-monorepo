@@ -443,7 +443,7 @@ const scrapePromise = (async () => {
     addToCartOnDrawer: async (page: Page) => {
       console.log("3.8.0.1");
       const offers = await page.$$("#aod-pinned-offer, #aod-offer");
-      console.log("3.8.0.2");
+      console.log("3.8.0.2 offers.length =", offers.length);
 
       for (let i = 0; i < offers.length; i++) {
         console.log("i=", i);
@@ -1071,7 +1071,7 @@ const scrapePromise = (async () => {
               // レンダラープロセスにデータを送信
               event.sender.send("scraping-result", asinData);
             })(),
-            120000,
+            180000,
             "Timeout"
           );
         }

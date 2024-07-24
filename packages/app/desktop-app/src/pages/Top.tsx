@@ -18,6 +18,7 @@ import {
   calculateDecreaseTodayToYesterday,
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
+import { calculateRemainingTime } from "../util/calculateRemainingTime";
 
 function Top() {
   const asinDataList = useSelector(
@@ -273,25 +274,8 @@ function Top() {
 
   /// スクレイピング残り時間の表示を動的に変更します。
   useEffect(() => {
-    // asinDataListRef.currentをイテレート処理
-    // isScraping === trueの要素の時に
-    // const isScrapingCount をインクリメント
-    // 要素1つにつき１分なのでそのまま
-    const isScrapingTrueCount: number = asinDataListRef.current.reduce(
-      (acc: number, asinData: AsinData) => {
-        return asinData.isScraping === true ? ++acc : acc;
-      },
-      0
-    );
-
-    const isScrapingNullCount: number = asinDataListRef.current.reduce(
-      (acc: number, asinData: AsinData) => {
-        return asinData.isScraping === null ? ++acc : acc;
-      },
-      0
-    );
-
-    setScrapeTimeLeft(isScrapingTrueCount + isScrapingNullCount);
+    const remainingTime = calculateRemainingTime(asinDataListRef.current);
+    setScrapeTimeLeft(remainingTime);
   }, [asinDataList]);
 
   /// ASIN数のカウント関数
