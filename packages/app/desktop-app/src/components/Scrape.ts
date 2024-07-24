@@ -281,13 +281,27 @@ const scrapePromise = (async () => {
 
     scrollOnDrawer: async (page: Page) => {
       await sleep(2000, 4000);
+      // スクロールしたい要素を宣言
       const drawerSelector = "#all-offers-display";
+      // スクロールしたい要素を取得
       const drawerElement = await page.$(drawerSelector);
 
+      // スクロールの試行回数を、セラー数に応じて調整するために一致する全ての要素を取得
+      const offers = await page.$$("#aod-pinned-offer, #aod-offer");
+      // スクロールの必要最低限の最大試行回数を算出
+      const tryTimes = Math.floor(offers.length / 2);
+
+      // drawerElement が存在するか確認します。
+      //存在しない場合、この時点で関数は終了します。
       if (drawerElement) {
+        // drawerElement の位置とサイズ（バウンディングボックス）を取得します。
+        // 要素上でマウスの操作、スクロール操作を行うために使用されます。
         const boundingBox = await drawerElement.boundingBox();
 
+        // boundingBox が存在するか確認します。
+        // 存在しない場合、この時点で関数は終了します。
         if (boundingBox) {
+          // マウスポインタを boundingBox の中心に移動させます。
           await page.mouse.move(
             boundingBox.x + boundingBox.width / 2,
             boundingBox.y + boundingBox.height / 2
@@ -296,13 +310,20 @@ const scrapePromise = (async () => {
           let previousPosition = await page.evaluate(() => window.scrollY);
           let samePositionTimes: number = 0;
 
-          for (let i = 0; i < 6; i++) {
+          for (let i = 0; i < tryTimes; i++) {
             console.log("i =", i);
             await page.mouse.wheel({
               deltaY: boundingBox.height,
             });
 
-            // 要素のトップの高さを取得して強制的に更新
+            await sleep(1500, 2000);
+
+            await page.mouse.wheel({
+              deltaY: 50,
+            });
+
+            // 要素のトップの高さを取得して強制的にDOMを更新
+            // 返り値を使用しないので実際的には何もしていない更新自体が目的の記述
             await page.evaluate((selector) => {
               document.querySelector(selector);
             }, drawerSelector);
@@ -1071,7 +1092,7 @@ const scrapePromise = (async () => {
               // レンダラープロセスにデータを送信
               event.sender.send("scraping-result", asinData);
             })(),
-            180000,
+            240000,
             "Timeout"
           );
         }
