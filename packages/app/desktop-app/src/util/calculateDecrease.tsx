@@ -127,11 +127,15 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
   const result = data.reduce(
     (acc: number, currentData: any, index: number, array: any) => {
       if (index === 0) return acc; // 最初の要素には前日がないためスキップ
+      console.log("▲ index", index);
 
       // 現在処理してる日付のオブジェクトとその前の日のオブジェクトの差分をとる
       const prevData = array[index - 1];
       let currentTotalStock = currentData["FBA全体在庫"] ?? null;
-      const prevTotalStock = prevData["FBA全体在庫"] ?? null;
+      let prevTotalStock = prevData["FBA全体在庫"] ?? null;
+
+      console.log("▲ 1 currentTotalStock", currentTotalStock);
+      console.log("▲ 1 prevTotalStock", prevTotalStock);
 
       // ■ 各セラーでの増加（補充）フィルター処理
       // オブジェクト内の "FBA全体在庫"以外の全てのセラーキーを取得し
@@ -142,7 +146,7 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
       const keys = Object.keys(currentData).filter(
         (key) => key !== "FBA全体在庫" && key !== "date"
       );
-
+      console.log("▲ 2");
       // セラー内(各要素)に
       // １人でも在庫の増加がある場合(someメソッド)は
       // isIncreaseをTrueにする
@@ -172,26 +176,54 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
           prevSellerStock < currentSellerStock
         );
       });
-
+      console.log("▲ 3");
       if (isIncrease && prevData["FBA全体在庫"] !== null) {
         ++increaseCount;
         return acc;
       }
 
+      console.log("▲ 4");
       // DecreaseMetrics, Topでは
       // "-" による減少数を在庫の減少としてカウントしないように
       // 減少分(前日の在庫数)を加えて、±0で相殺する
+      // 減少分として計算自体は行っているので
+      // decreaseCountをあらかじめデクリメントしておく
       if (offSet === true) {
+        // ■ currentTotalStock の更新
+        // 「実際の値」 →　" - " の場合
         currentTotalStock = keys.reduce((acc: any, key) => {
-          const prevSellerStock = prevData[key] ?? null;
-          let currentSellerStock = currentData[key] ?? null;
+          let tempPrevSellerStock = prevData[key] ?? null;
+          let tempCurrentSellerStock = currentData[key] ?? null;
 
-          if (prevSellerStock && currentSellerStock === null) {
-            currentSellerStock = prevSellerStock;
+          if (
+            tempPrevSellerStock &&
+            tempCurrentSellerStock === null &&
+            currentTotalStock !== null
+          ) {
+            tempCurrentSellerStock = tempPrevSellerStock;
           }
-          return acc + currentSellerStock;
+          return acc + tempCurrentSellerStock;
+        }, 0);
+
+        // ■ prevTotalStock の更新
+        // " - " → 「実際の値」 の場合
+        prevTotalStock = keys.reduce((acc: any, key) => {
+          let tempPrevSellerStock = prevData[key] ?? null;
+          let tempCurrentSellerStock = currentData[key] ?? null;
+
+          if (
+            tempPrevSellerStock === null &&
+            tempCurrentSellerStock &&
+            prevTotalStock !== null
+          ) {
+            tempPrevSellerStock = tempCurrentSellerStock;
+          }
+          return acc + tempPrevSellerStock;
         }, 0);
       }
+
+      console.log("▲ 5 currentTotalStock", currentTotalStock);
+      console.log("▲ 5 prevTotalStock", prevTotalStock);
 
       // ■ 合算処理
       // 増加（補充）してるセラーがいない
@@ -204,6 +236,10 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
         prevTotalStock >= currentTotalStock
       ) {
         const difference = prevTotalStock - currentTotalStock;
+        console.log("■ index", index);
+        console.log("■ prevTotalStock", prevTotalStock);
+        console.log("■ currentTotalStock", currentTotalStock);
+        console.log("■ difference", difference);
         // if (difference >= 0) {
         // 減少 or 同じ値の場合
         ++decreaseCount;
@@ -217,6 +253,7 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
     0
   );
 
+  console.log("▲ 6");
   // 日次の平均減少数を算出する、その際に
   // 指定期間の最初の日付はスキップしてるので -1 する。
   // 算出した値を増加日をスキップした回数分だけ加える。
@@ -224,8 +261,8 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
   // 日次の平均減少数シミュレートしたことになる。
   const newDayAverage = result / decreaseCount;
   const newTotalDecrease = result + newDayAverage * increaseCount;
-  console.log("■ FBA全体在庫 result", result);
-  console.log("■ FBA全体在庫 increaseCount", increaseCount);
+  // console.log("■ FBA全体在庫 result", result);
+  // console.log("■ FBA全体在庫 increaseCount", increaseCount);
   // Math.round : 小数点以下を四捨五入
   return {
     newDayAverage: Math.round(newDayAverage),
