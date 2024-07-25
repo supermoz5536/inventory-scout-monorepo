@@ -4,7 +4,7 @@ import { resetTime } from "./dateFormatter";
 
 /// asinDataオブジェクトを受け取り、
 /// 当日と前日の合計在庫の差分を出力する関数
-export const calculateDecreaseTodayToYesterday = (asinData: AsinData) => {
+export const calculateDecreaseLatestToPrevEl = (asinData: AsinData) => {
   // 当日の合計在庫、求める値は
   // fbaSellerDatasの各オブジェクト（セラー）ごとの
   // stockCountDatas プロパティに保持している配列のなかの
@@ -13,15 +13,20 @@ export const calculateDecreaseTodayToYesterday = (asinData: AsinData) => {
 
   // 前日の合計在庫、求める値は同様にして
   // キーが前日(配列の最後から遡って２番目のオブジェクト)の値の合計
-  const totalStockPrevOneEl: number | null = asinData.fbaSellerDatas.reduce(
+  const totalStockPrevEl: number | null = asinData.fbaSellerDatas.reduce(
     (acc, currentSellerData) => {
       const length = currentSellerData.stockCountDatas.length;
 
       if (currentSellerData.stockCountDatas.length >= 2) {
-        const yesterdayObj = currentSellerData.stockCountDatas[length - 2];
-        const key = Object.keys(yesterdayObj);
-        const stockYesterday = yesterdayObj[key[0]];
-        return acc + stockYesterday;
+        const prevElObj = currentSellerData.stockCountDatas[length - 2];
+        const key = Object.keys(prevElObj);
+        let stockPrevOneEl = prevElObj[key[0]];
+
+        // 呼び出し元はTopコンポーネントで、
+        // 取得不可の在庫の値はフラグ値としての -1 のままなので
+        // 合算の例外として処理するために 0で計算
+        if (stockPrevOneEl === -1) stockPrevOneEl = 0;
+        return acc + stockPrevOneEl;
       }
 
       return acc;
@@ -29,8 +34,8 @@ export const calculateDecreaseTodayToYesterday = (asinData: AsinData) => {
     0
   );
 
-  if (totalStockLatest && totalStockPrevOneEl) {
-    const difference = totalStockPrevOneEl - totalStockLatest;
+  if (totalStockLatest && totalStockPrevEl) {
+    const difference = totalStockPrevEl - totalStockLatest;
     return difference;
   } else {
     return -1;
@@ -127,15 +132,11 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
   const result = data.reduce(
     (acc: number, currentData: any, index: number, array: any) => {
       if (index === 0) return acc; // 最初の要素には前日がないためスキップ
-      console.log("▲ index", index);
 
       // 現在処理してる日付のオブジェクトとその前の日のオブジェクトの差分をとる
       const prevData = array[index - 1];
       let currentTotalStock = currentData["FBA全体在庫"] ?? null;
       let prevTotalStock = prevData["FBA全体在庫"] ?? null;
-
-      console.log("▲ 1 currentTotalStock", currentTotalStock);
-      console.log("▲ 1 prevTotalStock", prevTotalStock);
 
       // ■ 各セラーでの増加（補充）フィルター処理
       // オブジェクト内の "FBA全体在庫"以外の全てのセラーキーを取得し
@@ -146,7 +147,6 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
       const keys = Object.keys(currentData).filter(
         (key) => key !== "FBA全体在庫" && key !== "date"
       );
-      console.log("▲ 2");
       // セラー内(各要素)に
       // １人でも在庫の増加がある場合(someメソッド)は
       // isIncreaseをTrueにする
@@ -176,13 +176,11 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
           prevSellerStock < currentSellerStock
         );
       });
-      console.log("▲ 3");
       if (isIncrease && prevData["FBA全体在庫"] !== null) {
         ++increaseCount;
         return acc;
       }
 
-      console.log("▲ 4");
       // DecreaseMetrics, Topでは
       // "-" による減少数を在庫の減少としてカウントしないように
       // 減少分(前日の在庫数)を加えて、±0で相殺する
@@ -222,9 +220,6 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
         }, 0);
       }
 
-      console.log("▲ 5 currentTotalStock", currentTotalStock);
-      console.log("▲ 5 prevTotalStock", prevTotalStock);
-
       // ■ 合算処理
       // 増加（補充）してるセラーがいない
       // かつ
@@ -236,10 +231,6 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
         prevTotalStock >= currentTotalStock
       ) {
         const difference = prevTotalStock - currentTotalStock;
-        console.log("■ index", index);
-        console.log("■ prevTotalStock", prevTotalStock);
-        console.log("■ currentTotalStock", currentTotalStock);
-        console.log("■ difference", difference);
         // if (difference >= 0) {
         // 減少 or 同じ値の場合
         ++decreaseCount;
@@ -253,7 +244,6 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
     0
   );
 
-  console.log("▲ 6");
   // 日次の平均減少数を算出する、その際に
   // 指定期間の最初の日付はスキップしてるので -1 する。
   // 算出した値を増加日をスキップした回数分だけ加える。
@@ -261,8 +251,7 @@ export const calculateDataForChart = (data: any, offSet: boolean) => {
   // 日次の平均減少数シミュレートしたことになる。
   const newDayAverage = result / decreaseCount;
   const newTotalDecrease = result + newDayAverage * increaseCount;
-  // console.log("■ FBA全体在庫 result", result);
-  // console.log("■ FBA全体在庫 increaseCount", increaseCount);
+
   // Math.round : 小数点以下を四捨五入
   return {
     newDayAverage: Math.round(newDayAverage),

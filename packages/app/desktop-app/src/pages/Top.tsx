@@ -15,7 +15,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import {
   calculateDataForChart,
-  calculateDecreaseTodayToYesterday,
+  calculateDecreaseLatestToPrevEl,
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
@@ -115,6 +115,7 @@ function Top() {
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
     } else if (user.isAuthed === true && user.plan === "f") {
+      console.log("2");
       gotoPlanURL();
 
       // ■ 待機状態での「取得開始」のクリック
@@ -124,6 +125,7 @@ function Top() {
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
+      console.log("3");
       // スクレイピングを開始
       dispatch(changeShowButtonStatus(1));
       handleRunScraping();
@@ -135,6 +137,7 @@ function Top() {
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
+      console.log("4");
       // 「本当に？」UIを表示
       dispatch(changeShowButtonStatus(2));
 
@@ -145,6 +148,7 @@ function Top() {
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {
+      console.log("5");
       // スクレイピングの終了処理を実行
       dispatch(changeShowButtonStatus(0));
       window.myAPI.stopScraping();
@@ -210,7 +214,9 @@ function Top() {
       dispatch(updateIsScrapingTrueAll());
       await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
       window.myAPI.runScraping(asinDataListRef.current);
+      dispatch(changeSystemStatus(1));
       dispatch(changeShowButtonStatus(1));
+      console.log("■ 2 handleRunScraping systemStatus =", systemStatus);
     } else {
       console.log("■ 3 handleRunScraping");
       // ■ 同日に前回の処理が中断されている場合の処理
@@ -232,6 +238,7 @@ function Top() {
         //「アプリ終了で中断された取得処理を自動で...」
         window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(2));
+        dispatch(changeShowButtonStatus(1));
       } else if (hasNewItems) {
         console.log("■ 5 handleRunScraping");
         console.log("同日データ取得が無事完了 && 新規アイテムの追加がある場合");
@@ -242,12 +249,14 @@ function Top() {
         await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
         window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(3));
+        dispatch(changeShowButtonStatus(1));
       } else {
         console.log("■ 6 handleRunScraping");
         dispatch(updateIsScrapingTrueAll());
         await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
         window.myAPI.runScraping(asinDataListRef.current);
         dispatch(changeSystemStatus(1));
+        dispatch(changeShowButtonStatus(1));
       }
     }
   };
@@ -545,9 +554,9 @@ function Top() {
               {/* 要素9 本日の減少数 */}
               <div className="top-square-space-amazon-num">
                 <p>
-                  {calculateDecreaseTodayToYesterday(asinData) === -1
+                  {calculateDecreaseLatestToPrevEl(asinData) === -1
                     ? ""
-                    : calculateDecreaseTodayToYesterday(asinData)}
+                    : calculateDecreaseLatestToPrevEl(asinData)}
                 </p>
               </div>
 
