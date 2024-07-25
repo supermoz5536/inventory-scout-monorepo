@@ -86,8 +86,10 @@ const EachSellerDecreaseMetrics = ({
           const prevSelectedSellerStock =
             prevData[keysFixed[selectedIndex]] ?? null;
 
-          const isIncrease: boolean =
-            currentSelectedSellerStock - prevSelectedSellerStock > 0;
+          const isIncrease =
+            prevSelectedSellerStock &&
+            currentSelectedSellerStock &&
+            prevSelectedSellerStock < currentSelectedSellerStock;
 
           // 増加（補充）日のフィルター処理
           if (isIncrease && prevData["FBA全体在庫"] !== null) {
@@ -267,7 +269,7 @@ const EachSellerDecreaseMetrics = ({
                       textAlign: "center", // Center align text
                     }}
                   >
-                    {Number.isNaN(value) ? 0 : value}
+                    {Number.isNaN(value) ? "N/A" : value}
                   </TableCell>
                 ))}
               </TableRow>

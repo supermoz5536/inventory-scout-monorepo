@@ -14,7 +14,7 @@ import {
 } from "../slices/systemStatusSlice";
 import { useEffect, useRef, useState } from "react";
 import {
-  CalculateDecrease,
+  calculateDataForChart,
   calculateDecreaseTodayToYesterday,
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
@@ -268,7 +268,7 @@ function Top() {
 
   const handleDecrease2 = (asinData: AsinData) => {
     const data = prepareDataForCalculateDecrease(asinData);
-    const result = CalculateDecrease(data).newTotalDecrease;
+    const result = calculateDataForChart(data, true).newTotalDecrease;
     return result;
   };
 

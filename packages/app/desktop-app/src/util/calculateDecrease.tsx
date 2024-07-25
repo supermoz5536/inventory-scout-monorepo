@@ -117,7 +117,10 @@ export const prepareDataForCalculateDecrease = (
   return newDataList;
 };
 
-export const CalculateDecrease = (data: any) => {
+export const calculateDataForChart = (data: any, offSet: boolean) => {
+  // 引数のoffSet: 一部コンポーネントで "-" の在庫数減少に対する例外処理が必要な場合に利用
+  // true: DecreaseMetrics, Top (例外を追記)
+
   let decreaseCount: number = 0;
   let increaseCount: number = 0;
 
@@ -127,7 +130,7 @@ export const CalculateDecrease = (data: any) => {
 
       // 現在処理してる日付のオブジェクトとその前の日のオブジェクトの差分をとる
       const prevData = array[index - 1];
-      const currentTotalStock = currentData["FBA全体在庫"] ?? null;
+      let currentTotalStock = currentData["FBA全体在庫"] ?? null;
       const prevTotalStock = prevData["FBA全体在庫"] ?? null;
 
       // ■ 各セラーでの増加（補充）フィルター処理
@@ -139,20 +142,55 @@ export const CalculateDecrease = (data: any) => {
       const keys = Object.keys(currentData).filter(
         (key) => key !== "FBA全体在庫" && key !== "date"
       );
-      const isDecrease = keys.every((key) => {
+
+      // セラー内(各要素)に
+      // １人でも在庫の増加がある場合(someメソッド)は
+      // isIncreaseをTrueにする
+      const isIncrease = keys.some((key) => {
         const prevSellerStock = prevData[key] ?? null;
         const currentSellerStock = currentData[key] ?? null;
+
+        // prevSellerStock や currentSellerStock が null である場合は
+        // 比較を回避する条件を明確に設定する
+        // 理由は、null や undefined が数値として扱われると、
+        // 意図しない比較結果が生じ、isIncraaseがtrueになるリスクがあるので
+        // 例外処理が必要
+
+        // ifで例外処理：当日の値 or 前日の値のいずれかがnullだった場合は、
+        // いずれかの日の値の取得に失敗している例外なので
+        // isIncrease は false にする。
+        if (prevSellerStock === null || currentSellerStock === null) {
+          return false;
+        }
+
+        // 当日の値と前日の値が両方存在し
+        // かつ
+        // 増加してる場合のみ isIncrease を True にする
         return (
           prevSellerStock &&
           currentSellerStock &&
-          prevSellerStock >= currentSellerStock
+          prevSellerStock < currentSellerStock
         );
       });
 
-      // console.log("isDecreaseAll =", isDecreaseAll);
-      if (!isDecrease && prevData["FBA全体在庫"] !== null) {
+      if (isIncrease && prevData["FBA全体在庫"] !== null) {
         ++increaseCount;
         return acc;
+      }
+
+      // DecreaseMetrics, Topでは
+      // "-" による減少数を在庫の減少としてカウントしないように
+      // 減少分(前日の在庫数)を加えて、±0で相殺する
+      if (offSet === true) {
+        currentTotalStock = keys.reduce((acc: any, key) => {
+          const prevSellerStock = prevData[key] ?? null;
+          let currentSellerStock = currentData[key] ?? null;
+
+          if (prevSellerStock && currentSellerStock === null) {
+            currentSellerStock = prevSellerStock;
+          }
+          return acc + currentSellerStock;
+        }, 0);
       }
 
       // ■ 合算処理
@@ -186,6 +224,8 @@ export const CalculateDecrease = (data: any) => {
   // 日次の平均減少数シミュレートしたことになる。
   const newDayAverage = result / decreaseCount;
   const newTotalDecrease = result + newDayAverage * increaseCount;
+  console.log("■ FBA全体在庫 result", result);
+  console.log("■ FBA全体在庫 increaseCount", increaseCount);
   // Math.round : 小数点以下を四捨五入
   return {
     newDayAverage: Math.round(newDayAverage),

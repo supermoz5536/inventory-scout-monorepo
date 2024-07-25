@@ -115,7 +115,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
                     key={column}
                     sx={{
                       color:
-                        index > 1 && isIncrease
+                        index > 1 && isIncrease && previousData !== -1
                           ? "#ff6666"
                           : currentData === -1
                           ? "#AFAFAF"

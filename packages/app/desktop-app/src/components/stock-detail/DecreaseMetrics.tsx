@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { CalculateDecrease } from "../../util/calculateDecrease";
+import { calculateDataForChart } from "../../util/calculateDecrease";
 
 const DecreaseMetrics = ({ data }: StockDetailProps) => {
   const [totalDecrease, setTotalDecrease] = useState<number>(0);
@@ -29,8 +29,8 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
   ];
 
   useEffect(() => {
-    setDayAverage(CalculateDecrease(data).newDayAverage);
-    setTotalDecrease(CalculateDecrease(data).newTotalDecrease);
+    setDayAverage(calculateDataForChart(data, true).newDayAverage);
+    setTotalDecrease(calculateDataForChart(data, true).newTotalDecrease);
   }, [data]);
 
   return (
@@ -109,7 +109,8 @@ const DecreaseMetrics = ({ data }: StockDetailProps) => {
                       textAlign: "center", // Center align text
                     }}
                   >
-                    {Number.isNaN(value) ? 0 : value}
+                    {/* {value} */}
+                    {Number.isNaN(value) ? "N/A" : value}
                   </TableCell>
                 ))}
               </TableRow>
