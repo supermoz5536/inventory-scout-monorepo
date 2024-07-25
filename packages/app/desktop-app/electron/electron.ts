@@ -271,8 +271,8 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 /// メイン画面を生成する関数です
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 975,
+    width: 1505,
+    height: 965,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -338,7 +338,7 @@ function createMainWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -378,7 +378,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    prefWindow.webContents.openDevTools();
+    // prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -418,7 +418,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    loginPromptWindow.webContents.openDevTools();
+    // loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -460,7 +460,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    StockDetailWindow.webContents.openDevTools();
+    // StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して

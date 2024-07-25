@@ -28,7 +28,7 @@
 }
 
 .top-square-space-menu-container-left {
-  width: 357.5px;
+  width: 385px;
   height: 110px;
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -61,7 +61,7 @@
 }
 
 .top-square-space-menu-container-center {
-  width: 819px;
+  width: 832px;
   height: 110px;
   border: 0.5px solid #c0c0c0;
   position: relative;
@@ -140,10 +140,10 @@
 
 .top-globalList {
   height: 750px;
-  width: 1393px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  width: 1466px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
   max-height: 750px; /* この縦幅以上にリストが増えたらスクロール開始 */
-  max-width: 1410px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
-  background-color: aqua;
+  max-width: 1466px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  background-color: rgb(156, 255, 250);
   display: flex;
   flex-direction: column;
   overflow-x: auto;
@@ -192,7 +192,7 @@
 }
 
 .top-square-space-asin {
-  width: 110px;
+  width: 140px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -247,7 +247,7 @@
 }
 
 .top-square-space-name {
-  width: 300px;
+  width: 312.5px;
   height: 65px;
   border: 0.5px solid #c0c0c0;
   display: flex;
@@ -257,7 +257,7 @@
 }
 
 .top-square-space-name p {
-  max-width: 300px;
+  max-width: 312.5px;
   max-height: 65px;
   padding: 5px;
   display: flex;
@@ -325,7 +325,7 @@
 
 .top-bottom-container {
   height: 40px;
-  width: 1392px;
+  width: 1464px;
   background-color: darkkhaki;
   border: 0.5px solid #c0c0c0;
   position: relative;
