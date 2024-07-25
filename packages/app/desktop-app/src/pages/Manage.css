@@ -18,7 +18,7 @@
 .manage-body {
   height: 860px;
   width: 1385px;
-  background-color: aqua;
+  background-color: rgb(156, 255, 250);
   display: flex;
 }
 
