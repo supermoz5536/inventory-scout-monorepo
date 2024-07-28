@@ -45,15 +45,10 @@ const AuthedScrapeSection = () => {
     dispatch(changeScheduledTime(inputTime));
   };
 
-  // システムステータスがスクレピングを実行中ではない場合
-  // かつ
-  // ログイン中の場合に
-  // 定時スクレイピングを実行します
+  // 定時スクレイピングの予約処理を実行します。
   const handleScheduledScraping = () => {
-    if (![1, 2, 3].includes(systemStatus) && user.isAuthed === true) {
-      window.myAPI.scheduledScraping(inputScheduledTime, asinDataList);
-      setIsScrapeTimeChanged(true);
-    }
+    window.myAPI.scheduledScraping(inputScheduledTime, asinDataList);
+    setIsScrapeTimeChanged(true);
   };
 
   return (

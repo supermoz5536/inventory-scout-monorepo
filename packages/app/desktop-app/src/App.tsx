@@ -34,6 +34,15 @@ const App: React.FC = () => {
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
+  const systemStatus: any = useSelector(
+    (state: RootState) => state.systemStatus.value
+  );
+
+  const systemStatusRef = useRef(systemStatus);
+  useEffect(() => {
+    systemStatusRef.current = systemStatus;
+  }, [systemStatus]);
+
   const user = useSelector((state: RootState) => state.user.value);
   const userRef = useRef(user);
   useEffect(() => {
@@ -50,8 +59,8 @@ const App: React.FC = () => {
   /// ④ サーバーサイドの認証ステータスと常に同期するリスナーを設置
   /// ⑤ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
   /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
-  /// ■■■■■■■■■■ → メインプロセスのwhenReadyでトリガーするリスナー関数に変更、メインウインドウを開くたびにログイン処理が発生してる
-  /// ⑦ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
+  /// ⑦
+  /// ⑧ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     if (isInitialized === false) {
       isInitialized = true;
@@ -92,6 +101,15 @@ const App: React.FC = () => {
           }
 
           // ⑦
+          // 保存されてる定時スクレイピングの指定時刻にセッティングします。
+          await window.myAPI.initScheduledTime(() => {
+            window.myAPI.scheduledScraping(
+              systemStatusRef.current.scheduledScrapingTime,
+              asinDataList
+            );
+          });
+
+          // ⑧
           // 有料プランにログインしてる場合に実行
           // ■ 同日に前回の処理が中断されている場合の自動処理
           if (
