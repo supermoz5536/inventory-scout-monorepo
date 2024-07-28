@@ -26,6 +26,9 @@ const AuthedScrapeSection = () => {
     systemStatus.scheduledScrapingTime
   );
 
+  // 保存時の表示用時刻の格納変数
+  const [savedScheduledTime, setSavedScheduledTime] = useState<string>("");
+
   // 保存ボタンを押した際のコールバックをハンドリングするための変数
   const [isScrapeTimeChanged, setIsScrapeTimeChanged] = useState<
     boolean | null
@@ -45,15 +48,10 @@ const AuthedScrapeSection = () => {
     dispatch(changeScheduledTime(inputTime));
   };
 
-  // システムステータスがスクレピングを実行中ではない場合
-  // かつ
-  // ログイン中の場合に
-  // 定時スクレイピングを実行します
+  // 定時スクレイピングの予約処理を実行します。
   const handleScheduledScraping = () => {
-    if (![1, 2, 3].includes(systemStatus) && user.isAuthed === true) {
-      window.myAPI.scheduledScraping(inputScheduledTime, asinDataList);
-      setIsScrapeTimeChanged(true);
-    }
+    window.myAPI.scheduledScraping(inputScheduledTime);
+    setIsScrapeTimeChanged(true);
   };
 
   return (
@@ -89,6 +87,7 @@ const AuthedScrapeSection = () => {
         <button
           onClick={() => {
             handleScheduledScraping();
+            setSavedScheduledTime(inputScheduledTime);
           }}
         >
           保存
@@ -97,7 +96,7 @@ const AuthedScrapeSection = () => {
           {isScrapeTimeChanged === null
             ? ""
             : isScrapeTimeChanged
-            ? "時刻を保存しました（指定の時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）"
+            ? `時刻を${savedScheduledTime}で保存しました（指定の時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）`
             : "システムエラーです。運営者にお問い合わせください。"}
         </p>
       </div>

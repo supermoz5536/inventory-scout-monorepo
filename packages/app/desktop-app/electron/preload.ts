@@ -35,8 +35,6 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   stopScraping: () => ipcRenderer.invoke("stopScraping"),
 
-  scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
-
   saveData: (asinDataList: AsinData[]) =>
     ipcRenderer.invoke("save-data", asinDataList),
 
@@ -47,25 +45,38 @@ contextBridge.exposeInMainWorld("myAPI", {
   openStockDetail: (asinDataList: AsinData) =>
     ipcRenderer.invoke("open-stock-detail", asinDataList),
 
+  scheduledScraping: (time: string, asinDataList: AsinData[]) =>
+    ipcRenderer.invoke("schedule-scraping", time, asinDataList),
+
+  // ====================================================================
+
+  scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
+
   receiveAsinData: (callback) => ipcRenderer.on("receive-asin-data", callback),
 
   initLogout: (callback) => {
     ipcRenderer.on("init-logout", callback);
   },
-
   initLogin: (callback) => {
     ipcRenderer.on("init-login", callback);
   },
+
+  loadTransferData: (callback) =>
+    ipcRenderer.on("load-transfer-data", callback),
 
   initScraping: (callback) => {
     ipcRenderer.on("init-scraping", callback);
   },
 
-  scheduledScraping: (time: string, asinDataList: AsinData[]) =>
-    ipcRenderer.invoke("schedule-scraping", time, asinDataList),
+  initScheduledTime: (callback) => {
+    ipcRenderer.on("init-scheduled-time", callback);
+  },
 
-  loadTransferData: (callback) =>
-    ipcRenderer.on("load-transfer-data", callback),
+  startScheduledScraping: (callback) => {
+    ipcRenderer.on("start-scheduled-scraping", callback);
+  },
+
+  // ====================================================================
 
   disposeListener: (channel, callback) =>
     ipcRenderer.removeListener(channel, callback),
@@ -74,6 +85,9 @@ contextBridge.exposeInMainWorld("myAPI", {
     ipcRenderer.removeAllListeners("scraping-result");
     ipcRenderer.removeAllListeners("receive-asin-data");
     ipcRenderer.removeAllListeners("init-logout");
+    ipcRenderer.removeAllListeners("init-login");
     ipcRenderer.removeAllListeners("load-transfer-data");
+    ipcRenderer.removeAllListeners("init-scraping");
+    ipcRenderer.removeAllListeners("init-scheduled-time");
   },
 });

@@ -109,13 +109,13 @@ function Top() {
   const handleScrapingButton = () => {
     // ■ ログインウインドウの表示
     if (user.isAuthed === false) {
-      console.log("1");
+      console.log("1 handleScrapingButton ");
       window.myAPI.openLoginPrompt();
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
     } else if (user.isAuthed === true && user.plan === "f") {
-      console.log("2");
+      console.log("2 handleScrapingButton");
       gotoPlanURL();
 
       // ■ 待機状態での「取得開始」のクリック
@@ -125,7 +125,7 @@ function Top() {
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
-      console.log("3");
+      console.log("3 handleScrapingButton");
       // スクレイピングを開始
       dispatch(changeShowButtonStatus(1));
       handleRunScraping();
@@ -137,7 +137,7 @@ function Top() {
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
-      console.log("4");
+      console.log("4 handleScrapingButton");
       // 「本当に？」UIを表示
       dispatch(changeShowButtonStatus(2));
 
@@ -148,7 +148,7 @@ function Top() {
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {
-      console.log("5");
+      console.log("5 handleScrapingButton");
       // スクレイピングの終了処理を実行
       dispatch(changeShowButtonStatus(0));
       window.myAPI.stopScraping();
