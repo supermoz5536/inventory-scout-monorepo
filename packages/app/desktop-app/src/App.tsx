@@ -4,9 +4,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateAsinData,
+  updateIsScrapingTrueAll,
   updateWithLoadedData,
 } from "./slices/asinDataListSlice";
-import { changeSystemStatus } from "./slices/systemStatusSlice";
+import {
+  changeShowButtonStatus,
+  changeSystemStatus,
+} from "./slices/systemStatusSlice";
 import Top from "./pages/Top";
 import Manage from "./pages/Manage";
 import Setting from "./pages/Setting";
@@ -53,19 +57,25 @@ const App: React.FC = () => {
   let isInitialized: boolean = false;
 
   /// アプリ立ち上げの初期化処理
+  /// ⓪ systemStatusを初期化
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② 移行データの取得リスナーの配置と削除
   /// ③ ローカルストレージデータのロード
   /// ④ サーバーサイドの認証ステータスと常に同期するリスナーを設置
   /// ⑤ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
   /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
-  /// ⑦
-  /// ⑧ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
+  /// ⑦ 保存されてる定時スクレイピングの指定時刻の再設定
+  /// ⑧ メインプロセスの定時スクレイピング実行をリスンして状態変数を更新
+  /// ⑨ 中断されていた場合の自動フォローアップ (自動ログイン時がTrue === ログイン状態の場合のみ)
   useEffect(() => {
     if (isInitialized === false) {
       isInitialized = true;
       (async () => {
         try {
+          // ⓪
+          dispatch(changeSystemStatus(0));
+          dispatch(changeShowButtonStatus(0));
+
           // ①
           console.log("scrapingResult called");
           window.myAPI.scrapingResult(handleScrapingResult);
@@ -100,16 +110,21 @@ const App: React.FC = () => {
             });
           }
 
-          // ⑦
-          // 保存されてる定時スクレイピングの指定時刻にセッティングします。
+          // ⑦ 保存されてる定時スクレイピングの指定時刻にセッティングします。
           await window.myAPI.initScheduledTime(() => {
             window.myAPI.scheduledScraping(
-              systemStatusRef.current.scheduledScrapingTime,
-              asinDataList
+              systemStatusRef.current.scheduledScrapingTime
             );
           });
 
-          // ⑧
+          // ⑧ メインプロセスの定時スクレイピング実行をリスンして状態変数を更新
+          window.myAPI.startScheduledScraping(() => {
+            dispatch(changeSystemStatus(1));
+            dispatch(changeShowButtonStatus(1));
+            dispatch(updateIsScrapingTrueAll());
+          });
+
+          // ⑨
           // 有料プランにログインしてる場合に実行
           // ■ 同日に前回の処理が中断されている場合の自動処理
           if (

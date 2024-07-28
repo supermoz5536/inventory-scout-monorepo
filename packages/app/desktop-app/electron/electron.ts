@@ -217,36 +217,62 @@ ipcMain.handle("stopScraping", async () => {
 });
 
 /// 定時スクレイピングの実行関数
-ipcMain.handle(
-  "schedule-scraping",
-  async (event, time: string, asinDataList: AsinData[]) => {
-    if (scheduledTask) {
-      scheduledTask.stop();
-    }
+ipcMain.handle("schedule-scraping", async (event, time: string) => {
+  // 既に予約が入っている場合は
+  // それをキャンセル(stop)して再設定します。
+  if (scheduledTask) scheduledTask.stop();
 
-    const [hour, minute] = time.split(":");
-    const cronTime = `${minute} ${hour} * * *`;
+  const [hour, minute] = time.split(":");
+  const cronTime = `${minute} ${hour} * * *`;
+  const data = await loadJsonData();
+  const loadedAsinDataList = await parseJsonToJS(data);
 
-    scheduledTask = cron.schedule(cronTime, async () => {
-      try {
+  // runScrapingの処理対象とするため
+  // 全てのitemのisScrapingをtrueに更新
+  loadedAsinDataList.forEach((item) => (item.isScraping = true));
+
+  // runScarapingの予約処理を実行
+  // ブラウザが存在してる(手動トリガーでのスクレイピング宇宙)場合は
+  // 予約のコールバックを実行しない
+  scheduledTask = cron.schedule(cronTime, async () => {
+    try {
+      if (!browser) {
+        // メインウインドウが開かれてない場合
+        if (mainWindow === null) {
+          createMainWindow();
+          // ウィンドウが完全にロードされるのを待つ
+          await new Promise<void>((resolve) => {
+            if (mainWindow.isloading()) {
+              mainWindow.webContents.once("did-finish-load", resolve);
+            } else {
+              resolve();
+            }
+          });
+        }
+
+        // ロードされたら状態変数更新の通知をメインウインドウに送り
+        // メインウインドウで更新処理を行う
+        mainWindow.webContents.send("start-scheduled-scraping");
+
         scrape = await scrapePromis;
         browser = await scrape.launchBrowser();
+
         await scrape.runScraping(
           scrape,
           browser,
           updateGlobalBrowser,
           event,
-          asinDataList
+          loadedAsinDataList
         );
-      } catch (error) {
-        console.error("schedule-scraping ERROR", error);
-        return "schedule-scraping ERROR"; // エラーメッセージを返す
       }
-    });
+    } catch (error) {
+      console.error("schedule-scraping ERROR", error);
+      return "schedule-scraping ERROR"; // エラーメッセージを返す
+    }
+  });
 
-    return "Scraping scheduled";
-  }
-);
+  return "Scraping scheduled";
+});
 
 ipcMain.handle("save-data", (event, data) => {
   saveDataToStorage(data);
