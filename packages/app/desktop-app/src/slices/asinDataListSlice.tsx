@@ -89,10 +89,13 @@ export const asinSlice = createSlice({
     /// 全てのasinData要素のisScrapingを
     /// Trueにする関数
     updateIsScrapingTrueAll: (state) => {
-      const arrayLength = state.value.length;
-      for (let index = 0; index < arrayLength; ++index) {
-        state.value[index].isScraping = true;
-      }
+      state.value.forEach((item) => {
+        item.isScraping = true;
+      });
+      // const arrayLength = state.value.length;
+      // for (let index = 0; index < arrayLength; ++index) {
+      //   state.value[index].isScraping = true;
+      // }
     },
 
     /// 全ての削除用のCheckBoxの値を反転させる関数
