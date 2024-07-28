@@ -1,20 +1,49 @@
 import React, { useState } from "react";
 import "./AuthedScrapeSection.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  changeIsScheduledScrapingAble,
+  changeScheduledTime,
+} from "../../slices/systemStatusSlice";
 
 const AuthedScrapeSection = () => {
-  let time: string = "00:00";
-  let isAutoScraping: boolean = false;
   const asinDataList: AsinData[] = useSelector(
     (state: RootState) => state.asinDataList.value
   );
-  const systemStatus: number = useSelector(
-    (state: RootState) => state.systemStatus.value.systemStatus
+
+  const systemStatus: any = useSelector(
+    (state: RootState) => state.systemStatus.value
   );
+
   const user = useSelector((state: RootState) => state.user.value);
+
+  // 定時スクレイピングのON/OFFのチェックボックスの状態管理に用いる変数
+  const [isScheduledScrapingAble, setIsScheduledScrapingAble] =
+    useState<boolean>(systemStatus.isScheduledScrapingAble);
+
+  // データ取得の指定時刻の状態管理に用いる変数
+  const [inputScheduledTime, setInputScheduledTime] = useState<string>(
+    systemStatus.scheduledScrapingTime
+  );
+
+  // 保存ボタンを押した際のコールバックをハンドリングするための変数
   const [isScrapeTimeChanged, setIsScrapeTimeChanged] = useState<
     boolean | null
   >(null);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  // 定時スクレイピングのON/OFFのチェックボックスのコールバックです
+  const handleCheckBox = (checked: boolean) => {
+    setIsScheduledScrapingAble(checked);
+    dispatch(changeIsScheduledScrapingAble(checked));
+  };
+
+  // 保存ボタンを押した際のコールバックです。
+  const handleSaveScheduledTime = (inputTime: string) => {
+    setInputScheduledTime(inputTime);
+    dispatch(changeScheduledTime(inputTime));
+  };
 
   // システムステータスがスクレピングを実行中ではない場合
   // かつ
@@ -22,7 +51,7 @@ const AuthedScrapeSection = () => {
   // 定時スクレイピングを実行します
   const handleScheduledScraping = () => {
     if (![1, 2, 3].includes(systemStatus) && user.isAuthed === true) {
-      window.myAPI.scheduledScraping(time, asinDataList);
+      window.myAPI.scheduledScraping(inputScheduledTime, asinDataList);
       setIsScrapeTimeChanged(true);
     }
   };
@@ -39,9 +68,10 @@ const AuthedScrapeSection = () => {
           </p>
           <input
             className="authed-scrape-section-item-value-1"
+            checked={isScheduledScrapingAble}
             type="checkbox"
             onChange={(event) => {
-              isAutoScraping = event.target.checked;
+              handleCheckBox(event.target.checked);
             }}
           />
         </div>
@@ -49,9 +79,10 @@ const AuthedScrapeSection = () => {
           <p>時刻の指定：</p>
           <input
             type="time"
+            value={inputScheduledTime}
             className="authed-scrape-section-item-value-2"
             onChange={(event) => {
-              time = event.target.value;
+              handleSaveScheduledTime(event.target.value);
             }}
           />
         </div>

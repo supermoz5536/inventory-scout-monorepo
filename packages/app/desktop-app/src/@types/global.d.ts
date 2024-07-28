@@ -99,8 +99,9 @@ declare global {
 
   interface SystemStatus {
     systemStatus: number;
-    isConfirmed: boolean;
     showButtonStatus: number;
+    isScheduledScrapingAble: boolean;
+    scheduledScrapingTime: string;
   }
 
   interface IsAutoLoginProps {

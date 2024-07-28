@@ -3,8 +3,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState: { value: SystemStatus } = {
   value: {
     systemStatus: 0,
-    isConfirmed: false,
     showButtonStatus: 0,
+    isScheduledScrapingAble: false,
+    scheduledScrapingTime: "00:00",
   },
 };
 
@@ -26,12 +27,16 @@ export const systemStatusSlice = createSlice({
       state.value.systemStatus = action.payload;
     },
 
-    changeIsConfirmed: (state, action: PayloadAction<boolean>) => {
-      state.value.isConfirmed = action.payload;
-    },
-
     changeShowButtonStatus: (state, action: PayloadAction<number>) => {
       state.value.showButtonStatus = action.payload;
+    },
+
+    changeIsScheduledScrapingAble: (state, action: PayloadAction<boolean>) => {
+      state.value.isScheduledScrapingAble = action.payload;
+    },
+
+    changeScheduledTime: (state, action: PayloadAction<string>) => {
+      state.value.scheduledScrapingTime = action.payload;
     },
   },
 });
@@ -40,8 +45,12 @@ export const systemStatusSlice = createSlice({
 // addAsinとdeleteAsinというプロパティを抽出し、
 // 各々を同名の"addAsin" "deleteAsin" という名前の変数に
 // 割り当てるための分割代入を使用した文法です。
-export const { changeSystemStatus, changeIsConfirmed, changeShowButtonStatus } =
-  systemStatusSlice.actions;
+export const {
+  changeSystemStatus,
+  changeShowButtonStatus,
+  changeIsScheduledScrapingAble,
+  changeScheduledTime,
+} = systemStatusSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
 // reducerもエクスポートしておきます。
