@@ -1097,8 +1097,9 @@ const scrapePromise = (async () => {
           );
         }
         await browser.close();
+        updateGlobalBrowser(null);
         // レンダラープロセスにスクレイピング終了を知らせるデータを送信
-        console.log("isEndを送信");
+        // 第二引数 isEndをtrueで送信
         event.sender.send("scraping-result", null, true);
       } catch (error: any) {
         console.log("Error message:", error.message);
@@ -1126,8 +1127,9 @@ const scrapePromise = (async () => {
         } else {
           console.log("最大リトライ回数に達しました。処理を終了します。");
           await browser.close();
-          const isEnd: boolean | null = true;
-          console.log("isEndを送信");
+          updateGlobalBrowser(null);
+          // レンダラープロセスにスクレイピング終了を知らせるデータを送信
+          // 第二引数 isEndをtrueで送信
           event.sender.send("scraping-result", null, true);
         }
       }

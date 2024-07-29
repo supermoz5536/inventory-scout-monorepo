@@ -8,7 +8,7 @@ const Setting = () => {
   const user = useSelector((state: RootState) => state.user.value);
 
   // 「次回からは自動でログインする」のチェックボックスの真偽値の状態を格納する変数を宣言
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(user.isAutoLogIn);
 
   // 子コンポーネント(GuestLoginSection)にpropsで渡し
   // 親コンポーネント(Setting)のisChecked変数を更新して

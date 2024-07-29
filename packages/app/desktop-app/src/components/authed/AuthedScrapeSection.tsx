@@ -96,7 +96,7 @@ const AuthedScrapeSection = () => {
           {isScrapeTimeChanged === null
             ? ""
             : isScrapeTimeChanged
-            ? `時刻を${savedScheduledTime}で保存しました（指定の時刻にアプリが起動していない場合、また、プラン未加入の場合は実行されません）`
+            ? `時刻を${savedScheduledTime}で保存しました（指定時刻にアプリを起動してログインしていない場合、また、プラン未加入の場合は実行されません）`
             : "システムエラーです。運営者にお問い合わせください。"}
         </p>
       </div>

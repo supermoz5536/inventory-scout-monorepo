@@ -219,45 +219,55 @@ ipcMain.handle("stopScraping", async () => {
 
 /// 定時スクレイピングの実行関数
 ipcMain.handle("schedule-scraping", async (event, time: string) => {
+  console.log("■ 1");
   // 既に予約が入っている場合は
   // それをキャンセル(stop)して再設定します。
   if (scheduledTask) scheduledTask.stop();
-
+  console.log("■ 2 scheduledTask =", scheduledTask);
   const [hour, minute] = time.split(":");
   const cronTime = `${minute} ${hour} * * *`;
   const data = await loadJsonData();
   const loadedAsinDataList = await parseJsonToJS(data);
-
+  console.log("■ 3");
   // runScrapingの処理対象とするため
   // 全てのitemのisScrapingをtrueに更新
   loadedAsinDataList.forEach((item) => (item.isScraping = true));
-
+  console.log("■ 4");
   // runScarapingの予約処理を実行
   // ブラウザが存在してる(手動トリガーでのスクレイピング宇宙)場合は
   // 予約のコールバックを実行しない
   scheduledTask = cron.schedule(cronTime, async () => {
+    console.log("■ 5");
     try {
+      console.log("■ 6");
       if (!browser) {
+        console.log("■ 7");
         // メインウインドウが開かれてない場合
         if (mainWindow === null) {
+          console.log("■ 8");
           createMainWindow();
+          console.log("■ 9");
           // ウィンドウが完全にロードされるのを待つ
           await new Promise<void>((resolve) => {
+            console.log("■ 10");
             if (mainWindow.isloading()) {
+              console.log("■ 11");
               mainWindow.webContents.once("did-finish-load", resolve);
             } else {
+              console.log("■ 12");
               resolve();
             }
           });
         }
-
+        console.log("■ 13");
         // ロードされたら状態変数更新の通知をメインウインドウに送り
         // メインウインドウで更新処理を行う
         mainWindow.webContents.send("start-scheduled-scraping");
-
+        console.log("■ 14");
         scrape = await scrapePromis;
+        console.log("■ 15");
         browser = await scrape.launchBrowser();
-
+        console.log("■ 16");
         await scrape.runScraping(
           scrape,
           browser,
@@ -265,7 +275,9 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
           event,
           loadedAsinDataList
         );
+        console.log("■ 17");
       }
+      console.log("■ 18");
     } catch (error) {
       console.error("schedule-scraping ERROR", error);
       return "schedule-scraping ERROR"; // エラーメッセージを返す
@@ -403,7 +415,7 @@ function openPreferences() {
   }
 
   prefWindow = new BrowserWindow({
-    width: 450,
+    width: 500,
     height: 900,
     resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
