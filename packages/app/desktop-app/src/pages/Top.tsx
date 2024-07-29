@@ -19,6 +19,7 @@ import {
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
+import ConfirmReExcuteDialog from "../components/ConfirmReExcuteDialog";
 
 function Top() {
   const asinDataList = useSelector(
@@ -55,6 +56,7 @@ function Top() {
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
     asinDataListRef.current
   );
+  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -203,8 +205,7 @@ function Top() {
       // 本日のデータ取得を完了していることを意味するので
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
-      dispatch(changeSystemStatus(4));
-      dispatch(changeShowButtonStatus(0));
+      setIsOpenDialog(true);
     } else if (isScrapingFalseAll && !isDoneTodayAtLeast1) {
       console.log("■ 2 handleRunScraping");
       // 全てのデータ取得が完了状態で
@@ -611,6 +612,12 @@ function Top() {
             ? `データ取得が完了しました。`
             : `System cord e`}
         </p>
+      </div>
+      <div>
+        <ConfirmReExcuteDialog
+          isOpenDialog={isOpenDialog}
+          setIsOpenDialog={setIsOpenDialog}
+        />
       </div>
     </div>
   );
