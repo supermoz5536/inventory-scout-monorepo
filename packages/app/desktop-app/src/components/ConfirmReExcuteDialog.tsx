@@ -5,22 +5,46 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
+import { updateIsScrapingTrueAll } from "../slices/asinDataListSlice";
+import {
+  changeShowButtonStatus,
+  changeSystemStatus,
+} from "../slices/systemStatusSlice";
 
 const ConfirmReExcuteDialog = ({
   isOpenDialog,
   setIsOpenDialog,
 }: ConfirmReExcuteDialogProps) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const asinDataList = useSelector(
+    (state: RootState) => state.asinDataList.value
+  );
+  const asinDataListRef = useRef(asinDataList);
+  useEffect(() => {
+    asinDataListRef.current = asinDataList;
+  }, [asinDataList]);
+
   const handleClickOpen = () => {
     setIsOpenDialog(true);
   };
 
-  const handleActionYes = () => {
+  const handleActionYes = async () => {
     setIsOpenDialog(false);
-    // ■■■■■■■■ スクレイピングの実行
+    console.log("■ excuted runScraping in dialog");
+    dispatch(updateIsScrapingTrueAll());
+    await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
+    window.myAPI.runScraping(asinDataListRef.current);
+    dispatch(changeSystemStatus(1));
+    dispatch(changeShowButtonStatus(1));
   };
 
   const handleActionNo = () => {
     setIsOpenDialog(false);
+    dispatch(changeSystemStatus(4));
+    dispatch(changeShowButtonStatus(0));
   };
 
   return (
@@ -32,11 +56,13 @@ const ConfirmReExcuteDialog = ({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"本日分のデータ取得はすでに完了しています。"}
+          {"本日分のデータ取得は、全てのASINですでに完了しています。"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <p>もしこのまま実行すると、新規取得データを上書きします。</p>
+            <p>
+              もしこのまま実行すると、新規取得データを本日分として上書きします。
+            </p>
             {/* <br /> */}
             <p>本当に実行しますか？</p>
           </DialogContentText>

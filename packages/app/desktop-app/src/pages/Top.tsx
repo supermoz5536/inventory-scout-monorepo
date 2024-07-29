@@ -56,7 +56,7 @@ function Top() {
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
     asinDataListRef.current
   );
-  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(true);
+  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -206,8 +206,6 @@ function Top() {
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
       setIsOpenDialog(true);
-      dispatch(changeSystemStatus(4));
-      dispatch(changeShowButtonStatus(0));
     } else if (isScrapingFalseAll && !isDoneTodayAtLeast1) {
       console.log("■ 2 handleRunScraping");
       // 全てのデータ取得が完了状態で
@@ -272,10 +270,6 @@ function Top() {
     await new Promise((resolve) => setTimeout(resolve, 200));
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
-  };
-
-  const handleDialog = (value: boolean) => {
-    setIsOpenDialog(value);
   };
 
   const handleDeleteCheck = (id: string) => {
