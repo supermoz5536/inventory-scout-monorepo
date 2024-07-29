@@ -119,6 +119,11 @@ declare global {
     onChange?: (dates: [Date, Date]) => void;
     setSelectedSellerIndex?: (index: number) => void;
   }
+
+  interface ConfirmReExcuteDialogProps {
+    isOpenDialog: boolean;
+    setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  }
 }
 
 // tsの構文では
