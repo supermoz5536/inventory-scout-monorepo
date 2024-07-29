@@ -72,12 +72,15 @@ const App: React.FC = () => {
       isInitialized = true;
       (async () => {
         try {
+          console.log("Initializing process excuted");
+
           // ⓪
-          dispatch(changeSystemStatus(0));
-          dispatch(changeShowButtonStatus(0));
+          window.myAPI.initSystemStatus(() => {
+            dispatch(changeSystemStatus(0));
+            dispatch(changeShowButtonStatus(0));
+          });
 
           // ①
-          console.log("scrapingResult called");
           window.myAPI.scrapingResult(handleScrapingResult);
 
           // ②

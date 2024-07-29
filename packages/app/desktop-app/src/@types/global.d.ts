@@ -22,6 +22,7 @@ declare global {
       receiveAsinData: (
         callback: (event: any, asinData: AsinData) => void
       ) => void;
+      initSystemStatus: (callback: () => void) => void;
       initLogout: (callback: () => void) => Promise<void>;
       initLogin: (
         callback: (
