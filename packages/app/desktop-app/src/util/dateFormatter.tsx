@@ -12,3 +12,9 @@ export const convertDateToString = (date: Date) => {
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
 };
+
+// export const getTommorowDate = () => {
+//   const newDate = new Date(); // 元の日付をコピー
+//   newDate.setDate(newDate.getDate() + 1); // 日付を1日加算
+//   return newDate;
+// };

@@ -55,7 +55,7 @@ const Chart = ({ data, selectedSellerIndex }: StockDetailProps) => {
             data={data}
             margin={{
               top: 20,
-              right: 0,
+              right: 10,
               left: 5,
               bottom: 0,
             }}

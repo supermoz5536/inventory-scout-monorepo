@@ -41,7 +41,7 @@ const Table = ({ columnHeader, data }: StockDetailProps) => {
       // variant="outlined"
       square
       sx={{
-        width: 1083.5,
+        width: 1073.5,
         height: 300,
         marginLeft: 8,
         marginBottom: 0,
