@@ -22,6 +22,7 @@ let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
+let isInitSystemStatus: boolean = false;
 let isInitLogoutDone: boolean = false;
 let isInitLoginDone: boolean = false;
 let isInitScraping: boolean = false;
@@ -332,12 +333,21 @@ function createMainWindow() {
 
   mainWindow.loadURL(appURL);
 
+  // 起動時のみsystemStatusを初期化
+  // ウィンドウの読み込みが完了した後に処理します
+  mainWindow.webContents.once("did-finish-load", () => {
+    if (isInitSystemStatus === false) {
+      mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
+      isInitSystemStatus = true; // 更新処理が実行されたことを記録
+    }
+  });
+
   // 起動時のみログアウト処理を実行
   // ウィンドウの読み込みが完了した後に処理します
   mainWindow.webContents.once("did-finish-load", () => {
     if (isInitLogoutDone === false) {
-      mainWindow.webContents.send("init-logout"); // レンダラープロセスにメッセージを送信
-      isInitLogoutDone = true; // ログアウト処理が実行されたことを記録
+      mainWindow.webContents.send("init-logout");
+      isInitLogoutDone = true;
     }
   });
 

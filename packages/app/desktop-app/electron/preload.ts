@@ -50,6 +50,9 @@ contextBridge.exposeInMainWorld("myAPI", {
 
   // ====================================================================
 
+  initSystemStatus: (callback) =>
+    ipcRenderer.on("init-system-status", callback),
+
   scrapingResult: (callback) => ipcRenderer.on("scraping-result", callback),
 
   receiveAsinData: (callback) => ipcRenderer.on("receive-asin-data", callback),
