@@ -20,6 +20,7 @@ import {
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
 import ConfirmReExcuteDialog from "../components/ConfirmReExcuteDialog";
+import { Tab, Tabs } from "@mui/material";
 
 function Top() {
   const asinDataList = useSelector(
@@ -313,7 +314,22 @@ function Top() {
     <div className="App">
       {/* タブ部分 */}
       <div className="top-square-space-tab">
-        <button
+        <Tabs>
+          <Tab
+            label="トップ画面"
+            onClick={() => {
+              navigate("/Top");
+            }}
+          />
+          <Tab
+            label="リスト管理画面"
+            onClick={() => {
+              navigate("/Manage");
+            }}
+          />
+        </Tabs>
+
+        {/* <button
           className="top-square-space-tab-button"
           onClick={() => {
             // App.tsxでマッピングしたURLパスを指定
@@ -329,7 +345,7 @@ function Top() {
           }}
         >
           ASIN管理
-        </button>
+        </button> */}
       </div>
 
       {/* メニュー部分 */}
