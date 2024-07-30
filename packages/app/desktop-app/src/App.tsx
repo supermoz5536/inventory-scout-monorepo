@@ -262,7 +262,7 @@ const App: React.FC = () => {
       <Routes>
         {/* ユーザーがアプリケーションのルートURL (/) にアクセスしたときに、
         /Topにリダイレクトするための設定です。 */}
-        <Route path="/" element={<Navigate to="/Top" />} />
+        <Route path="/" element={<Navigate to="/MainWindow" />} />
         {/* 各ページのURLパスと対応するコンポーネントをルートをマッピングしてます。 */}
         <Route path="/Top" element={<Top />} />
         <Route path="/Manage" element={<Manage />} />

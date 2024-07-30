@@ -314,22 +314,7 @@ function Top() {
     <div className="App">
       {/* タブ部分 */}
       <div className="top-square-space-tab">
-        <Tabs>
-          <Tab
-            label="トップ画面"
-            onClick={() => {
-              navigate("/Top");
-            }}
-          />
-          <Tab
-            label="リスト管理画面"
-            onClick={() => {
-              navigate("/Manage");
-            }}
-          />
-        </Tabs>
-
-        {/* <button
+        <button
           className="top-square-space-tab-button"
           onClick={() => {
             // App.tsxでマッピングしたURLパスを指定
@@ -345,7 +330,7 @@ function Top() {
           }}
         >
           ASIN管理
-        </button> */}
+        </button>
       </div>
 
       {/* メニュー部分 */}
