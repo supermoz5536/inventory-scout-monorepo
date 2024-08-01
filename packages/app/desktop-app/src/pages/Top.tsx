@@ -624,7 +624,6 @@ function Top() {
         sx={{
           justifyContent: "center",
           backgroundColor: "white",
-          // backgroundColor: "#00BCD4",
           minHeight: "45px",
           height: "45px",
           boxShadow: 3,

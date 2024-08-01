@@ -21,6 +21,7 @@ const MainWindow = () => {
 
   return (
     <TabContext value={isSelectedTab}>
+      {/* タブの部分のコンテナ */}
       <Box
         component={"div"}
         className="main-window-tabs"
@@ -35,12 +36,32 @@ const MainWindow = () => {
           value={isSelectedTab}
           onChange={handleChangeTab}
           sx={{ minHeight: "45px", height: "45px" }}
+          TabIndicatorProps={{ style: { backgroundColor: "white" } }} // カーソルの色を白に変更
         >
-          <Tab value="0" label="トップ画面" sx={{ color: "white" }} />
-          <Tab value="1" label="リスト管理画面" />
+          <Tab
+            value="0"
+            label="トップ画面"
+            sx={{
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "bold",
+              "&.Mui-selected": { color: "white" }, // 選択時の文字色を白に設定
+            }}
+          />
+          <Tab
+            value="1"
+            label="リスト管理画面"
+            sx={{
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "bold",
+              "&.Mui-selected": { color: "white" }, // 選択時の文字色を白に設定
+            }}
+          />
         </Tabs>
       </Box>
 
+      {/* Body部分のコンテナ */}
       <Box
         component={"div"}
         sx={{
