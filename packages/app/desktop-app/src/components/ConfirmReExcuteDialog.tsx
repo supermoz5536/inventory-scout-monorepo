@@ -27,10 +27,6 @@ const ConfirmReExcuteDialog = ({
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
-  const handleClickOpen = () => {
-    setIsOpenDialog(true);
-  };
-
   const handleActionYes = async () => {
     setIsOpenDialog(false);
     console.log("■ excuted runScraping in dialog");

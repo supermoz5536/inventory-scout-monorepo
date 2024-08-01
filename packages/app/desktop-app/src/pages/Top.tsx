@@ -20,7 +20,16 @@ import {
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
 import ConfirmReExcuteDialog from "../components/ConfirmReExcuteDialog";
-import { Tab, Tabs } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 
 function Top() {
   const asinDataList = useSelector(
@@ -312,34 +321,28 @@ function Top() {
 
   return (
     <div className="App">
-      {/* タブ部分 */}
-      {/* <div className="top-square-space-tab">
-        <button
-          className="top-square-space-tab-button"
-          onClick={() => {
-            // App.tsxでマッピングしたURLパスを指定
-            navigate("/Top");
-          }}
-        >
-          メイン画面
-        </button>
-        <button
-          className="top-square-space-tab-button"
-          onClick={() => {
-            navigate("/Manage");
-          }}
-        >
-          ASIN管理
-        </button>
-      </div> */}
-
       {/* メニュー部分 */}
-      <div className="top-square-space-menu">
+      <Box
+        className="top-square-space-menu"
+        component={"div"}
+        sx={{
+          marginBottom: "15px",
+          boxShadow: 2, // 影のレベルを指定
+        }}
+      >
         <div className="top-square-space-menu-container-left">
           {/* Scraperコンポーネントの実行ボタン */}
-          <button
+          <Button
             className="top-square-space-menu-container-left-scraping"
             onClick={() => handleScrapingButton()}
+            variant="contained"
+            sx={{
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+            }}
           >
             {showButtonStatus === 0
               ? "取得開始"
@@ -348,7 +351,8 @@ function Top() {
               : showButtonStatus === 2
               ? "本当に？"
               : null}
-          </button>
+          </Button>
+
           {/* 全選択チェック */}
           <input
             type="checkbox"
@@ -358,11 +362,15 @@ function Top() {
             }
           />
           {/* ASIN検索入力欄 */}
-          <input
-            type="text"
+          <TextField
+            className="top-square-space-menu-container-left-input"
+            label="検索するASINを入力"
+            variant="standard"
             value={asinQuery}
             onChange={(event) => handleAsinQuery(event.target.value)}
-            className="top-square-space-menu-container-left-input"
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
         </div>
 
@@ -376,35 +384,51 @@ function Top() {
           <p className="top-square-space-menu-container-center-decrease2">
             減少２： 直近７日間の減少数
           </p>
-          <input
+          <TextField
+            className="top-square-space-menu-container-center-input"
+            value={nameQuery}
+            label="検索する商品名を入力"
+            variant="standard"
             onChange={(event) => {
               handleNameQuery(event.target.value);
             }}
-            value={nameQuery}
-            type="text"
-            className="top-square-space-menu-container-center-input"
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
-        </div>
-        <div className="top-square-space-menu-container-right">
-          <button
-            className="top-square-space-menu-container-right-delete-button"
+          <Button
+            className="top-square-space-menu-container-center-delete-button"
             onClick={() => {
               handleRemoveAsin();
             }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+            }}
           >
             チェックしたASINを削除
-          </button>
-          <p className="top-square-space-menu-container-right-asin-num">
-            登録ASIN数：{asinDataListCount}
+          </Button>
+          <p className="top-square-space-menu-container-center-asin-num">
+            登録ASIN数：20
           </p>
-          <input
-            value={parentQuery}
-            onChange={(event) => handleParentQuery(event.target.value)}
-            type="text"
+        </div>
+        <div className="top-square-space-menu-container-right">
+          <TextField
             className="top-square-space-menu-container-right-input"
+            value={parentQuery}
+            label="検索する親ASINを入力"
+            variant="standard"
+            onChange={(event) => handleParentQuery(event.target.value)}
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
         </div>
-      </div>
+      </Box>
 
       {/* リスト全体 */}
       <div className="top-globalList">
@@ -597,23 +621,38 @@ function Top() {
           ))}
         </div>
       </div>
-      <div className="top-bottom-container">
-        <p>
-          {systemStatus === 0
-            ? ""
-            : systemStatus === 1
-            ? `データ取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 2
-            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 3
-            ? `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 4
-            ? `本日分のデータ取得は既に完了しています。`
-            : systemStatus === 5
-            ? `データ取得が完了しました。`
-            : `System cord e`}
-        </p>
-      </div>
+      {/* static: AppBar が通常の文書フローに従って配置されます。
+       スクロールしても固定されず、他のコンテンツと一緒にスクロールされます。 */}
+      <Box
+        component={"div"}
+        className="top-bottom-container"
+        sx={{
+          justifyContent: "center",
+          backgroundColor: "white",
+          // backgroundColor: "#00BCD4",
+          minHeight: "45px",
+          height: "45px",
+          boxShadow: 3,
+        }}
+      >
+        <Typography variant="h5" sx={{ color: "white", fontWeight: "bold" }}>
+          <p>
+            {systemStatus === 0
+              ? ""
+              : systemStatus === 1
+              ? `データ取得中...残り${scrapeTimeLeft}分`
+              : systemStatus === 2
+              ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
+              : systemStatus === 3
+              ? `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
+              : systemStatus === 4
+              ? `本日分のデータ取得は既に完了しています。`
+              : systemStatus === 5
+              ? `データ取得が完了しました。`
+              : `System cord e`}
+          </p>
+        </Typography>
+      </Box>
       <div>
         <ConfirmReExcuteDialog
           isOpenDialog={isOpenDialog}
