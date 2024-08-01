@@ -30,6 +30,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { ConfirmDeleteDataDialog } from "../components/ConfirmDeleteDataDialog";
 
 function Top() {
   const asinDataList = useSelector(
@@ -66,7 +67,11 @@ function Top() {
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
     asinDataListRef.current
   );
-  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+  const [isOpenConfirmReExcuteDialog, setIsOpenConfirmReExcuteDialog] =
+    useState<boolean>(false);
+
+  const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -215,7 +220,7 @@ function Top() {
       // 本日のデータ取得を完了していることを意味するので
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
-      setIsOpenDialog(true);
+      setIsOpenConfirmReExcuteDialog(true);
     } else if (isScrapingFalseAll && !isDoneTodayAtLeast1) {
       console.log("■ 2 handleRunScraping");
       // 全てのデータ取得が完了状態で
@@ -270,16 +275,6 @@ function Top() {
         dispatch(changeShowButtonStatus(1));
       }
     }
-  };
-
-  /// チェックしたAsinリストを削除して
-  /// ストレージを最新に更新する関数
-  const handleRemoveAsin = async () => {
-    dispatch(removeAsin());
-    // 状態変数の更新が完了するまで200ms待機
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    // ストレージに最新のasinDataListを保存
-    await window.myAPI.saveData(asinDataListRef.current);
   };
 
   const handleDeleteCheck = (id: string) => {
@@ -399,7 +394,7 @@ function Top() {
           <Button
             className="top-square-space-menu-container-center-delete-button"
             onClick={() => {
-              handleRemoveAsin();
+              setIsOpenConfirmDeleteDataDialog(true);
             }}
             variant="contained"
             sx={{
@@ -413,7 +408,7 @@ function Top() {
             チェックしたASINを削除
           </Button>
           <p className="top-square-space-menu-container-center-asin-num">
-            登録ASIN数：20
+            {`登録ASIN数：${asinDataListRef.current.length}`}
           </p>
         </div>
         <div className="top-square-space-menu-container-right">
@@ -655,8 +650,14 @@ function Top() {
       </Box>
       <div>
         <ConfirmReExcuteDialog
-          isOpenDialog={isOpenDialog}
-          setIsOpenDialog={setIsOpenDialog}
+          isOpenConfirmReExcuteDialog={isOpenConfirmReExcuteDialog}
+          setIsOpenConfirmReExcuteDialog={setIsOpenConfirmReExcuteDialog}
+        />
+      </div>
+      <div>
+        <ConfirmDeleteDataDialog
+          isOpenConfirmDeleteDataDialog={isOpenConfirmDeleteDataDialog}
+          setIsOpenConfirmDeleteDataDialog={setIsOpenConfirmDeleteDataDialog}
         />
       </div>
     </div>

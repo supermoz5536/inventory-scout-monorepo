@@ -14,8 +14,8 @@ import {
 } from "../slices/systemStatusSlice";
 
 const ConfirmReExcuteDialog = ({
-  isOpenDialog,
-  setIsOpenDialog,
+  isOpenConfirmReExcuteDialog: isOpenDialog,
+  setIsOpenConfirmReExcuteDialog: setIsOpenDialog,
 }: ConfirmReExcuteDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
