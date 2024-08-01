@@ -313,7 +313,7 @@ function Top() {
   return (
     <div className="App">
       {/* タブ部分 */}
-      <div className="top-square-space-tab">
+      {/* <div className="top-square-space-tab">
         <button
           className="top-square-space-tab-button"
           onClick={() => {
@@ -331,7 +331,7 @@ function Top() {
         >
           ASIN管理
         </button>
-      </div>
+      </div> */}
 
       {/* メニュー部分 */}
       <div className="top-square-space-menu">
