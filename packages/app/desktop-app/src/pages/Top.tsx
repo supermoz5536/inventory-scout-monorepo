@@ -31,6 +31,9 @@ import {
   Typography,
 } from "@mui/material";
 import { ConfirmDeleteDataDialog } from "../components/ConfirmDeleteDataDialog";
+import DoneIcon from "@mui/icons-material/Done";
+import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
+import { Footer } from "../components/Footer";
 
 function Top() {
   const asinDataList = useSelector(
@@ -616,37 +619,8 @@ function Top() {
           ))}
         </div>
       </div>
-      {/* static: AppBar が通常の文書フローに従って配置されます。
-       スクロールしても固定されず、他のコンテンツと一緒にスクロールされます。 */}
-      <Box
-        component={"div"}
-        className="top-bottom-container"
-        sx={{
-          justifyContent: "center",
-          backgroundColor: "white",
-          minHeight: "45px",
-          height: "45px",
-          boxShadow: 3,
-        }}
-      >
-        <Typography variant="h5" sx={{ color: "white", fontWeight: "bold" }}>
-          <p>
-            {systemStatus === 0
-              ? ""
-              : systemStatus === 1
-              ? `データ取得中...残り${scrapeTimeLeft}分`
-              : systemStatus === 2
-              ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-              : systemStatus === 3
-              ? `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
-              : systemStatus === 4
-              ? `本日分のデータ取得は既に完了しています。`
-              : systemStatus === 5
-              ? `データ取得が完了しました。`
-              : `System cord e`}
-          </p>
-        </Typography>
-      </Box>
+      {/* フッター部分のコンポーネントです。 */}
+      <Footer scrapeTimeLeft={scrapeTimeLeft} />
       <div>
         <ConfirmReExcuteDialog
           isOpenConfirmReExcuteDialog={isOpenConfirmReExcuteDialog}
