@@ -8,7 +8,7 @@ import Manage from "./Manage";
 
 const MainWindow = () => {
   const navigate = useNavigate();
-  const [isSelectedTab, setIsSelectedTab] = useState<any>();
+  const [isSelectedTab, setIsSelectedTab] = useState<any>("0");
 
   const handleChangeTab = (
     event: React.SyntheticEvent<Element, Event>,
