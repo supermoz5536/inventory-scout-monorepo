@@ -121,8 +121,17 @@ declare global {
   }
 
   interface ConfirmReExcuteDialogProps {
-    isOpenDialog: boolean;
-    setIsOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    isOpenConfirmReExcuteDialog: boolean;
+    setIsOpenConfirmReExcuteDialog: React.Dispatch<
+      React.SetStateAction<boolean>
+    >;
+  }
+
+  interface ConfirmDeleteDataDialogProps {
+    isOpenConfirmDeleteDataDialog: boolean;
+    setIsOpenConfirmDeleteDataDialog: React.Dispatch<
+      React.SetStateAction<boolean>
+    >;
   }
 }
 

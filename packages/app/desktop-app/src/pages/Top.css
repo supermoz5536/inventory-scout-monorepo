@@ -17,10 +17,13 @@
 }
 
 .top-square-space-menu {
-  background-color: rgb(255, 165, 165);
+  /* background-color: #81d4fa; */
+  /* background-color: #03a9f4; */
+  background-color: white;
+  /* background-color: #00bcd4; */
   width: 100%;
-  height: 110px;
-  border: 0.5px solid #c0c0c0;
+  height: 105px;
+  /* border: 0.5px solid #c0c0c0; */
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -28,12 +31,12 @@
 }
 
 .top-square-space-menu-container-left {
-  width: 385px;
-  height: 110px;
-  border: 0.5px solid #c0c0c0;
+  width: 387.5px;
+  /* border: 0.5px solid #c0c0c0; */
   display: flex;
   position: relative;
 }
+
 .top-square-space-menu-container-left-scraping {
   height: 25px;
   width: 90px;
@@ -41,41 +44,57 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 20%;
-  left: 20%;
+  top: 15%;
+  left: 5%;
 }
 
 .top-square-space-menu-container-left-check {
   position: absolute;
-  top: 77%;
-  left: 7%;
+  top: 75%;
+  left: 6.5%;
   transform: scale(1.5); /* サイズを1.5倍に拡大 */
 }
 
 .top-square-space-menu-container-left-input {
-  width: 100px;
+  width: 120px;
   height: 20px;
   position: absolute;
-  top: 72.5%;
-  left: 20%;
+  top: 45%;
+  left: -3%;
 }
 
 .top-square-space-menu-container-center {
   width: 832px;
-  height: 110px;
-  border: 0.5px solid #c0c0c0;
+  border-left: 0.5px solid #c0c0c0;
+  border-right: 0.5px solid #c0c0c0;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.top-square-space-menu-container-center p {
+  color: white;
+  font-weight: bold;
+}
+
 .top-square-space-menu-container-center-input {
-  width: 280px;
+  width: 290px;
   height: 20px;
   position: absolute;
-  top: 72.5%;
-  left: 1%;
+  top: 5%;
+  left: -19%;
+}
+
+.top-square-space-menu-container-center-delete-button {
+  width: 200px;
+  height: 25px;
+  position: absolute;
+  top: -24%;
+  left: -53.75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .top-square-space-menu-container-center-total-stock {
@@ -100,50 +119,41 @@
 }
 
 .top-square-space-menu-container-right {
-  width: 212px;
-  height: 110px;
-  border: 0.5px solid #c0c0c0;
+  width: 220px;
+  /* border: 0.5px solid #c0c0c0; */
   display: flex;
   position: relative;
   align-items: center;
   justify-content: center;
 }
 
-.top-square-space-menu-container-right-delete-button {
-  width: 165px;
-  height: 20px;
+.top-square-space-menu-container-center-asin-num {
   position: absolute;
-  top: 5%;
-  left: 5%;
+  top: 15%;
+  left: 29%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.top-square-space-menu-container-right-asin-num {
-  position: absolute;
-  top: 25%;
-  left: 5%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: grey !important;
   font-size: 15px;
+  font-weight: 100;
 }
 
 .top-square-space-menu-container-right-input {
-  width: 100px;
+  width: 125px;
   height: 20px;
   position: absolute;
-  top: 72.5%;
-  left: 48%;
+  top: 5%;
+  left: 30%;
 }
 
 .top-globalList {
   height: 750px;
-  width: 1466px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
+  width: 1485px; /*アイテム要素が横に増えたときにwidthが変動しないに固定値を設定*/
   max-height: 750px; /* この縦幅以上にリストが増えたらスクロール開始 */
-  max-width: 1466px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
-  background-color: rgb(156, 255, 250);
+  max-width: 1485px; /* この横幅以上にリスト要素が増えたらスクロール開始 */
+  /* background-color: rgb(156, 255, 250); */
+  background-color: white;
   display: flex;
   flex-direction: column;
   overflow-x: auto;
@@ -154,7 +164,7 @@
 
 .top-asin-list-header {
   z-index: 10; /* リスト要素の前面に表示する設定 */
-  background-color: beige;
+  background-color: #65b2c6;
   display: flex;
   flex-direction: row;
   position: absolute;
@@ -166,7 +176,8 @@
   display: flex;
   flex-direction: column;
   z-index: 200px;
-  background-color: rgb(215, 215, 255);
+  background-color: white;
+  /* background-color: rgb(215, 215, 255); */
   position: absolute;
   top: 65px;
   left: 0%;
@@ -185,6 +196,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0; /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/
+  color: white;
+  font-weight: bold;
 }
 
 .top-square-space-asin-delete input[type="checkbox"] {
@@ -324,18 +337,16 @@
 }
 
 .top-bottom-container {
-  height: 40px;
-  width: 1464px;
-  background-color: darkkhaki;
-  border: 0.5px solid #c0c0c0;
+  margin-top: 10px;
+  width: 1467px;
   position: relative;
 }
 
 .top-bottom-container p {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   position: absolute;
   top: 50%;
-  left: 1%;
+  left: 2%;
   transform: translate(0%, -50%); /* 第一引数がx軸、第二引数がy軸 */
 }

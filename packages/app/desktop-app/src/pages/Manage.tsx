@@ -161,7 +161,7 @@ function Manage() {
   return (
     <div className="App">
       {/* タブ部分 */}
-      <div className="manage-square-space-tab">
+      {/* <div className="manage-square-space-tab">
         <button
           className="manage-square-space-tab-button"
           onClick={() => {
@@ -179,7 +179,7 @@ function Manage() {
         >
           ASIN管理
         </button>
-      </div>
+      </div> */}
       <div className="manage-body">
         {/* 左Columnエリア */}
         <div className="manage-left-column">

@@ -24,6 +24,7 @@ import {
 import { updateUser } from "./slices/userSlice";
 import { DocumentData } from "firebase/firestore";
 import { getUserDoc } from "./firebase/firestore";
+import MainWindow from "./pages/MainWindow";
 
 const App: React.FC = () => {
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
@@ -261,13 +262,14 @@ const App: React.FC = () => {
       <Routes>
         {/* ユーザーがアプリケーションのルートURL (/) にアクセスしたときに、
         /Topにリダイレクトするための設定です。 */}
-        <Route path="/" element={<Navigate to="/Top" />} />
+        <Route path="/" element={<Navigate to="/MainWindow" />} />
         {/* 各ページのURLパスと対応するコンポーネントをルートをマッピングしてます。 */}
         <Route path="/Top" element={<Top />} />
         <Route path="/Manage" element={<Manage />} />
         <Route path="/Setting" element={<Setting />} />
         <Route path="/LoginPrompt" element={<LoginPrompt />} />
         <Route path="/StockDetail" element={<StockDetail />} />
+        <Route path="/MainWindow" element={<MainWindow />} />
       </Routes>
     </div>
   );

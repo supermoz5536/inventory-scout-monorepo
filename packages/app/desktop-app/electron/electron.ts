@@ -399,7 +399,7 @@ function openPreferences() {
   prefWindow = new BrowserWindow({
     width: 500,
     height: 900,
-    resizable: false, // ウィンドウサイズを変更できないようにする
+    resizable: true, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて

@@ -1,22 +1,17 @@
-import * as React from "react";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef } from "react";
-import { updateIsScrapingTrueAll } from "../slices/asinDataListSlice";
-import {
-  changeShowButtonStatus,
-  changeSystemStatus,
-} from "../slices/systemStatusSlice";
+import { removeAsin } from "../slices/asinDataListSlice";
 
-const ConfirmReExcuteDialog = ({
-  isOpenConfirmReExcuteDialog: isOpenDialog,
-  setIsOpenConfirmReExcuteDialog: setIsOpenDialog,
-}: ConfirmReExcuteDialogProps) => {
+export const ConfirmDeleteDataDialog = ({
+  isOpenConfirmDeleteDataDialog: isOpenDialog,
+  setIsOpenConfirmDeleteDataDialog: setIsOpenDialog,
+}: ConfirmDeleteDataDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const asinDataList = useSelector(
@@ -29,18 +24,21 @@ const ConfirmReExcuteDialog = ({
 
   const handleActionYes = async () => {
     setIsOpenDialog(false);
-    console.log("■ excuted runScraping in dialog");
-    dispatch(updateIsScrapingTrueAll());
-    await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
-    window.myAPI.runScraping(asinDataListRef.current);
-    dispatch(changeSystemStatus(1));
-    dispatch(changeShowButtonStatus(1));
+    handleRemoveAsin();
   };
 
   const handleActionNo = () => {
     setIsOpenDialog(false);
-    dispatch(changeSystemStatus(4));
-    dispatch(changeShowButtonStatus(0));
+  };
+
+  /// チェックしたAsinリストを削除して
+  /// ストレージを最新に更新する関数
+  const handleRemoveAsin = async () => {
+    dispatch(removeAsin());
+    // 状態変数の更新が完了するまで200ms待機
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    // ストレージに最新のasinDataListを保存
+    await window.myAPI.saveData(asinDataListRef.current);
   };
 
   return (
@@ -52,15 +50,11 @@ const ConfirmReExcuteDialog = ({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"本日分のデータ取得は、全てのASINですでに完了しています。"}
+          {"この操作は取り消せません。"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <p>
-              もしこのまま実行すると、新規取得データを本日分として上書きします。
-            </p>
-            {/* <br /> */}
-            <p>本当に実行しますか？</p>
+            <p>チェックした項目を完全に消去してもよろしいですか?</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -93,5 +87,3 @@ const ConfirmReExcuteDialog = ({
     </React.Fragment>
   );
 };
-
-export default ConfirmReExcuteDialog;
