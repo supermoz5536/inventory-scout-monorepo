@@ -65,7 +65,7 @@ const MainWindow = () => {
       <Box
         component={"div"}
         sx={{
-          backgroundColor: "#e9e9e9",
+          backgroundColor: "#efefef",
           // backgroundColor: "#f5f5f5",
           zIndex: 0,
         }}

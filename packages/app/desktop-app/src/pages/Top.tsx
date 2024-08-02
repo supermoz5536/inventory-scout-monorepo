@@ -34,6 +34,7 @@ import { ConfirmDeleteDataDialog } from "../components/main-window/ConfirmDelete
 import DoneIcon from "@mui/icons-material/Done";
 import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
 import { Footer } from "../components/main-window/Footer";
+import { AsinDataTable } from "../components/main-window/AsinDataTable";
 
 function Top() {
   const asinDataList = useSelector(
@@ -427,205 +428,8 @@ function Top() {
           />
         </div>
       </Box>
-
-      {/* リスト全体 */}
-      <Box
-        component={"div"}
-        className="top-globalList"
-        sx={{
-          border: "0.5px solid #c0c0c0",
-          boxShadow: 3, // 影のレベルを指定
-        }}
-      >
-        {/* リストヘッダー部分 */}
-        <div className="top-asin-list-header">
-          {/* 要素0 チェック */}
-          <div className="top-square-space-asin-delete">削除</div>
-          {/* 要素1 ASIN */}
-          <div className="top-square-space-asin">{<p>ASIN</p>}</div>
-
-          {/* 要素2 3ボタン */}
-          <div className="top-square-space-3button">
-            <div className="top-square-space-3buttonp-elements">
-              <p></p>
-            </div>
-          </div>
-
-          {/* 要素3 画像 */}
-          <div className="top-square-space-img">
-            <p>画像</p>
-          </div>
-
-          {/* 要素4 商品名 */}
-          <div className="top-square-space-name">
-            <p>商品名</p>
-          </div>
-
-          {/* 要素5 Amazon在庫数 */}
-          <div className="top-square-space-amazon-num">
-            <p>AMAZON数</p>
-          </div>
-
-          {/* 要素6 FBAセラー数 */}
-          <div className="top-square-space-amazon-num">
-            <p>FBA数</p>
-          </div>
-
-          {/* 要素7 合計在庫 */}
-          <div className="top-square-space-amazon-num">
-            <p>FBA合計在庫</p>
-          </div>
-
-          {/* 要素8 カート価格 */}
-          <div className="top-square-space-amazon-num">
-            <p>カート価格</p>
-          </div>
-
-          {/* 要素9 本日の減少数 */}
-          <div className="top-square-space-amazon-num">
-            <p>減少１</p>
-          </div>
-
-          {/* 要素10 週間の減少数 */}
-          <div className="top-square-space-amazon-num">
-            <p>減少２</p>
-          </div>
-
-          {/* 要素11 最新取得 */}
-          <div className="top-square-space-update-latest">
-            <p>最新取得</p>
-          </div>
-
-          {/* 要素12 取得状況 */}
-          <div className="top-square-space-update-state">
-            <p>取得状況</p>
-          </div>
-
-          {/* 要素13 親ASIN */}
-          <div className="top-square-space-asin">{<p>親ASIN</p>}</div>
-        </div>
-
-        <div className="top-asinArray-map-wrapper-top-css">
-          {/* リスト部分 */}
-          {filteredAsinDataList.map((asinData: AsinData) => (
-            <div className="top-asin-list">
-              {/* 要素0 チェック */}
-              <div className="top-square-space-asin-delete">
-                <label>
-                  <input
-                    type="checkbox"
-                    onChange={() => {
-                      handleDeleteCheck(asinData.id);
-                    }}
-                    checked={asinData.isDeleteCheck}
-                  />
-                </label>
-              </div>
-
-              {/* 要素1 ASIN */}
-              <div className="top-square-space-asin">
-                {<p>{asinData.asin}</p>}
-              </div>
-
-              {/* 要素2 3ボタン */}
-              <div className="top-square-space-3button">
-                <div className="top-square-space-3buttonp-elements">
-                  {/* <button className="top-square-space-each-button">
-                    出品者一覧
-                  </button> */}
-                  <button
-                    className="top-square-space-each-button"
-                    onClick={() => {
-                      gotoAmazonURL(asinData.asin);
-                    }}
-                  >
-                    商品URL
-                  </button>
-                  <button
-                    className="top-square-space-each-button"
-                    onClick={() => {
-                      window.myAPI.openStockDetail(asinData);
-                    }}
-                  >
-                    在庫データ
-                  </button>
-                </div>
-              </div>
-
-              {/* 要素3 画像 */}
-              <div className="top-square-space-img">
-                <img src={asinData.imageURL} alt="" />
-              </div>
-
-              {/* 要素4 商品名 */}
-              <div className="top-square-space-name">
-                {<p>{asinData.name}</p>}
-              </div>
-
-              {/* 要素5 Amazon数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.amazonSellerNOP}</p>
-              </div>
-
-              {/* 要素6 FBAセラー数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.fbaSellerNOP}</p>
-              </div>
-
-              {/* 要素7 合計在庫数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.totalStock}</p>
-              </div>
-
-              {/* 要素8 カート価格 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.cartPrice}</p>
-              </div>
-
-              {/* 要素9 本日の減少数 */}
-              <div className="top-square-space-amazon-num">
-                <p>
-                  {calculateDecreaseLatestToPrevEl(asinData) === -1
-                    ? ""
-                    : calculateDecreaseLatestToPrevEl(asinData)}
-                </p>
-              </div>
-
-              {/* 要素10 週間の減少数 */}
-              <div className="top-square-space-amazon-num">
-                <p>
-                  {/* Number.isNaN(decreaseValue) を使用して NaN のチェックを行っています。 */}
-                  {Number.isNaN(handleDecrease2(asinData))
-                    ? ""
-                    : handleDecrease2(asinData)}
-                </p>
-              </div>
-
-              {/* 要素11 最新取得 */}
-              <div className="top-square-space-update-latest">
-                <p>{asinData.fetchLatestDate}</p>
-                <p>{asinData.fetchLatestTime}</p>
-              </div>
-
-              {/* 要素12 取得状況 */}
-              <div className="top-square-space-update-state">
-                <p>
-                  {asinData.isScraping === null
-                    ? ""
-                    : asinData.isScraping === true
-                    ? "取得中"
-                    : "取得完了"}
-                </p>
-              </div>
-
-              {/* 要素13 親ASIN */}
-              <div className="top-square-space-asin">
-                {<p>{asinData.asinParent}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Box>
+      {/* リスト部分 */}
+      <AsinDataTable />
       {/* フッター部分のコンポーネントです。 */}
       <Footer scrapeTimeLeft={scrapeTimeLeft} />
       <div>
@@ -645,3 +449,197 @@ function Top() {
 }
 
 export default Top;
+
+// {/* <Box
+//   component={"div"}
+//   className="top-globalList"
+//   sx={{
+//     border: "0.5px solid #c0c0c0",
+//     boxShadow: 3, // 影のレベルを指定
+//   }}
+// >
+//   {/* リストヘッダー部分 */}
+//   <div className="top-asin-list-header">
+//     {/* 要素0 チェック */}
+//     <div className="top-square-space-asin-delete">削除</div>
+//     {/* 要素1 ASIN */}
+//     <div className="top-square-space-asin">{<p>ASIN</p>}</div>
+
+//     {/* 要素2 3ボタン */}
+//     <div className="top-square-space-3button">
+//       <div className="top-square-space-3buttonp-elements">
+//         <p></p>
+//       </div>
+//     </div>
+
+//     {/* 要素3 画像 */}
+//     <div className="top-square-space-img">
+//       <p>画像</p>
+//     </div>
+
+//     {/* 要素4 商品名 */}
+//     <div className="top-square-space-name">
+//       <p>商品名</p>
+//     </div>
+
+//     {/* 要素5 Amazon在庫数 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>AMAZON数</p>
+//     </div>
+
+//     {/* 要素6 FBAセラー数 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>FBA数</p>
+//     </div>
+
+//     {/* 要素7 合計在庫 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>FBA合計在庫</p>
+//     </div>
+
+//     {/* 要素8 カート価格 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>カート価格</p>
+//     </div>
+
+//     {/* 要素9 本日の減少数 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>減少１</p>
+//     </div>
+
+//     {/* 要素10 週間の減少数 */}
+//     <div className="top-square-space-amazon-num">
+//       <p>減少２</p>
+//     </div>
+
+//     {/* 要素11 最新取得 */}
+//     <div className="top-square-space-update-latest">
+//       <p>最新取得</p>
+//     </div>
+
+//     {/* 要素12 取得状況 */}
+//     <div className="top-square-space-update-state">
+//       <p>取得状況</p>
+//     </div>
+
+//     {/* 要素13 親ASIN */}
+//     <div className="top-square-space-asin">{<p>親ASIN</p>}</div>
+//   </div>
+
+//   <div className="top-asinArray-map-wrapper-top-css">
+//     {/* リスト部分 */}
+//     {filteredAsinDataList.map((asinData: AsinData) => (
+//       <div className="top-asin-list">
+//         {/* 要素0 チェック */}
+//         <div className="top-square-space-asin-delete">
+//           <label>
+//             <input
+//               type="checkbox"
+//               onChange={() => {
+//                 handleDeleteCheck(asinData.id);
+//               }}
+//               checked={asinData.isDeleteCheck}
+//             />
+//           </label>
+//         </div>
+
+//         {/* 要素1 ASIN */}
+//         <div className="top-square-space-asin">{<p>{asinData.asin}</p>}</div>
+
+//         {/* 要素2 3ボタン */}
+//         <div className="top-square-space-3button">
+//           <div className="top-square-space-3buttonp-elements">
+//             {/* <button className="top-square-space-each-button">
+//               出品者一覧
+//             </button> */}
+//             <button
+//               className="top-square-space-each-button"
+//               onClick={() => {
+//                 gotoAmazonURL(asinData.asin);
+//               }}
+//             >
+//               商品URL
+//             </button>
+//             <button
+//               className="top-square-space-each-button"
+//               onClick={() => {
+//                 window.myAPI.openStockDetail(asinData);
+//               }}
+//             >
+//               在庫データ
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* 要素3 画像 */}
+//         <div className="top-square-space-img">
+//           <img src={asinData.imageURL} alt="" />
+//         </div>
+
+//         {/* 要素4 商品名 */}
+//         <div className="top-square-space-name">{<p>{asinData.name}</p>}</div>
+
+//         {/* 要素5 Amazon数 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>{asinData.amazonSellerNOP}</p>
+//         </div>
+
+//         {/* 要素6 FBAセラー数 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>{asinData.fbaSellerNOP}</p>
+//         </div>
+
+//         {/* 要素7 合計在庫数 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>{asinData.totalStock}</p>
+//         </div>
+
+//         {/* 要素8 カート価格 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>{asinData.cartPrice}</p>
+//         </div>
+
+//         {/* 要素9 本日の減少数 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>
+//             {calculateDecreaseLatestToPrevEl(asinData) === -1
+//               ? ""
+//               : calculateDecreaseLatestToPrevEl(asinData)}
+//           </p>
+//         </div>
+
+//         {/* 要素10 週間の減少数 */}
+//         <div className="top-square-space-amazon-num">
+//           <p>
+//             {/* Number.isNaN(decreaseValue) を使用して NaN のチェックを行っています。 */}
+//             {Number.isNaN(handleDecrease2(asinData))
+//               ? ""
+//               : handleDecrease2(asinData)}
+//           </p>
+//         </div>
+
+//         {/* 要素11 最新取得 */}
+//         <div className="top-square-space-update-latest">
+//           <p>{asinData.fetchLatestDate}</p>
+//           <p>{asinData.fetchLatestTime}</p>
+//         </div>
+
+//         {/* 要素12 取得状況 */}
+//         <div className="top-square-space-update-state">
+//           <p>
+//             {asinData.isScraping === null
+//               ? ""
+//               : asinData.isScraping === true
+//               ? "取得中"
+//               : "取得完了"}
+//           </p>
+//         </div>
+
+//         {/* 要素13 親ASIN */}
+//         <div className="top-square-space-asin">
+//           {<p>{asinData.asinParent}</p>}
+//         </div>
+//       </div>
+//     ))}
+//   </div>
+// </Box>; */}
