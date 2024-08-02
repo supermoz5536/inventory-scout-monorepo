@@ -7,11 +7,11 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
-import { updateIsScrapingTrueAll } from "../slices/asinDataListSlice";
+import { updateIsScrapingTrueAll } from "../../slices/asinDataListSlice";
 import {
   changeShowButtonStatus,
   changeSystemStatus,
-} from "../slices/systemStatusSlice";
+} from "../../slices/systemStatusSlice";
 
 const ConfirmReExcuteDialog = ({
   isOpenConfirmReExcuteDialog: isOpenDialog,
