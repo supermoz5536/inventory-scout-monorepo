@@ -373,7 +373,7 @@ function Top() {
         </div>
 
         <div className="top-square-space-menu-container-center">
-          <p className="top-square-space-menu-container-center-total-stock">
+          {/* <p className="top-square-space-menu-container-center-total-stock">
             FBA合計在庫：Amazon本体の在庫数(非公開)は含みません
           </p>
           <p className="top-square-space-menu-container-center-decrease1">
@@ -381,7 +381,7 @@ function Top() {
           </p>
           <p className="top-square-space-menu-container-center-decrease2">
             減少２： 直近７日間の減少数
-          </p>
+          </p> */}
           <TextField
             className="top-square-space-menu-container-center-input"
             value={nameQuery}
@@ -429,7 +429,14 @@ function Top() {
       </Box>
 
       {/* リスト全体 */}
-      <div className="top-globalList">
+      <Box
+        component={"div"}
+        className="top-globalList"
+        sx={{
+          border: "0.5px solid #c0c0c0",
+          boxShadow: 3, // 影のレベルを指定
+        }}
+      >
         {/* リストヘッダー部分 */}
         <div className="top-asin-list-header">
           {/* 要素0 チェック */}
@@ -618,7 +625,7 @@ function Top() {
             </div>
           ))}
         </div>
-      </div>
+      </Box>
       {/* フッター部分のコンポーネントです。 */}
       <Footer scrapeTimeLeft={scrapeTimeLeft} />
       <div>

@@ -14,6 +14,7 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
       component={"div"}
       className="top-bottom-container"
       sx={{
+        width: "100%",
         display: "flex",
         flexDirection: "row",
         justifyContent: "start",
@@ -21,8 +22,8 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         backgroundColor: "#f7f7f7",
         minHeight: "45px",
         height: "45px",
-        paddingLeft: "15px",
         boxShadow: 3,
+        marginTop: "20px",
       }}
     >
       {systemStatus === 0 ? (
