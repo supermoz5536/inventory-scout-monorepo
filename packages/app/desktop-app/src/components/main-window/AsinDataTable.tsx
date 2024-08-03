@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { jaJP } from "@mui/x-data-grid/locales";
 
 import Checkbox from "@mui/material/Checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { switchRemoveCheck } from "../../slices/asinDataListSlice";
-import { Box } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import {
   calculateDataForChart,
   calculateDecreaseLatestToPrevEl,
@@ -13,12 +13,33 @@ import {
 } from "../../util/calculateDecrease";
 
 export const AsinDataTable = () => {
+  // 数秒遅らせる関数
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
-  const asinDataListRef = useRef(asinDataList);
+
+  const [dataGridRows, setDataGridRows] = useState<AsinData[]>(asinDataList);
+
   useEffect(() => {
-    asinDataListRef.current = asinDataList;
+    const updateDataGridRows = async () => {
+      await delay(2000); // 2秒遅延
+      setDataGridRows(asinDataList);
+      console.log("■ 2秒後に更新");
+      await delay(2000); // 2秒遅延
+      console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
+      console.log("■ asinDataList", asinDataList);
+      setDataGridRows(asinDataList);
+      console.log("■ 2秒後に更新");
+      await delay(2000); // 2秒遅延
+      console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
+      console.log("■ asinDataList", asinDataList);
+    };
+    updateDataGridRows();
+    setDataGridRows(asinDataList);
+    console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
   }, [asinDataList]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -49,37 +70,87 @@ export const AsinDataTable = () => {
     // },
     { field: "asin", headerName: "ASIN", width: 130 },
     {
-      field: "",
+      field: " ",
       headerName: "",
-      width: 130,
+      width: 100,
+      renderHeader: (params) => (
+        <div style={{ backgroundColor: "white", height: "100%" }}>
+          {params.colDef.headerName}
+        </div>
+      ),
       renderCell: (params) => (
-        <>
-          <button className="top-square-space-each-button">出品者一覧</button>
-          <button
-            className="top-square-space-each-button"
+        <Box component={"div"} className="top-square-space-3buttonp-elements ">
+          {/* Scraperコンポーネントの実行ボタン */}
+          <Button
+            className="top-square-space-each-button-1"
             onClick={() => {
               gotoAmazonURL(params.row.asin);
             }}
-          ></button>
-        </>
+            variant="outlined"
+            sx={{
+              backgroundColor: "white",
+              fontWeight: "bold",
+              fontSize: "11px",
+              "&:hover": {
+                backgroundColor: "#dedede", // ホバー時の背景色
+              },
+            }}
+          >
+            商品URL
+          </Button>
+          <Button
+            className="top-square-space-each-button-2"
+            onClick={() => {
+              window.myAPI.openStockDetail(params.row);
+            }}
+            variant="outlined"
+            sx={{
+              backgroundColor: "#white",
+              fontWeight: "bold",
+              fontSize: "11px",
+              "&:hover": {
+                backgroundColor: "#dedede", // ホバー時の背景色
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                marginTop: "3.5px",
+                fontSize: "11px",
+                fontWeight: "bold",
+              }}
+            >
+              在庫データ
+            </Typography>
+          </Button>
+        </Box>
       ),
     },
     {
       field: "imageURL",
       headerName: "画像",
-      width: 150,
+      width: 65,
       renderCell: (params) => (
-        <img
-          src={params.value}
-          alt={params.row.name}
-          style={{ width: "100%" }}
-        />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <img
+            src={params.value}
+            alt={params.row.name}
+            style={{ width: "100%" }}
+          />
+        </div>
       ),
     },
-    { field: "name", headerName: "商品名", width: 250 },
+    { field: "name", headerName: "商品名", width: 200 },
     { field: "amazonSellerNOP", headerName: "AMAZON数", width: 90 },
     { field: "fbaSellerNOP", headerName: "FBA数", width: 65 },
-    { field: "totalStock", headerName: "FBA合計在庫", width: 65 },
+    { field: "totalStock", headerName: "FBA合計在庫", width: 100 },
     { field: "cartPrice", headerName: "カート価格", width: 90 },
     {
       field: "decrease1",
@@ -117,25 +188,27 @@ export const AsinDataTable = () => {
   return (
     <Box sx={{ height: 750, width: 1485, backgroundColor: "white" }}>
       <DataGrid
-        rows={asinDataListRef.current}
+        rows={asinDataList}
         columns={columns}
+        rowHeight={70} // 行の高さを70に設定
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: asinDataListRef.current.length,
+              pageSize: 100,
             },
           },
         }}
         checkboxSelection
         disableRowSelectionOnClick
-        hideFooterPagination // ページネーションエリアを非表示に設定
+        // hideFooterPagination // ページネーションエリアを非表示に設定
+        // pageSizeOptions={[2]}
         localeText={jaJP.components.MuiDataGrid.defaultProps.localeText} // ここで日本語を設定
         sx={{
           border: "0.5px solid #c0c0c0",
           boxShadow: 3, // 影のレベルを指定
-          "& .MuiDataGrid-footerContainer": {
-            display: "none",
-          },
+          // "& .MuiDataGrid-footerContainer": {
+          //   display: "none",
+          // },
           "& .MuiDataGrid-row": {
             backgroundColor: "white", // アイテムの背景色を変更
           },

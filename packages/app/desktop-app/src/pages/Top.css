@@ -228,20 +228,29 @@
 .top-square-space-3buttonp-elements {
   width: 110px;
   height: 65px;
-  border: 0.5px solid #c0c0c0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  position: relative;
 }
 
-.top-square-space-each-button {
-  width: 50;
+.top-square-space-each-button-1 {
+  width: 40px;
   height: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0.5px 0;
+  position: absolute;
+  top: -20%;
+  left: 10%;
+}
+
+.top-square-space-each-button-2 {
+  width: 50px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 15%;
+  left: -47.5%;
 }
 
 .top-square-space-img {
