@@ -30,7 +30,9 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         ""
       ) : systemStatus === 1 ? (
         <>
-          <RunningWithErrorsIcon sx={{ color: "#f44336", marginRight: 1 }} />
+          <RunningWithErrorsIcon
+            sx={{ color: "#f44336", marginLeft: "20px", marginRight: 1 }}
+          />
           <Typography
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
@@ -40,7 +42,9 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         </>
       ) : systemStatus === 2 ? (
         <>
-          <RunningWithErrorsIcon sx={{ color: "#f44336", marginRight: 1 }} />
+          <RunningWithErrorsIcon
+            sx={{ color: "#f44336", marginLeft: "20px", marginRight: 1 }}
+          />
           <Typography
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
@@ -51,7 +55,9 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         </>
       ) : systemStatus === 3 ? (
         <>
-          <RunningWithErrorsIcon sx={{ color: "#f44336", marginRight: 1 }} />
+          <RunningWithErrorsIcon
+            sx={{ color: "#f44336", marginLeft: "20px", marginRight: 1 }}
+          />
           <Typography
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
@@ -61,7 +67,9 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         </>
       ) : systemStatus === 4 ? (
         <>
-          <DoneIcon sx={{ color: "#4caf50", marginRight: 1 }} />
+          <DoneIcon
+            sx={{ color: "#4caf50", marginLeft: "20px", marginRight: 1 }}
+          />
           <Typography
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
@@ -71,7 +79,9 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
         </>
       ) : systemStatus === 5 ? (
         <>
-          <DoneIcon sx={{ color: "#4caf50", marginRight: 1 }} />
+          <DoneIcon
+            sx={{ color: "#4caf50", marginLeft: "20px", marginRight: 1 }}
+          />
           <Typography
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
