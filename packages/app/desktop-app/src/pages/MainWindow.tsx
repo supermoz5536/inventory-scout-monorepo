@@ -66,7 +66,6 @@ const MainWindow = () => {
         component={"div"}
         sx={{
           backgroundColor: "#efefef",
-          // backgroundColor: "#f5f5f5",
           zIndex: 0,
         }}
       >

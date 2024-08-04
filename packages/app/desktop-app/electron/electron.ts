@@ -294,7 +294,7 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1505,
-    height: 965,
+    height: 955,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

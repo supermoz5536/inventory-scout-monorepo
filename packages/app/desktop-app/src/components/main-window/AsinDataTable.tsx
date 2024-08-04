@@ -3,7 +3,11 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { jaJP } from "@mui/x-data-grid/locales";
 import Checkbox from "@mui/material/Checkbox";
 import { useDispatch, useSelector } from "react-redux";
-import { switchRemoveCheck } from "../../slices/asinDataListSlice";
+import {
+  setIsDeleteCheckSelected,
+  switchIsDeleteCheckAll,
+  switchRemoveCheck,
+} from "../../slices/asinDataListSlice";
 import {
   Box,
   Button,
@@ -350,8 +354,21 @@ export const AsinDataTable = ({
     },
   ];
 
+  const handleSelectionChange = (newSelection: any) => {
+    if (newSelection.length === filteredAsinDataList.length) {
+      console.log("すべての行が選択されました");
+      dispatch(switchIsDeleteCheckAll(true));
+    } else if (newSelection.length === 0) {
+      console.log("すべての行の選択が解除されました");
+      dispatch(switchIsDeleteCheckAll(false));
+    } else {
+      console.log("一部の行が選択されました");
+      dispatch(setIsDeleteCheckSelected(newSelection));
+    }
+  };
+
   return (
-    <Box sx={{ height: 750, width: 1570, backgroundColor: "white" }}>
+    <Box sx={{ height: 745, width: 1570, backgroundColor: "white" }}>
       <DataGrid
         rows={filteredAsinDataList}
         columns={columns}
@@ -365,9 +382,11 @@ export const AsinDataTable = ({
         }}
         checkboxSelection
         disableRowSelectionOnClick
+        onRowSelectionModelChange={handleSelectionChange} // 選択変更時のコールバック
+        getRowId={(row) => row.asin} // 行のIDとしてasinを使用する
+        localeText={jaJP.components.MuiDataGrid.defaultProps.localeText} // ここで日本語を設定
         // hideFooterPagination // ページネーションエリアを非表示に設定
         // pageSizeOptions={[2]}
-        localeText={jaJP.components.MuiDataGrid.defaultProps.localeText} // ここで日本語を設定
         sx={{
           border: "0.5px solid #c0c0c0",
           boxShadow: 3, // 影のレベルを指定

@@ -106,6 +106,24 @@ export const asinSlice = createSlice({
       }
     },
 
+    /// 部分選択状態のCheckBoxの状態を反映
+    setIsDeleteCheckSelected: (state, action: PayloadAction<string[]>) => {
+      const arrayLength = state.value.length;
+
+      // まず、全てのチェックボックスをfalseにする
+      for (let index = 0; index < arrayLength; ++index) {
+        state.value[index].isDeleteCheck = false;
+      }
+      // 次に、ONになっているチェックボックスのASINの配列を順にtrueにする
+      state.value.forEach((asinData) =>
+        action.payload.forEach((selectedAsin: string) => {
+          if (selectedAsin === asinData.asin) {
+            asinData.isDeleteCheck = true;
+          }
+        })
+      );
+    },
+
     setIsScrapingTrueForNewItems: (state) => {
       state.value.forEach((asinData) => {
         if (asinData.fetchLatestDate === "") {
@@ -129,6 +147,7 @@ export const {
   switchIsDeleteCheckAll,
   updateWithLoadedData,
   setIsScrapingTrueForNewItems,
+  setIsDeleteCheckSelected,
 } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
