@@ -429,7 +429,7 @@ function Top() {
         </div>
       </Box>
       {/* リスト部分 */}
-      <AsinDataTable />
+      <AsinDataTable filteredAsinDataList={filteredAsinDataList} />
       {/* フッター部分のコンポーネントです。 */}
       <Footer scrapeTimeLeft={scrapeTimeLeft} />
       <div>

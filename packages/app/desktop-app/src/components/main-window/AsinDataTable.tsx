@@ -21,7 +21,11 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import { getPrevScrapingDate } from "../../util/asinDataUtil";
 
-export const AsinDataTable = () => {
+export const AsinDataTable = ({
+  filteredAsinDataList,
+}: {
+  filteredAsinDataList: AsinData[];
+}) => {
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -330,7 +334,7 @@ export const AsinDataTable = () => {
   return (
     <Box sx={{ height: 750, width: 1570, backgroundColor: "white" }}>
       <DataGrid
-        rows={asinDataList}
+        rows={filteredAsinDataList}
         columns={columns}
         rowHeight={80} // 行の高さを70に設定
         initialState={{
