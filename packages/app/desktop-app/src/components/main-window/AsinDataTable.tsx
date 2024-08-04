@@ -50,17 +50,6 @@ export const AsinDataTable = ({
   };
 
   const columns: readonly GridColDef<AsinData>[] = [
-    // {
-    //   field: "isDeleteCheck",
-    //   headerName: "削除",
-    //   width: 65,
-    //   renderCell: (params: any) => (
-    //     <Checkbox
-    //       checked={params.row.isDeleteCheck}
-    //       onChange={() => handleDeleteCheck(params.row.id)}
-    //     />
-    //   ),
-    // },
     {
       field: "asin",
       headerName: "ASIN",
@@ -194,7 +183,7 @@ export const AsinDataTable = ({
     },
     {
       field: "decrease1",
-      headerName: "減少１",
+      headerName: "前回減少",
       width: 105,
       disableColumnMenu: false,
       sortable: true,
@@ -243,7 +232,7 @@ export const AsinDataTable = ({
     },
     {
       field: "decrease2",
-      headerName: "減少２",
+      headerName: "週間減少",
       width: 105,
       disableColumnMenu: false,
       sortable: true,
@@ -294,9 +283,28 @@ export const AsinDataTable = ({
       field: "",
       headerName: "前回取得",
       width: 100,
-      disableColumnMenu: true,
+      disableColumnMenu: false,
       sortable: false,
-      renderCell: (params) => getPrevScrapingDate(params.row),
+      renderHeader: (params) => (
+        <Box
+          sx={{
+            paddingLeft: "10px",
+          }}
+        >
+          {params.colDef.headerName}
+        </Box>
+      ),
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {getPrevScrapingDate(params.row)}
+        </Box>
+      ),
     },
     {
       field: "fetchLatestDateTime",
@@ -304,6 +312,15 @@ export const AsinDataTable = ({
       width: 100,
       disableColumnMenu: false,
       sortable: false,
+      renderHeader: (params) => (
+        <Box
+          sx={{
+            paddingLeft: "9.5px",
+          }}
+        >
+          {params.colDef.headerName}
+        </Box>
+      ),
       renderCell: (params) => (
         <Box
           sx={{
@@ -349,6 +366,15 @@ export const AsinDataTable = ({
       field: "asinParent",
       headerName: "親ASIN",
       width: 130,
+      renderHeader: (params) => (
+        <Box
+          sx={{
+            paddingLeft: "22.5px",
+          }}
+        >
+          {params.colDef.headerName}
+        </Box>
+      ),
       disableColumnMenu: false,
       sortable: false,
     },
@@ -388,6 +414,12 @@ export const AsinDataTable = ({
         // hideFooterPagination // ページネーションエリアを非表示に設定
         // pageSizeOptions={[2]}
         sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "white !important", // ヘッダーの背景色を白に設定
+          },
+          "& .MuiDataGrid-columnHeader": {
+            backgroundColor: "white !important", // ヘッダーセルの背景色を白に設定
+          },
           border: "0.5px solid #c0c0c0",
           boxShadow: 3, // 影のレベルを指定
           // "& .MuiDataGrid-footerContainer": {
