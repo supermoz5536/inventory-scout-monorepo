@@ -224,7 +224,17 @@ export const AsinDataTable = ({
           {params.colDef.headerName}
         </div>
       ),
-      renderCell: (params) => calculateDecreaseLatestToPrevEl(params.row),
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {calculateDecreaseLatestToPrevEl(params.row)}
+        </Box>
+      ),
       valueGetter: (prams, row) => calculateDecreaseLatestToPrevEl(row),
     },
     {
@@ -261,10 +271,19 @@ export const AsinDataTable = ({
           {params.colDef.headerName}
         </div>
       ),
-      renderCell: (params) =>
-        Number.isNaN(handleDecrease2(params.row))
-          ? "N"
-          : handleDecrease2(params.row),
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {Number.isNaN(handleDecrease2(params.row))
+            ? "N"
+            : handleDecrease2(params.row)}
+        </Box>
+      ),
       valueGetter: (prams, row) => handleDecrease2(row),
     },
     {
