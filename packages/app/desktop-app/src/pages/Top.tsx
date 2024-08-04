@@ -353,14 +353,6 @@ function Top() {
               : null}
           </Button>
 
-          {/* 全選択チェック */}
-          <input
-            type="checkbox"
-            className="top-square-space-menu-container-left-check"
-            onChange={(event) =>
-              dispatch(switchIsDeleteCheckAll(event.target.checked))
-            }
-          />
           {/* ASIN検索入力欄 */}
           <TextField
             className="top-square-space-menu-container-left-input"
@@ -375,15 +367,6 @@ function Top() {
         </div>
 
         <div className="top-square-space-menu-container-center">
-          {/* <p className="top-square-space-menu-container-center-total-stock">
-            FBA合計在庫：Amazon本体の在庫数(非公開)は含みません
-          </p>
-          <p className="top-square-space-menu-container-center-decrease1">
-            減少１：「最新の取得分」と「その1つ前の取得分」における減少数
-          </p>
-          <p className="top-square-space-menu-container-center-decrease2">
-            減少２： 直近７日間の減少数
-          </p> */}
           <TextField
             className="top-square-space-menu-container-center-input"
             value={nameQuery}
