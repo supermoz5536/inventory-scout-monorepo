@@ -293,8 +293,8 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 /// メイン画面を生成する関数です
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1505,
-    height: 955,
+    width: 1650,
+    height: 1050,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),

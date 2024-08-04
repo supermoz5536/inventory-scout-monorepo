@@ -368,7 +368,7 @@ export const AsinDataTable = ({
   };
 
   return (
-    <Box sx={{ height: 745, width: 1570, backgroundColor: "white" }}>
+    <Box sx={{ height: 740, width: 1570, backgroundColor: "white" }}>
       <DataGrid
         rows={filteredAsinDataList}
         columns={columns}
