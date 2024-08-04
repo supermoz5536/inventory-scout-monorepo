@@ -5,12 +5,12 @@ import { resetTime } from "./dateFormatter";
 /// asinDataオブジェクトを受け取り、
 /// 当日と前日の合計在庫の差分を出力する関数
 export const calculateDecreaseLatestToPrevEl = (asinData: AsinData) => {
+  // try {
   // 当日の合計在庫、求める値は
   // fbaSellerDatasの各オブジェクト（セラー）ごとの
   // stockCountDatas プロパティに保持している配列のなかの
   // キーが当日(配列の最後のオブジェクト)の値の合計
   const totalStockLatest: number | null = asinData.totalStock;
-
   // 前日の合計在庫、求める値は同様にして
   // キーが前日(配列の最後から遡って２番目のオブジェクト)の値の合計
   const totalStockPrevEl: number | null = asinData.fbaSellerDatas.reduce(
@@ -40,6 +40,9 @@ export const calculateDecreaseLatestToPrevEl = (asinData: AsinData) => {
   } else {
     return -1;
   }
+  // } catch (error) {
+  //   console.log("■ calculateDecreaseLatestToPrevEl error", error);
+  // }
 };
 
 /// asinDataオブジェクトを受け取り、
