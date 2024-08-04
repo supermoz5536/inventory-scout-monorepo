@@ -21,27 +21,6 @@ export const AsinDataTable = () => {
     (state: RootState) => state.asinDataList.value
   );
 
-  const [dataGridRows, setDataGridRows] = useState<AsinData[]>(asinDataList);
-
-  useEffect(() => {
-    const updateDataGridRows = async () => {
-      await delay(2000); // 2秒遅延
-      setDataGridRows(asinDataList);
-      console.log("■ 2秒後に更新");
-      await delay(2000); // 2秒遅延
-      console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
-      console.log("■ asinDataList", asinDataList);
-      setDataGridRows(asinDataList);
-      console.log("■ 2秒後に更新");
-      await delay(2000); // 2秒遅延
-      console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
-      console.log("■ asinDataList", asinDataList);
-    };
-    updateDataGridRows();
-    setDataGridRows(asinDataList);
-    console.log("■ 2秒後に更新 dataGridRows", dataGridRows);
-  }, [asinDataList]);
-
   const dispatch = useDispatch<AppDispatch>();
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
