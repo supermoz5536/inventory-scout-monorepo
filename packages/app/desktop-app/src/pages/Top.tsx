@@ -19,7 +19,22 @@ import {
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
-import ConfirmReExcuteDialog from "../components/ConfirmReExcuteDialog";
+import ConfirmReExcuteDialog from "../components/main-window/ConfirmReExcuteDialog";
+import {
+  AppBar,
+  Box,
+  Button,
+  Tab,
+  Tabs,
+  TextField,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { ConfirmDeleteDataDialog } from "../components/main-window/ConfirmDeleteDataDialog";
+import DoneIcon from "@mui/icons-material/Done";
+import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
+import { Footer } from "../components/main-window/Footer";
+import { AsinDataTable } from "../components/main-window/AsinDataTable";
 
 function Top() {
   const asinDataList = useSelector(
@@ -56,7 +71,11 @@ function Top() {
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
     asinDataListRef.current
   );
-  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+  const [isOpenConfirmReExcuteDialog, setIsOpenConfirmReExcuteDialog] =
+    useState<boolean>(false);
+
+  const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
 
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
@@ -205,7 +224,7 @@ function Top() {
       // 本日のデータ取得を完了していることを意味するので
       // runScrapingを実行しない
       console.log("当日のデータ取得が既に完了していて何もしない場合");
-      setIsOpenDialog(true);
+      setIsOpenConfirmReExcuteDialog(true);
     } else if (isScrapingFalseAll && !isDoneTodayAtLeast1) {
       console.log("■ 2 handleRunScraping");
       // 全てのデータ取得が完了状態で
@@ -262,16 +281,6 @@ function Top() {
     }
   };
 
-  /// チェックしたAsinリストを削除して
-  /// ストレージを最新に更新する関数
-  const handleRemoveAsin = async () => {
-    dispatch(removeAsin());
-    // 状態変数の更新が完了するまで200ms待機
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    // ストレージに最新のasinDataListを保存
-    await window.myAPI.saveData(asinDataListRef.current);
-  };
-
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
   };
@@ -311,34 +320,29 @@ function Top() {
 
   return (
     <div className="App">
-      {/* タブ部分 */}
-      <div className="top-square-space-tab">
-        <button
-          className="top-square-space-tab-button"
-          onClick={() => {
-            // App.tsxでマッピングしたURLパスを指定
-            navigate("/Top");
-          }}
-        >
-          メイン画面
-        </button>
-        <button
-          className="top-square-space-tab-button"
-          onClick={() => {
-            navigate("/Manage");
-          }}
-        >
-          ASIN管理
-        </button>
-      </div>
-
       {/* メニュー部分 */}
-      <div className="top-square-space-menu">
+      <Box
+        className="top-square-space-menu"
+        component={"div"}
+        sx={{
+          marginTop: "0px",
+          marginBottom: "17.5px",
+          boxShadow: 2, // 影のレベルを指定
+        }}
+      >
         <div className="top-square-space-menu-container-left">
           {/* Scraperコンポーネントの実行ボタン */}
-          <button
+          <Button
             className="top-square-space-menu-container-left-scraping"
             onClick={() => handleScrapingButton()}
+            variant="contained"
+            sx={{
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+            }}
           >
             {showButtonStatus === 0
               ? "取得開始"
@@ -347,276 +351,81 @@ function Top() {
               : showButtonStatus === 2
               ? "本当に？"
               : null}
-          </button>
-          {/* 全選択チェック */}
-          <input
-            type="checkbox"
-            className="top-square-space-menu-container-left-check"
-            onChange={(event) =>
-              dispatch(switchIsDeleteCheckAll(event.target.checked))
-            }
-          />
+          </Button>
+
           {/* ASIN検索入力欄 */}
-          <input
-            type="text"
+          <TextField
+            className="top-square-space-menu-container-left-input"
+            label="検索するASINを入力"
+            variant="standard"
             value={asinQuery}
             onChange={(event) => handleAsinQuery(event.target.value)}
-            className="top-square-space-menu-container-left-input"
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
         </div>
 
         <div className="top-square-space-menu-container-center">
-          <p className="top-square-space-menu-container-center-total-stock">
-            FBA合計在庫：Amazon本体の在庫数(非公開)は含みません
-          </p>
-          <p className="top-square-space-menu-container-center-decrease1">
-            減少１：「最新の取得分」と「その1つ前の取得分」における減少数
-          </p>
-          <p className="top-square-space-menu-container-center-decrease2">
-            減少２： 直近７日間の減少数
-          </p>
-          <input
+          <TextField
+            className="top-square-space-menu-container-center-input"
+            value={nameQuery}
+            label="検索する商品名を入力"
+            variant="standard"
             onChange={(event) => {
               handleNameQuery(event.target.value);
             }}
-            value={nameQuery}
-            type="text"
-            className="top-square-space-menu-container-center-input"
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
-        </div>
-        <div className="top-square-space-menu-container-right">
-          <button
-            className="top-square-space-menu-container-right-delete-button"
+          <Button
+            className="top-square-space-menu-container-center-delete-button"
             onClick={() => {
-              handleRemoveAsin();
+              setIsOpenConfirmDeleteDataDialog(true);
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
             }}
           >
             チェックしたASINを削除
-          </button>
-          <p className="top-square-space-menu-container-right-asin-num">
-            登録ASIN数：{asinDataListCount}
+          </Button>
+          <p className="top-square-space-menu-container-center-asin-num">
+            {`登録ASIN数：${asinDataListRef.current.length}`}
           </p>
-          <input
-            value={parentQuery}
-            onChange={(event) => handleParentQuery(event.target.value)}
-            type="text"
+        </div>
+        <div className="top-square-space-menu-container-right">
+          <TextField
             className="top-square-space-menu-container-right-input"
+            value={parentQuery}
+            label="検索する親ASINを入力"
+            variant="standard"
+            onChange={(event) => handleParentQuery(event.target.value)}
+            InputLabelProps={{
+              style: { fontSize: "15px" },
+            }}
           />
         </div>
-      </div>
-
-      {/* リスト全体 */}
-      <div className="top-globalList">
-        {/* リストヘッダー部分 */}
-        <div className="top-asin-list-header">
-          {/* 要素0 チェック */}
-          <div className="top-square-space-asin-delete">削除</div>
-          {/* 要素1 ASIN */}
-          <div className="top-square-space-asin">{<p>ASIN</p>}</div>
-
-          {/* 要素2 3ボタン */}
-          <div className="top-square-space-3button">
-            <div className="top-square-space-3buttonp-elements">
-              <p></p>
-            </div>
-          </div>
-
-          {/* 要素3 画像 */}
-          <div className="top-square-space-img">
-            <p>画像</p>
-          </div>
-
-          {/* 要素4 商品名 */}
-          <div className="top-square-space-name">
-            <p>商品名</p>
-          </div>
-
-          {/* 要素5 Amazon在庫数 */}
-          <div className="top-square-space-amazon-num">
-            <p>AMAZON数</p>
-          </div>
-
-          {/* 要素6 FBAセラー数 */}
-          <div className="top-square-space-amazon-num">
-            <p>FBA数</p>
-          </div>
-
-          {/* 要素7 合計在庫 */}
-          <div className="top-square-space-amazon-num">
-            <p>FBA合計在庫</p>
-          </div>
-
-          {/* 要素8 カート価格 */}
-          <div className="top-square-space-amazon-num">
-            <p>カート価格</p>
-          </div>
-
-          {/* 要素9 本日の減少数 */}
-          <div className="top-square-space-amazon-num">
-            <p>減少１</p>
-          </div>
-
-          {/* 要素10 週間の減少数 */}
-          <div className="top-square-space-amazon-num">
-            <p>減少２</p>
-          </div>
-
-          {/* 要素11 最新取得 */}
-          <div className="top-square-space-update-latest">
-            <p>最新取得</p>
-          </div>
-
-          {/* 要素12 取得状況 */}
-          <div className="top-square-space-update-state">
-            <p>取得状況</p>
-          </div>
-
-          {/* 要素13 親ASIN */}
-          <div className="top-square-space-asin">{<p>親ASIN</p>}</div>
-        </div>
-
-        <div className="top-asinArray-map-wrapper-top-css">
-          {/* リスト部分 */}
-          {filteredAsinDataList.map((asinData: AsinData) => (
-            <div className="top-asin-list">
-              {/* 要素0 チェック */}
-              <div className="top-square-space-asin-delete">
-                <label>
-                  <input
-                    type="checkbox"
-                    onChange={() => {
-                      handleDeleteCheck(asinData.id);
-                    }}
-                    checked={asinData.isDeleteCheck}
-                  />
-                </label>
-              </div>
-
-              {/* 要素1 ASIN */}
-              <div className="top-square-space-asin">
-                {<p>{asinData.asin}</p>}
-              </div>
-
-              {/* 要素2 3ボタン */}
-              <div className="top-square-space-3button">
-                <div className="top-square-space-3buttonp-elements">
-                  {/* <button className="top-square-space-each-button">
-                    出品者一覧
-                  </button> */}
-                  <button
-                    className="top-square-space-each-button"
-                    onClick={() => {
-                      gotoAmazonURL(asinData.asin);
-                    }}
-                  >
-                    商品URL
-                  </button>
-                  <button
-                    className="top-square-space-each-button"
-                    onClick={() => {
-                      window.myAPI.openStockDetail(asinData);
-                    }}
-                  >
-                    在庫データ
-                  </button>
-                </div>
-              </div>
-
-              {/* 要素3 画像 */}
-              <div className="top-square-space-img">
-                <img src={asinData.imageURL} alt="" />
-              </div>
-
-              {/* 要素4 商品名 */}
-              <div className="top-square-space-name">
-                {<p>{asinData.name}</p>}
-              </div>
-
-              {/* 要素5 Amazon数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.amazonSellerNOP}</p>
-              </div>
-
-              {/* 要素6 FBAセラー数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.fbaSellerNOP}</p>
-              </div>
-
-              {/* 要素7 合計在庫数 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.totalStock}</p>
-              </div>
-
-              {/* 要素8 カート価格 */}
-              <div className="top-square-space-amazon-num">
-                <p>{asinData.cartPrice}</p>
-              </div>
-
-              {/* 要素9 本日の減少数 */}
-              <div className="top-square-space-amazon-num">
-                <p>
-                  {calculateDecreaseLatestToPrevEl(asinData) === -1
-                    ? ""
-                    : calculateDecreaseLatestToPrevEl(asinData)}
-                </p>
-              </div>
-
-              {/* 要素10 週間の減少数 */}
-              <div className="top-square-space-amazon-num">
-                <p>
-                  {/* Number.isNaN(decreaseValue) を使用して NaN のチェックを行っています。 */}
-                  {Number.isNaN(handleDecrease2(asinData))
-                    ? ""
-                    : handleDecrease2(asinData)}
-                </p>
-              </div>
-
-              {/* 要素11 最新取得 */}
-              <div className="top-square-space-update-latest">
-                <p>{asinData.fetchLatestDate}</p>
-                <p>{asinData.fetchLatestTime}</p>
-              </div>
-
-              {/* 要素12 取得状況 */}
-              <div className="top-square-space-update-state">
-                <p>
-                  {asinData.isScraping === null
-                    ? ""
-                    : asinData.isScraping === true
-                    ? "取得中"
-                    : "取得完了"}
-                </p>
-              </div>
-
-              {/* 要素13 親ASIN */}
-              <div className="top-square-space-asin">
-                {<p>{asinData.asinParent}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="top-bottom-container">
-        <p>
-          {systemStatus === 0
-            ? ""
-            : systemStatus === 1
-            ? `データ取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 2
-            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 3
-            ? `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 4
-            ? `本日分のデータ取得は既に完了しています。`
-            : systemStatus === 5
-            ? `データ取得が完了しました。`
-            : `System cord e`}
-        </p>
-      </div>
+      </Box>
+      {/* リスト部分 */}
+      <AsinDataTable filteredAsinDataList={filteredAsinDataList} />
+      {/* フッター部分のコンポーネントです。 */}
+      <Footer scrapeTimeLeft={scrapeTimeLeft} />
       <div>
         <ConfirmReExcuteDialog
-          isOpenDialog={isOpenDialog}
-          setIsOpenDialog={setIsOpenDialog}
+          isOpenConfirmReExcuteDialog={isOpenConfirmReExcuteDialog}
+          setIsOpenConfirmReExcuteDialog={setIsOpenConfirmReExcuteDialog}
+        />
+      </div>
+      <div>
+        <ConfirmDeleteDataDialog
+          isOpenConfirmDeleteDataDialog={isOpenConfirmDeleteDataDialog}
+          setIsOpenConfirmDeleteDataDialog={setIsOpenConfirmDeleteDataDialog}
         />
       </div>
     </div>

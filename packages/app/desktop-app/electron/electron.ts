@@ -293,8 +293,8 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 /// メイン画面を生成する関数です
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1505,
-    height: 965,
+    width: 1650,
+    height: 1050,
     // resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -399,7 +399,7 @@ function openPreferences() {
   prefWindow = new BrowserWindow({
     width: 500,
     height: 900,
-    resizable: false, // ウィンドウサイズを変更できないようにする
+    resizable: true, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
