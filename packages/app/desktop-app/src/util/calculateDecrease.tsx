@@ -38,7 +38,7 @@ export const calculateDecreaseLatestToPrevEl = (asinData: AsinData) => {
     const difference = totalStockPrevEl - totalStockLatest;
     return difference;
   } else {
-    return -1;
+    return -99999;
   }
   // } catch (error) {
   //   console.log("■ calculateDecreaseLatestToPrevEl error", error);

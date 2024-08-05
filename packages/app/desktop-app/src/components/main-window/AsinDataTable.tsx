@@ -180,6 +180,8 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
+      renderCell: (params) => params.row.cartPrice,
+      valueGetter: (prams, row) => Number(row.cartPrice.replace(/,/g, "")),
     },
     {
       field: "decrease1",
@@ -188,10 +190,16 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => (
-        <div>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Tooltip
             title={
-              "「最新取得」と「前回取得」（最新の1つ前の取得）を比較したときの在庫の減少数です。"
+              "「最新取得」と「前回取得」（最新の1つ前の取得）を比較したときの在庫の減少数です（Nはエラー）"
             }
             placement="top"
             arrow
@@ -206,16 +214,16 @@ export const AsinDataTable = ({
               ],
             }}
           >
-            <IconButton>
-              <InfoIcon
-                sx={{
-                  color: "#E0E0E0",
-                }}
-              />
-            </IconButton>
+            <InfoIcon
+              sx={{
+                marginRight: "3px",
+                color: "#E0E0E0",
+              }}
+            />
           </Tooltip>
+
           {params.colDef.headerName}
-        </div>
+        </Box>
       ),
       renderCell: (params) => (
         <Box
@@ -225,7 +233,9 @@ export const AsinDataTable = ({
             justifyContent: "center",
           }}
         >
-          {calculateDecreaseLatestToPrevEl(params.row)}
+          {calculateDecreaseLatestToPrevEl(params.row) === -99999
+            ? "N"
+            : calculateDecreaseLatestToPrevEl(params.row)}
         </Box>
       ),
       valueGetter: (prams, row) => calculateDecreaseLatestToPrevEl(row),
@@ -237,7 +247,13 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => (
-        <div>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Tooltip
             title={"直近7日間の在庫の減少数です（Nはエラー）"}
             placement="top"
@@ -253,16 +269,15 @@ export const AsinDataTable = ({
               ],
             }}
           >
-            <IconButton>
-              <InfoIcon
-                sx={{
-                  color: "#E0E0E0",
-                }}
-              />
-            </IconButton>
+            <InfoIcon
+              sx={{
+                marginRight: "3px",
+                color: "#E0E0E0",
+              }}
+            />
           </Tooltip>
           {params.colDef.headerName}
-        </div>
+        </Box>
       ),
       renderCell: (params) => (
         <Box
@@ -277,7 +292,8 @@ export const AsinDataTable = ({
             : handleDecrease2(params.row)}
         </Box>
       ),
-      valueGetter: (prams, row) => handleDecrease2(row),
+      valueGetter: (prams, row) =>
+        Number.isNaN(handleDecrease2(row)) ? -99999 : handleDecrease2(row),
     },
     {
       field: "",
