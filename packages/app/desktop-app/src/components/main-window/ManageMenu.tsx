@@ -1,21 +1,15 @@
-import { useNavigate } from "react-router-dom";
-import "./Manage.css";
+import { Box, Button } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
+import { v4 as uuidv4 } from "uuid";
 import {
   addAsin,
   removeAsin,
   switchRemoveCheck,
-} from "../slices/asinDataListSlice";
-import { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { calculateRemainingTime } from "../util/calculateRemainingTime";
-import { ManageMenu } from "../components/main-window/ManageMenu";
-import { Footer } from "../components/main-window/Footer";
-import { Box } from "@mui/material";
-import { AsinDataTableManage } from "../components/main-window/AsinDataTableManage";
+} from "../../slices/asinDataListSlice";
+import { calculateRemainingTime } from "../../util/calculateRemainingTime";
 
-function Manage() {
+export const ManageMenu = ({ inputAsinCount }: { inputAsinCount: number }) => {
   // グローバル変数のASINリストの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
@@ -33,15 +27,11 @@ function Manage() {
 
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
-  const [inputAsinCount, setInputAsinCount] = useState<number>(0);
 
   // インプット文字列情報を取得するための関数
   const handleInputChange = (event: any) => {
     setInputAsin(event.target.value);
   };
-
-  // タブ切り替えのフック
-  const navigate = useNavigate();
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -138,14 +128,6 @@ function Manage() {
     dispatch(switchRemoveCheck(id));
   };
 
-  useEffect(() => {
-    const inputAsinLinesLength = inputAsin
-      .split(/[\r\n\s]+/)
-      .map((line) => line.trim())
-      .filter((line) => line !== "").length;
-    setInputAsinCount(inputAsinLinesLength);
-  }, [inputAsin]);
-
   const handleRemoveAsin = async () => {
     dispatch(removeAsin());
     // 状態変数の更新が完了するまで200ms待機
@@ -163,87 +145,76 @@ function Manage() {
   }, [asinDataList]);
 
   return (
-    <div className="App">
-      <ManageMenu inputAsinCount={inputAsinCount} />
+    // menuのグローバルBox
+    <Box
+      component={"div"}
+      sx={{
+        width: "100%",
+        height: "50px",
+        marginTop: "0px",
+        marginBottom: "17.5px",
+        boxShadow: "2",
+        backgroundColor: "white",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "start",
+        flexShrink:
+          "0" /* フレックスコンテナ内の要素が親スペースよりも大きい場合に、要素の縮小を防止。*/,
+      }}
+    >
+      {/* メニューの左コンテナ */}
       <Box
         sx={{
+          width: "190px",
           display: "flex",
-          flexDirection: "row",
+          position: "relative",
         }}
       >
-        <Box
-          sx={{
-            marginRight: "30px",
-            boxShadow: "7",
-          }}
-        >
-          <textarea
-            className="manage-input-asin"
-            value={inputAsin} /* valueの値をinputAsinに紐づけています。*/
-            onChange={handleInputChange}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                // デフォルトのブラウザの動作による
-                // Enterキーの動作(改行)を防ぎます。
-                event.preventDefault();
-                handleAddAsin();
-              }
-            }}
-            onPaste={handlePaste}
-            rows={300}
-            cols={10}
-            placeholder={
-              "追加ASINを改行で入力\n推奨：Excelから直接貼り付け\n\nB000000000\nB000000000\nB000000000\n    .\n    .\n    .\n    .\n    ."
-            }
-          />
-        </Box>
-
-        {/* 左Columnエリア */}
-        {/* <div className="manage-left-column"></div> */}
-        {/* 右Columnエリア */}
-        {/* <div className="manage-right-column"> */}
-        <AsinDataTableManage />
-        {/* リスト全体 */}
-        {/* 下部コンテナ */}
-        {/* <div className="manage-right-column-down-container"> */}
-        {/* <button
-              className="manage-delete-selected-asin-button"
-              onClick={() => {
-                handleRemoveAsin();
-              }}
-            >
-              選択したASINを削除
-            </button> */}
-        {/* <button className="manage-delete-no-fba-asin-button">
-              FBAセラーのいないASINを削除
-            </button>
-            <button className="manage-delete-no-protected-asin-button">
-              保護されたASIN以外を削除
-            </button> */}
-        {/* </div> */}
-        {/* </div> */}
+        <button className="manage-add-asin-button" onClick={handleAddAsin}>
+          登録
+        </button>
+        <p className="manage-add-asin-count">{inputAsinCount}</p>
       </Box>
 
-      {/* <div className="manage-bottom-container">
-        <p>
-          {systemStatus === 0
-            ? ""
-            : systemStatus === 1
-            ? `データ取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 2
-            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 3
-            ? `追加されたASINのデータを取得しています`
-            : systemStatus === 4
-            ? `本日分のデータ取得は既に完了しています。`
-            : systemStatus === 5
-            ? `データ取得が完了しました。`
-            : `System cord e`}
-        </p>
-      </div> */}
-      <Footer scrapeTimeLeft={scrapeTimeLeft} />
-    </div>
-  );
-}
+      {/* メニューの中央コンテナ */}
+      <Box
+        sx={{
+          width: "832px",
+          borderLeft: "0.5px solid #c0c0c0",
+          borderRight: "0.5px solid #c0c0c0",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <button
+          className="manage-delete-selected-asin-button"
+          onClick={() => {
+            handleRemoveAsin();
+          }}
+        >
+          選択したASINを削除
+        </button>
+        <button
+        // className="manage-delete-no-fba-asin-button"
+        >
+          FBAセラーのいないASINを全て削除
+        </button>
+        <button>チェックしたASIN "以外" を全て削除</button>
+        <button>Amazon本体の出品してるASINを全て削除</button>
+      </Box>
 
-export default Manage;
+      {/* メニューの右コンテナ */}
+      <Box
+        sx={{
+          width: "220px",
+          display: "flex",
+          position: "relative",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      ></Box>
+    </Box>
+  );
+};
