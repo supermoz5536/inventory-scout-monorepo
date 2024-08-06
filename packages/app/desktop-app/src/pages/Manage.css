@@ -15,8 +15,9 @@
   align-items: center;
   justify-content: center;
 }
-.manage-body {
-  height: 860px;
+
+.manage-table {
+  height: 790px;
   width: 1385px;
   background-color: rgb(156, 255, 250);
   display: flex;
@@ -25,7 +26,7 @@
 .manage-input-asin {
   background-color: #ffffff;
   width: 190px;
-  height: 800px;
+  height: 790px;
   border: 0.5px solid #7a7a7a;
 }
 
@@ -169,9 +170,9 @@
 
 .manage-add-asin-count {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0%;
+  left: 0%;
+  /* transform: translate(-50%, -50%); */
   font-size: 16px;
 }
 
@@ -182,9 +183,9 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: 50%;
-  left: 80%;
-  transform: translate(-50%, -50%);
+  top: 0%;
+  left: 0%;
+  /* transform: translate(-50%, -50%); */
 }
 
 .manage-right-column {

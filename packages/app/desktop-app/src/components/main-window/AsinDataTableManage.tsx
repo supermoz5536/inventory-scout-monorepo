@@ -30,17 +30,12 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import { getPrevScrapingDate } from "../../util/asinDataUtil";
 
-export const AsinDataTable = ({
-  filteredAsinDataList,
-}: {
-  filteredAsinDataList: AsinData[];
-}) => {
-  const dispatch = useDispatch<AppDispatch>();
-
+export const AsinDataTableManage = () => {
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
 
+  const dispatch = useDispatch<AppDispatch>();
   const initialSelectedIds = asinDataList
     .filter((asinData: AsinData) => asinData.isDeleteCheck === true)
     .map((asinData: AsinData) => asinData.asin);
@@ -57,21 +52,21 @@ export const AsinDataTable = ({
     setSelectedIds(newSelectedIds);
   }, [asinDataList]);
 
-  const gotoAmazonURL = (asin: string) => {
-    const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
-    window.myAPI.openExternal(amazonURL);
-  };
+  // const gotoAmazonURL = (asin: string) => {
+  //   const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
+  //   window.myAPI.openExternal(amazonURL);
+  // };
 
-  const handleDeleteCheck = (id: string) => {
-    dispatch(switchRemoveCheck(id));
-  };
+  // const handleDeleteCheck = (id: string) => {
+  //   dispatch(switchRemoveCheck(id));
+  // };
 
-  const handleDecrease2 = (asinData: AsinData) => {
-    const data = prepareDataForCalculateDecrease(asinData);
-    const result = calculateDataForChart(data, true).newTotalDecrease;
+  // const handleDecrease2 = (asinData: AsinData) => {
+  //   const data = prepareDataForCalculateDecrease(asinData);
+  //   const result = calculateDataForChart(data, true).newTotalDecrease;
 
-    return result;
-  };
+  //   return result;
+  // };
 
   const columns: readonly GridColDef<AsinData>[] = [
     {
@@ -82,65 +77,65 @@ export const AsinDataTable = ({
       sortable: false,
       renderHeader: (params) => params.colDef.headerName,
     },
-    {
-      field: " ",
-      headerName: "",
-      width: 100,
-      disableColumnMenu: false,
-      sortable: false,
-      renderHeader: (params) => (
-        <div style={{ backgroundColor: "white", height: "100%" }}>
-          {params.colDef.headerName}
-        </div>
-      ),
-      renderCell: (params) => (
-        <Box component={"div"} className="top-square-space-3buttonp-elements ">
-          {/* Scraperコンポーネントの実行ボタン */}
-          <Button
-            className="top-square-space-each-button-1"
-            onClick={() => {
-              gotoAmazonURL(params.row.asin);
-            }}
-            variant="outlined"
-            sx={{
-              backgroundColor: "white",
-              fontWeight: "bold",
-              fontSize: "11px",
-              "&:hover": {
-                backgroundColor: "#dedede", // ホバー時の背景色
-              },
-            }}
-          >
-            商品URL
-          </Button>
-          <Button
-            className="top-square-space-each-button-2"
-            onClick={() => {
-              window.myAPI.openStockDetail(params.row);
-            }}
-            variant="outlined"
-            sx={{
-              backgroundColor: "#white",
-              fontWeight: "bold",
-              fontSize: "11px",
-              "&:hover": {
-                backgroundColor: "#dedede", // ホバー時の背景色
-              },
-            }}
-          >
-            <Typography
-              sx={{
-                marginTop: "3.5px",
-                fontSize: "11px",
-                fontWeight: "bold",
-              }}
-            >
-              在庫データ
-            </Typography>
-          </Button>
-        </Box>
-      ),
-    },
+    // {
+    //   field: " ",
+    //   headerName: "",
+    //   width: 100,
+    //   disableColumnMenu: false,
+    //   sortable: false,
+    //   renderHeader: (params) => (
+    //     <div style={{ backgroundColor: "white", height: "100%" }}>
+    //       {params.colDef.headerName}
+    //     </div>
+    //   ),
+    //   renderCell: (params) => (
+    //     <Box component={"div"} className="top-square-space-3buttonp-elements ">
+    //       {/* Scraperコンポーネントの実行ボタン */}
+    //       <Button
+    //         className="top-square-space-each-button-1"
+    //         onClick={() => {
+    //           gotoAmazonURL(params.row.asin);
+    //         }}
+    //         variant="outlined"
+    //         sx={{
+    //           backgroundColor: "white",
+    //           fontWeight: "bold",
+    //           fontSize: "11px",
+    //           "&:hover": {
+    //             backgroundColor: "#dedede", // ホバー時の背景色
+    //           },
+    //         }}
+    //       >
+    //         商品URL
+    //       </Button>
+    //       <Button
+    //         className="top-square-space-each-button-2"
+    //         onClick={() => {
+    //           window.myAPI.openStockDetail(params.row);
+    //         }}
+    //         variant="outlined"
+    //         sx={{
+    //           backgroundColor: "#white",
+    //           fontWeight: "bold",
+    //           fontSize: "11px",
+    //           "&:hover": {
+    //             backgroundColor: "#dedede", // ホバー時の背景色
+    //           },
+    //         }}
+    //       >
+    //         <Typography
+    //           sx={{
+    //             marginTop: "3.5px",
+    //             fontSize: "11px",
+    //             fontWeight: "bold",
+    //           }}
+    //         >
+    //           在庫データ
+    //         </Typography>
+    //       </Button>
+    //     </Box>
+    //   ),
+    // },
     {
       field: "imageURL",
       headerName: "画像",
@@ -207,145 +202,145 @@ export const AsinDataTable = ({
       renderCell: (params) => params.row.cartPrice,
       valueGetter: (prams, row) => Number(row.cartPrice.replace(/,/g, "")),
     },
-    {
-      field: "decrease1",
-      headerName: "前回減少",
-      width: 105,
-      disableColumnMenu: false,
-      sortable: true,
-      renderHeader: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Tooltip
-            title={
-              "「最新取得」と「前回取得」（最新の1つ前の取得）を比較したときの在庫の減少数です（Nはエラー）"
-            }
-            placement="top"
-            arrow
-            PopperProps={{
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -5], // ここでピクセル単位で位置を調整
-                  },
-                },
-              ],
-            }}
-          >
-            <InfoIcon
-              sx={{
-                marginRight: "3px",
-                color: "#E0E0E0",
-              }}
-            />
-          </Tooltip>
+    // {
+    //   field: "decrease1",
+    //   headerName: "前回減少",
+    //   width: 105,
+    //   disableColumnMenu: false,
+    //   sortable: true,
+    //   renderHeader: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       <Tooltip
+    //         title={
+    //           "「最新取得」と「前回取得」（最新の1つ前の取得）を比較したときの在庫の減少数です（Nはエラー）"
+    //         }
+    //         placement="top"
+    //         arrow
+    //         PopperProps={{
+    //           modifiers: [
+    //             {
+    //               name: "offset",
+    //               options: {
+    //                 offset: [0, -5], // ここでピクセル単位で位置を調整
+    //               },
+    //             },
+    //           ],
+    //         }}
+    //       >
+    //         <InfoIcon
+    //           sx={{
+    //             marginRight: "3px",
+    //             color: "#E0E0E0",
+    //           }}
+    //         />
+    //       </Tooltip>
 
-          {params.colDef.headerName}
-        </Box>
-      ),
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {calculateDecreaseLatestToPrevEl(params.row) === -99999
-            ? "N"
-            : calculateDecreaseLatestToPrevEl(params.row)}
-        </Box>
-      ),
-      valueGetter: (prams, row) => calculateDecreaseLatestToPrevEl(row),
-    },
-    {
-      field: "decrease2",
-      headerName: "週間減少",
-      width: 105,
-      disableColumnMenu: false,
-      sortable: true,
-      renderHeader: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Tooltip
-            title={"直近7日間の在庫の減少数です（Nはエラー）"}
-            placement="top"
-            arrow
-            PopperProps={{
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -5], // ここでピクセル単位で位置を調整
-                  },
-                },
-              ],
-            }}
-          >
-            <InfoIcon
-              sx={{
-                marginRight: "3px",
-                color: "#E0E0E0",
-              }}
-            />
-          </Tooltip>
-          {params.colDef.headerName}
-        </Box>
-      ),
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {Number.isNaN(handleDecrease2(params.row))
-            ? "N"
-            : handleDecrease2(params.row)}
-        </Box>
-      ),
-      valueGetter: (prams, row) =>
-        Number.isNaN(handleDecrease2(row)) ? -99999 : handleDecrease2(row),
-    },
-    {
-      field: "",
-      headerName: "前回取得",
-      width: 100,
-      disableColumnMenu: false,
-      sortable: false,
-      renderHeader: (params) => (
-        <Box
-          sx={{
-            paddingLeft: "10px",
-          }}
-        >
-          {params.colDef.headerName}
-        </Box>
-      ),
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {getPrevScrapingDate(params.row)}
-        </Box>
-      ),
-    },
+    //       {params.colDef.headerName}
+    //     </Box>
+    //   ),
+    //   renderCell: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       {calculateDecreaseLatestToPrevEl(params.row) === -99999
+    //         ? "N"
+    //         : calculateDecreaseLatestToPrevEl(params.row)}
+    //     </Box>
+    //   ),
+    //   valueGetter: (prams, row) => calculateDecreaseLatestToPrevEl(row),
+    // },
+    // {
+    //   field: "decrease2",
+    //   headerName: "週間減少",
+    //   width: 105,
+    //   disableColumnMenu: false,
+    //   sortable: true,
+    //   renderHeader: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       <Tooltip
+    //         title={"直近7日間の在庫の減少数です（Nはエラー）"}
+    //         placement="top"
+    //         arrow
+    //         PopperProps={{
+    //           modifiers: [
+    //             {
+    //               name: "offset",
+    //               options: {
+    //                 offset: [0, -5], // ここでピクセル単位で位置を調整
+    //               },
+    //             },
+    //           ],
+    //         }}
+    //       >
+    //         <InfoIcon
+    //           sx={{
+    //             marginRight: "3px",
+    //             color: "#E0E0E0",
+    //           }}
+    //         />
+    //       </Tooltip>
+    //       {params.colDef.headerName}
+    //     </Box>
+    //   ),
+    //   renderCell: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       {Number.isNaN(handleDecrease2(params.row))
+    //         ? "N"
+    //         : handleDecrease2(params.row)}
+    //     </Box>
+    //   ),
+    //   valueGetter: (prams, row) =>
+    //     Number.isNaN(handleDecrease2(row)) ? -99999 : handleDecrease2(row),
+    // },
+    // {
+    //   field: "",
+    //   headerName: "前回取得",
+    //   width: 100,
+    //   disableColumnMenu: false,
+    //   sortable: false,
+    //   renderHeader: (params) => (
+    //     <Box
+    //       sx={{
+    //         paddingLeft: "10px",
+    //       }}
+    //     >
+    //       {params.colDef.headerName}
+    //     </Box>
+    //   ),
+    //   renderCell: (params) => (
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       {getPrevScrapingDate(params.row)}
+    //     </Box>
+    //   ),
+    // },
     {
       field: "fetchLatestDateTime",
       headerName: "最新取得",
@@ -421,7 +416,7 @@ export const AsinDataTable = ({
   ];
 
   const handleSelectionChange = (newSelection: any) => {
-    if (newSelection.length === filteredAsinDataList.length) {
+    if (newSelection.length === asinDataList.length) {
       console.log("すべての行が選択されました");
       dispatch(switchIsDeleteCheckAll(true));
     } else if (newSelection.length === 0) {
@@ -434,9 +429,9 @@ export const AsinDataTable = ({
   };
 
   return (
-    <Box sx={{ height: 740, width: 1570, backgroundColor: "white" }}>
+    <Box sx={{ height: 792.5, width: 1350, backgroundColor: "white" }}>
       <DataGrid
-        rows={filteredAsinDataList}
+        rows={asinDataList}
         columns={columns}
         rowHeight={80} // 行の高さを70に設定
         initialState={{
