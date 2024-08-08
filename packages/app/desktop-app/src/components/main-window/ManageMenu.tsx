@@ -33,26 +33,7 @@ export const ManageMenu = ({
     (state: RootState) => state.systemStatus.value.systemStatus
   );
 
-  // // 入力フィールドの状態を管理するためのuseState
-  // const [inputAsin, setInputAsin] = useState<string>("");
-
-  // // インプット文字列情報を取得するための関数
-  // const handleInputChange = (event: any) => {
-  //   setInputAsin(event.target.value);
-  // };
-
-  // dispatch: storeへのreducer起動のお知らせ役
-  // dispatch関数を取得し、
-  // その型をAppDispatchとして指定することで
-  // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
-
-  // // onPasteイベントをハンドルする関数
-  // const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-  //   event.preventDefault();
-  //   const pastedText = event.clipboardData.getData("text");
-  //   setInputAsin((inputAsin) => inputAsin + pastedText);
-  // };
 
   // ボタンをクリックしたときにアクションをディスパッチする関数
   const handleAddAsin = async () => {
@@ -143,14 +124,6 @@ export const ManageMenu = ({
     // ストレージに最新のasinDataListを保存
     await window.myAPI.saveData(asinDataListRef.current);
   };
-
-  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
-
-  /// スクレイピング残り時間の表示を動的に変更します。
-  useEffect(() => {
-    const remainingTime = calculateRemainingTime(asinDataListRef.current);
-    setScrapeTimeLeft(remainingTime);
-  }, [asinDataList]);
 
   return (
     // menuのグローバルBox
