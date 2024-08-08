@@ -166,55 +166,110 @@ export const ManageMenu = ({ inputAsinCount }: { inputAsinCount: number }) => {
       <Box
         sx={{
           width: "190px",
+          minWidth: "190px",
           display: "flex",
           position: "relative",
         }}
       >
-        <button className="manage-add-asin-button" onClick={handleAddAsin}>
-          登録
-        </button>
-        <p className="manage-add-asin-count">{inputAsinCount}</p>
+        <Button
+          variant="contained"
+          onClick={handleAddAsin}
+          sx={{
+            height: "30px",
+            width: "100px",
+            fontWeight: "bold",
+            position: "absolute",
+            top: "19%",
+            left: "7.5%",
+            /* transform: translate(-50%, -50%); */
+          }}
+        >
+          ASIN追加
+        </Button>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "29%",
+            left: "75%",
+            fontSize: "16px",
+          }}
+        >
+          {inputAsinCount}
+        </Box>
       </Box>
 
       {/* メニューの中央コンテナ */}
       <Box
         sx={{
-          width: "832px",
+          width: "100%",
           borderLeft: "0.5px solid #c0c0c0",
-          borderRight: "0.5px solid #c0c0c0",
-          position: "relative",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          position: "relative",
         }}
       >
-        <button
-          className="manage-delete-selected-asin-button"
+        <Button
+          variant="contained"
           onClick={() => {
             handleRemoveAsin();
           }}
+          sx={{
+            height: "30px",
+            width: "170px",
+            fontWeight: "bold",
+            position: "absolute",
+            top: "21%",
+            left: "2.3%",
+            fontSize: "14px",
+          }}
         >
           選択したASINを削除
-        </button>
-        <button
-        // className="manage-delete-no-fba-asin-button"
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            height: "30px",
+            width: "320px",
+            fontWeight: "bold",
+            position: "absolute",
+            top: "21%",
+            left: "17%",
+            fontSize: "14px",
+          }}
+        >
+          Amazon本体の出品してるASINを全て削除
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            height: "30px",
+            width: "280px",
+            fontWeight: "bold",
+            position: "absolute",
+            top: "21%",
+            left: "42.5%",
+            fontSize: "14px",
+          }}
         >
           FBAセラーのいないASINを全て削除
-        </button>
-        <button>チェックしたASIN "以外" を全て削除</button>
-        <button>Amazon本体の出品してるASINを全て削除</button>
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{
+            height: "30px",
+            width: "250px",
+            fontWeight: "bold",
+            position: "absolute",
+            top: "21%",
+            left: "79.5%",
+            fontSize: "14px",
+          }}
+        >
+          選択したASIN "以外" を全て削除
+        </Button>
       </Box>
 
       {/* メニューの右コンテナ */}
-      <Box
-        sx={{
-          width: "220px",
-          display: "flex",
-          position: "relative",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      ></Box>
     </Box>
   );
 };
