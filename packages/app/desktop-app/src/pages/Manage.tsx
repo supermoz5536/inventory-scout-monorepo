@@ -164,7 +164,11 @@ function Manage() {
 
   return (
     <div className="App">
-      <ManageMenu inputAsinCount={inputAsinCount} />
+      <ManageMenu
+        inputAsinCount={inputAsinCount}
+        inputAsin={inputAsin}
+        setInputAsin={setInputAsin}
+      />
       <Box
         sx={{
           display: "flex",

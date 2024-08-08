@@ -9,7 +9,15 @@ import {
 } from "../../slices/asinDataListSlice";
 import { calculateRemainingTime } from "../../util/calculateRemainingTime";
 
-export const ManageMenu = ({ inputAsinCount }: { inputAsinCount: number }) => {
+export const ManageMenu = ({
+  inputAsinCount,
+  inputAsin,
+  setInputAsin,
+}: {
+  inputAsinCount: number;
+  inputAsin: string;
+  setInputAsin: any;
+}) => {
   // グローバル変数のASINリストの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
@@ -25,13 +33,13 @@ export const ManageMenu = ({ inputAsinCount }: { inputAsinCount: number }) => {
     (state: RootState) => state.systemStatus.value.systemStatus
   );
 
-  // 入力フィールドの状態を管理するためのuseState
-  const [inputAsin, setInputAsin] = useState<string>("");
+  // // 入力フィールドの状態を管理するためのuseState
+  // const [inputAsin, setInputAsin] = useState<string>("");
 
-  // インプット文字列情報を取得するための関数
-  const handleInputChange = (event: any) => {
-    setInputAsin(event.target.value);
-  };
+  // // インプット文字列情報を取得するための関数
+  // const handleInputChange = (event: any) => {
+  //   setInputAsin(event.target.value);
+  // };
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -39,12 +47,12 @@ export const ManageMenu = ({ inputAsinCount }: { inputAsinCount: number }) => {
   // アクションをディスパッチする際に型安全性が確保されます。
   const dispatch = useDispatch<AppDispatch>();
 
-  // onPasteイベントをハンドルする関数
-  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    event.preventDefault();
-    const pastedText = event.clipboardData.getData("text");
-    setInputAsin((inputAsin) => inputAsin + pastedText);
-  };
+  // // onPasteイベントをハンドルする関数
+  // const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  //   event.preventDefault();
+  //   const pastedText = event.clipboardData.getData("text");
+  //   setInputAsin((inputAsin) => inputAsin + pastedText);
+  // };
 
   // ボタンをクリックしたときにアクションをディスパッチする関数
   const handleAddAsin = async () => {
