@@ -10,6 +10,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
+import { ManageMenu } from "../components/main-window/ManageMenu";
+import { Footer } from "../components/main-window/Footer";
+import { Box } from "@mui/material";
+import { AsinDataTableManage } from "../components/main-window/AsinDataTableManage";
 
 function Manage() {
   // グローバル変数のASINリストの値を取得
@@ -27,23 +31,19 @@ function Manage() {
     (state: RootState) => state.systemStatus.value.systemStatus
   );
 
+  const dispatch = useDispatch<AppDispatch>();
+
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
   const [inputAsinCount, setInputAsinCount] = useState<number>(0);
+  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+  const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
 
   // インプット文字列情報を取得するための関数
   const handleInputChange = (event: any) => {
     setInputAsin(event.target.value);
   };
-
-  // タブ切り替えのフック
-  const navigate = useNavigate();
-
-  // dispatch: storeへのreducer起動のお知らせ役
-  // dispatch関数を取得し、
-  // その型をAppDispatchとして指定することで
-  // アクションをディスパッチする際に型安全性が確保されます。
-  const dispatch = useDispatch<AppDispatch>();
 
   // onPasteイベントをハンドルする関数
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -150,8 +150,6 @@ function Manage() {
     await window.myAPI.saveData(asinDataListRef.current);
   };
 
-  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
-
   /// スクレイピング残り時間の表示を動的に変更します。
   useEffect(() => {
     const remainingTime = calculateRemainingTime(asinDataListRef.current);
@@ -160,9 +158,23 @@ function Manage() {
 
   return (
     <div className="App">
-      <div className="manage-body">
-        {/* 左Columnエリア */}
-        <div className="manage-left-column">
+      <ManageMenu
+        inputAsinCount={inputAsinCount}
+        inputAsin={inputAsin}
+        setInputAsin={setInputAsin}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Box
+          sx={{
+            marginRight: "30px",
+            boxShadow: "7",
+          }}
+        >
           <textarea
             className="manage-input-asin"
             value={inputAsin} /* valueの値をinputAsinに紐づけています。*/
@@ -182,139 +194,10 @@ function Manage() {
               "追加ASINを改行で入力\n推奨：Excelから直接貼り付け\n\nB000000000\nB000000000\nB000000000\n    .\n    .\n    .\n    .\n    ."
             }
           />
-          {/* 下部コンテナ */}
-          <div className="manage-left-column-down-container">
-            <p className="manage-add-asin-count">{inputAsinCount}</p>
-            <button className="manage-add-asin-button" onClick={handleAddAsin}>
-              登録
-            </button>
-          </div>
-        </div>
-        {/* 右Columnエリア */}
-        <div className="manage-right-column">
-          {/* リスト全体 */}
-          <div className="manage-globalList">
-            {/* リストヘッダー部分 */}
-            <div className="manage-asin-list-header">
-              {/* 要素 ID */}
-              <div className="manage-square-space-amazon-num">ID</div>
-              {/* 要素0 チェック */}
-              <div className="manage-square-space-amazon-num">削除</div>
-              {/* 要素1 ASIN */}
-              <div className="manage-square-space-asin">{<p>ASIN</p>}</div>
-
-              {/* 要素4 商品名 */}
-              <div className="manage-square-space-name">
-                <p>商品名</p>
-              </div>
-
-              {/* 要素5 st-code */}
-              <div className="manage-square-space-st-code">
-                <p>st_code</p>
-              </div>
-
-              {/* 要素6 lock-flag */}
-              <div className="manage-square-space-lock-flag">
-                <p>lock-flag</p>
-              </div>
-
-              {/* 要素7 親ASIN */}
-              <div className="manage-square-space-asin">
-                <p> 親ASIN</p>
-              </div>
-            </div>
-
-            {/* リスト部分 */}
-            <div className="manage-asinArray-map-wrapper-manage-css">
-              {asinDataList.map((asinData: AsinData, index: any) => (
-                <div className="manage-asin-list" key={index}>
-                  {/* 要素 ID */}
-                  <div className="manage-square-space-amazon-num">
-                    <p>{index + 1}</p>
-                  </div>
-                  {/* 要素0 チェック */}
-                  <div className="manage-square-space-amazon-num">
-                    <label>
-                      <input
-                        type="checkbox"
-                        onChange={() => {
-                          handleDeleteCheck(asinData.id);
-                        }}
-                        checked={asinData.isDeleteCheck}
-                      />
-                    </label>
-                  </div>
-                  {/* 要素1 ASIN */}
-                  <div className="manage-square-space-asin">
-                    {<p>{asinData.asin}</p>}
-                  </div>
-
-                  {/* 要素4 商品名 */}
-                  <div className="manage-square-space-name">
-                    {<p>{asinData.name}</p>}
-                  </div>
-
-                  {/* 要素5 st-code */}
-                  <div className="manage-square-space-st-code">
-                    <p>
-                      {" "}
-                      {asinData.isScraping === null
-                        ? ""
-                        : asinData.isScraping === true
-                        ? "取得中"
-                        : "取得完了"}
-                    </p>
-                  </div>
-
-                  {/* 要素6 lock-flag */}
-                  <div className="manage-square-space-lock-flag">
-                    <p></p>
-                  </div>
-
-                  {/* 要素7 親ASIN */}
-                  <div className="manage-square-space-asin">
-                    <p>{asinData.asinParent}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* 下部コンテナ */}
-          <div className="manage-right-column-down-container">
-            <button
-              className="manage-delete-selected-asin-button"
-              onClick={() => {
-                handleRemoveAsin();
-              }}
-            >
-              選択したASINを削除
-            </button>
-            {/* <button className="manage-delete-no-fba-asin-button">
-              FBAセラーのいないASINを削除
-            </button>
-            <button className="manage-delete-no-protected-asin-button">
-              保護されたASIN以外を削除
-            </button> */}
-          </div>
-        </div>
-      </div>
-      <div className="manage-bottom-container">
-        <p>
-          {systemStatus === 0
-            ? ""
-            : systemStatus === 1
-            ? `データ取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 2
-            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 3
-            ? `追加されたASINのデータを取得しています`
-            : systemStatus === 4
-            ? `本日分のデータ取得は既に完了しています。`
-            : systemStatus === 5
-            ? `データ取得が完了しました。`
-            : `System cord e`}
-        </p>
-      </div>
+        </Box>
+        <AsinDataTableManage />
+      </Box>
+      <Footer scrapeTimeLeft={scrapeTimeLeft} />
     </div>
   );
 }

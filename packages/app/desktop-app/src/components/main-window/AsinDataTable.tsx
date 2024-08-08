@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridInputRowSelectionModel,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
 import { jaJP } from "@mui/x-data-grid/locales";
 import Checkbox from "@mui/material/Checkbox";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,18 +35,37 @@ export const AsinDataTable = ({
 }: {
   filteredAsinDataList: AsinData[];
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
 
-  const dispatch = useDispatch<AppDispatch>();
+  const initialSelectedIds = asinDataList
+    .filter((asinData: AsinData) => asinData.isDeleteCheck === true)
+    .map((asinData: AsinData) => asinData.asin);
+
+  const [selectedIds, setSelectedIds] = useState<
+    GridInputRowSelectionModel | undefined
+  >(initialSelectedIds);
+
+  useEffect(() => {
+    const newSelectedIds = asinDataList
+      .filter((asinData: AsinData) => asinData.isDeleteCheck === true)
+      .map((asinData: AsinData) => asinData.asin);
+
+    setSelectedIds(newSelectedIds);
+  }, [asinDataList]);
+
   const gotoAmazonURL = (asin: string) => {
     const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
     window.myAPI.openExternal(amazonURL);
   };
+
   const handleDeleteCheck = (id: string) => {
     dispatch(switchRemoveCheck(id));
   };
+
   const handleDecrease2 = (asinData: AsinData) => {
     const data = prepareDataForCalculateDecrease(asinData);
     const result = calculateDataForChart(data, true).newTotalDecrease;
@@ -426,6 +450,7 @@ export const AsinDataTable = ({
         disableRowSelectionOnClick
         onRowSelectionModelChange={handleSelectionChange} // 選択変更時のコールバック
         getRowId={(row) => row.asin} // 行のIDとしてasinを使用する
+        rowSelectionModel={selectedIds}
         localeText={jaJP.components.MuiDataGrid.defaultProps.localeText} // ここで日本語を設定
         // hideFooterPagination // ページネーションエリアを非表示に設定
         // pageSizeOptions={[2]}
