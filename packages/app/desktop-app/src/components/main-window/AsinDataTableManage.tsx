@@ -163,7 +163,7 @@ export const AsinDataTableManage = () => {
     {
       field: "name",
       headerName: "商品名",
-      width: 490,
+      width: 550,
       disableColumnMenu: false,
       sortable: false,
       renderHeader: (params) => params.colDef.headerName,
@@ -184,14 +184,14 @@ export const AsinDataTableManage = () => {
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
     },
-    {
-      field: "totalStock",
-      headerName: "FBA合計在庫",
-      width: 100,
-      disableColumnMenu: false,
-      sortable: true,
-      renderHeader: (params) => params.colDef.headerName,
-    },
+    // {
+    //   field: "totalStock",
+    //   headerName: "FBA合計在庫",
+    //   width: 100,
+    //   disableColumnMenu: false,
+    //   sortable: true,
+    //   renderHeader: (params) => params.colDef.headerName,
+    // },
     // {
     //   field: "cartPrice",
     //   headerName: "カート価格",

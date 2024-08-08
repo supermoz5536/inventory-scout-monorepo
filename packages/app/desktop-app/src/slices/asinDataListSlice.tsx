@@ -131,6 +131,25 @@ export const asinSlice = createSlice({
         }
       });
     },
+
+    //「Amazon出品ASINの削除ボタン」の実行関数
+    removePresentAmazonAsin: (state) => {
+      state.value = state.value.filter(
+        (asinData) => asinData.amazonSellerNOP === 0
+      );
+    },
+    //「FBA出品者が0人のASINを削除するボタン」の実行関数
+    removeAbsentFbaAsin: (state) => {
+      state.value = state.value.filter(
+        (asinData) => asinData.fbaSellerNOP !== 0
+      );
+    },
+    //「選択したASIN "以外" のリストを削除するボタン」の実行関数
+    removeUncheckedAsin: (state) => {
+      state.value = state.value.filter(
+        (asinData) => asinData.isDeleteCheck === true
+      );
+    },
   },
 });
 
@@ -148,6 +167,9 @@ export const {
   updateWithLoadedData,
   setIsScrapingTrueForNewItems,
   setIsDeleteCheckSelected,
+  removePresentAmazonAsin,
+  removeAbsentFbaAsin,
+  removeUncheckedAsin,
 } = asinSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので

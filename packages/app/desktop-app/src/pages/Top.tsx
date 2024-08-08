@@ -77,10 +77,6 @@ function Top() {
   const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
     useState<boolean>(false);
 
-  const gotoAmazonURL = (asin: string) => {
-    const amazonURL = `https://www.amazon.co.jp/dp/${asin}`;
-    window.myAPI.openExternal(amazonURL);
-  };
   const gotoPlanURL = () => {
     const planURL = `https://www.google.co.jp/`;
     window.myAPI.openExternal(planURL);

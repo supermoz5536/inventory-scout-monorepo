@@ -31,23 +31,19 @@ function Manage() {
     (state: RootState) => state.systemStatus.value.systemStatus
   );
 
+  const dispatch = useDispatch<AppDispatch>();
+
   // 入力フィールドの状態を管理するためのuseState
   const [inputAsin, setInputAsin] = useState<string>("");
   const [inputAsinCount, setInputAsinCount] = useState<number>(0);
+  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
+  const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
 
   // インプット文字列情報を取得するための関数
   const handleInputChange = (event: any) => {
     setInputAsin(event.target.value);
   };
-
-  // タブ切り替えのフック
-  const navigate = useNavigate();
-
-  // dispatch: storeへのreducer起動のお知らせ役
-  // dispatch関数を取得し、
-  // その型をAppDispatchとして指定することで
-  // アクションをディスパッチする際に型安全性が確保されます。
-  const dispatch = useDispatch<AppDispatch>();
 
   // onPasteイベントをハンドルする関数
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -154,8 +150,6 @@ function Manage() {
     await window.myAPI.saveData(asinDataListRef.current);
   };
 
-  const [scrapeTimeLeft, setScrapeTimeLeft] = useState(0);
-
   /// スクレイピング残り時間の表示を動的に変更します。
   useEffect(() => {
     const remainingTime = calculateRemainingTime(asinDataListRef.current);
@@ -201,50 +195,8 @@ function Manage() {
             }
           />
         </Box>
-
-        {/* 左Columnエリア */}
-        {/* <div className="manage-left-column"></div> */}
-        {/* 右Columnエリア */}
-        {/* <div className="manage-right-column"> */}
         <AsinDataTableManage />
-        {/* リスト全体 */}
-        {/* 下部コンテナ */}
-        {/* <div className="manage-right-column-down-container"> */}
-        {/* <button
-              className="manage-delete-selected-asin-button"
-              onClick={() => {
-                handleRemoveAsin();
-              }}
-            >
-              選択したASINを削除
-            </button> */}
-        {/* <button className="manage-delete-no-fba-asin-button">
-              FBAセラーのいないASINを削除
-            </button>
-            <button className="manage-delete-no-protected-asin-button">
-              保護されたASIN以外を削除
-            </button> */}
-        {/* </div> */}
-        {/* </div> */}
       </Box>
-
-      {/* <div className="manage-bottom-container">
-        <p>
-          {systemStatus === 0
-            ? ""
-            : systemStatus === 1
-            ? `データ取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 2
-            ? `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り${scrapeTimeLeft}分`
-            : systemStatus === 3
-            ? `追加されたASINのデータを取得しています`
-            : systemStatus === 4
-            ? `本日分のデータ取得は既に完了しています。`
-            : systemStatus === 5
-            ? `データ取得が完了しました。`
-            : `System cord e`}
-        </p>
-      </div> */}
       <Footer scrapeTimeLeft={scrapeTimeLeft} />
     </div>
   );

@@ -8,6 +8,10 @@ import {
   switchRemoveCheck,
 } from "../../slices/asinDataListSlice";
 import { calculateRemainingTime } from "../../util/calculateRemainingTime";
+import { ConfirmDeleteDataDialog } from "./ConfirmDeleteDataDialog";
+import ConfirmDeleteAmazonDialog from "./ConfirmDeleteAmazonDialog";
+import { ConfirmDeleteFbaDialog } from "./ConfirmDeleteFbaDialog";
+import ConfirmDeleteUncheckedDialog from "./ConfirmDeleteUncheckedDialog";
 
 export const ManageMenu = ({
   inputAsinCount,
@@ -18,7 +22,6 @@ export const ManageMenu = ({
   inputAsin: string;
   setInputAsin: any;
 }) => {
-  // グローバル変数のASINリストの値を取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value
   );
@@ -28,14 +31,30 @@ export const ManageMenu = ({
     asinDataListRef.current = asinDataList;
   }, [asinDataList]);
 
-  // グローバル変数のsystemStatusの値を取得
-  const systemStatus = useSelector(
-    (state: RootState) => state.systemStatus.value.systemStatus
-  );
-
   const dispatch = useDispatch<AppDispatch>();
+  const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
+  const [isOpenConfirmDeleteAmazonDialog, setIsOpenConfirmDeleteAmazonDialog] =
+    useState<boolean>(false);
+  const [isOpenConfirmDeleteFbaDialog, setIsOpenConfirmDeleteFbaDialog] =
+    useState<boolean>(false);
+  const [
+    isOpenConfirmDeleteUncheckedDialog,
+    setIsOpenConfirmDeleteUncheckedDialog,
+  ] = useState<boolean>(false);
 
-  // ボタンをクリックしたときにアクションをディスパッチする関数
+  const handleDeleteCheck = (id: string) => {
+    dispatch(switchRemoveCheck(id));
+  };
+
+  const handleRemoveAsin = async () => {
+    dispatch(removeAsin());
+    // 状態変数の更新が完了するまで200ms待機
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    // ストレージに最新のasinDataListを保存
+    await window.myAPI.saveData(asinDataListRef.current);
+  };
+
   const handleAddAsin = async () => {
     // まず、入力されたASINコードが
     // 空でないか（または空白だけでないか）を確認します。
@@ -113,18 +132,6 @@ export const ManageMenu = ({
     }
   };
 
-  const handleDeleteCheck = (id: string) => {
-    dispatch(switchRemoveCheck(id));
-  };
-
-  const handleRemoveAsin = async () => {
-    dispatch(removeAsin());
-    // 状態変数の更新が完了するまで200ms待機
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    // ストレージに最新のasinDataListを保存
-    await window.myAPI.saveData(asinDataListRef.current);
-  };
-
   return (
     // menuのグローバルBox
     <Box
@@ -162,7 +169,9 @@ export const ManageMenu = ({
             position: "absolute",
             top: "19%",
             left: "7.5%",
-            /* transform: translate(-50%, -50%); */
+            "&:hover": {
+              backgroundColor: "#CB0000", // ホバー時の背景色
+            },
           }}
         >
           ASIN追加
@@ -191,7 +200,7 @@ export const ManageMenu = ({
         <Button
           variant="contained"
           onClick={() => {
-            handleRemoveAsin();
+            setIsOpenConfirmDeleteDataDialog(true);
           }}
           sx={{
             height: "30px",
@@ -201,12 +210,18 @@ export const ManageMenu = ({
             top: "21%",
             left: "2.3%",
             fontSize: "14px",
+            "&:hover": {
+              backgroundColor: "#CB0000", // ホバー時の背景色
+            },
           }}
         >
           選択したASINを削除
         </Button>
         <Button
           variant="contained"
+          onClick={() => {
+            setIsOpenConfirmDeleteAmazonDialog(true);
+          }}
           sx={{
             height: "30px",
             width: "320px",
@@ -215,12 +230,18 @@ export const ManageMenu = ({
             top: "21%",
             left: "17%",
             fontSize: "14px",
+            "&:hover": {
+              backgroundColor: "#CB0000", // ホバー時の背景色
+            },
           }}
         >
           Amazon本体の出品してるASINを全て削除
         </Button>
         <Button
           variant="contained"
+          onClick={() => {
+            setIsOpenConfirmDeleteFbaDialog(true);
+          }}
           sx={{
             height: "30px",
             width: "280px",
@@ -229,6 +250,9 @@ export const ManageMenu = ({
             top: "21%",
             left: "42.5%",
             fontSize: "14px",
+            "&:hover": {
+              backgroundColor: "#CB0000", // ホバー時の背景色
+            },
           }}
         >
           FBAセラーのいないASINを全て削除
@@ -236,6 +260,9 @@ export const ManageMenu = ({
 
         <Button
           variant="contained"
+          onClick={() => {
+            setIsOpenConfirmDeleteUncheckedDialog(true);
+          }}
           sx={{
             height: "30px",
             width: "250px",
@@ -244,13 +271,33 @@ export const ManageMenu = ({
             top: "21%",
             left: "79.5%",
             fontSize: "14px",
+            "&:hover": {
+              backgroundColor: "#CB0000", // ホバー時の背景色
+            },
           }}
         >
           選択したASIN "以外" を全て削除
         </Button>
       </Box>
 
-      {/* メニューの右コンテナ */}
+      <ConfirmDeleteDataDialog
+        isOpenConfirmDeleteDataDialog={isOpenConfirmDeleteDataDialog}
+        setIsOpenConfirmDeleteDataDialog={setIsOpenConfirmDeleteDataDialog}
+      />
+      <ConfirmDeleteAmazonDialog
+        isOpenConfirmDeleteAmazonDialog={isOpenConfirmDeleteAmazonDialog}
+        setIsOpenConfirmDeleteAmazonDialog={setIsOpenConfirmDeleteAmazonDialog}
+      />
+      <ConfirmDeleteFbaDialog
+        isOpenConfirmDeleteFbaDialog={isOpenConfirmDeleteFbaDialog}
+        setIsOpenConfirmDeleteFbaDialog={setIsOpenConfirmDeleteFbaDialog}
+      />
+      <ConfirmDeleteUncheckedDialog
+        isOpenConfirmDeleteUncheckedDialog={isOpenConfirmDeleteUncheckedDialog}
+        setIsOpenConfirmDeleteUncheckedDialog={
+          setIsOpenConfirmDeleteUncheckedDialog
+        }
+      />
     </Box>
   );
 };
