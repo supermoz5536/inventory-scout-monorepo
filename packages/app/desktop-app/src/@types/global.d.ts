@@ -133,6 +133,27 @@ declare global {
       React.SetStateAction<boolean>
     >;
   }
+
+  interface ConfirmDeleteAmazonDialogProps {
+    isOpenConfirmDeleteAmazonDialog: boolean;
+    setIsOpenConfirmDeleteAmazonDialog: React.Dispatch<
+      React.SetStateAction<boolean>
+    >;
+  }
+
+  interface ConfirmDeleteFbaDialogProps {
+    isOpenConfirmDeleteFbaDialog: boolean;
+    setIsOpenConfirmDeleteFbaDialog: React.Dispatch<
+      React.SetStateAction<boolean>
+    >;
+  }
+
+  interface ConfirmDeleteUncheckedDialogProps {
+    isOpenConfirmDeleteUncheckedDialog: boolean;
+    setIsOpenConfirmDeleteUncheckedDialog: React.Dispatch<
+      React.SetStateAction<boolean>
+    >;
+  }
 }
 
 // tsの構文では
