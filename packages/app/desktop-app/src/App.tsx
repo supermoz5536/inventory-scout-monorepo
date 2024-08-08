@@ -114,12 +114,15 @@ const App: React.FC = () => {
             });
           }
 
-          // ⑦ 保存されてる定時スクレイピングの指定時刻にセッティングします。
-          await window.myAPI.initScheduledTime(() => {
-            window.myAPI.scheduledScraping(
-              systemStatusRef.current.scheduledScrapingTime
-            );
-          });
+          // ⑦ 定時スクレイピングの設定がTrueの場合
+          // 保存されてる指定時刻に予約をセッティングします。
+          if (systemStatusRef.current.isScheduledScrapingAble === true) {
+            await window.myAPI.initScheduledTime(() => {
+              window.myAPI.scheduledScraping(
+                systemStatusRef.current.scheduledScrapingTime
+              );
+            });
+          }
 
           // ⑧ メインプロセスの定時スクレイピング実行をリスンして状態変数を更新
           window.myAPI.startScheduledScraping(() => {
