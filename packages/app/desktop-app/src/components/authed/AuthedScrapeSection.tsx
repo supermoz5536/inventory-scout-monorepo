@@ -38,8 +38,20 @@ const AuthedScrapeSection = () => {
 
   // 定時スクレイピングのON/OFFのチェックボックスのコールバックです
   const handleCheckBox = (checked: boolean) => {
+    // UIの切り替えと状態の更新
     setIsScheduledScrapingAble(checked);
     dispatch(changeIsScheduledScrapingAble(checked));
+    if (checked === true) {
+      // チェックをつける場合は
+      // 保存済みの予約時刻を引数にして
+      // メインプロセスに予約リクエスト
+      window.myAPI.scheduledScraping(inputScheduledTime);
+    } else if (checked === false) {
+      // チェックを外す場合は
+      // 予約済みのタスクを
+      // メインプロセスでキャンセルする必要がある
+      window.myAPI.stopScheduledScraping();
+    }
   };
 
   // 保存ボタンを押した際のコールバックです。
@@ -48,10 +60,18 @@ const AuthedScrapeSection = () => {
     dispatch(changeScheduledTime(inputTime));
   };
 
-  // 定時スクレイピングの予約処理を実行します。
+  // 定時スクレイピングの予約処理をハンドルします。
   const handleScheduledScraping = () => {
-    window.myAPI.scheduledScraping(inputScheduledTime);
     setIsScrapeTimeChanged(true);
+    setSavedScheduledTime(inputScheduledTime);
+
+    // 条件に合致する場合のみ、メインプロセスに予約処理をリクエスト
+    if (
+      systemStatus.isScheduledScrapingAble === true &&
+      (user.plan === "s" || user.plan === "p")
+    ) {
+      window.myAPI.scheduledScraping(inputScheduledTime);
+    }
   };
 
   return (
@@ -87,7 +107,6 @@ const AuthedScrapeSection = () => {
         <button
           onClick={() => {
             handleScheduledScraping();
-            setSavedScheduledTime(inputScheduledTime);
           }}
         >
           保存

@@ -7,6 +7,7 @@ declare global {
       openExternal: (url: string) => void | null;
       runScraping: (asinDataList: AsinData[]) => void;
       stopScraping: () => void;
+      stopScheduledScraping: () => void;
       scrapingResult: (
         callback: (
           event: Electron.IpcRendererEvent,

@@ -269,6 +269,10 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
   return "Scraping scheduled";
 });
 
+ipcMain.handle("stop-scheduled-scraping", (event, data) => {
+  if (scheduledTask) scheduledTask.stop();
+});
+
 ipcMain.handle("save-data", (event, data) => {
   saveDataToStorage(data);
 });
