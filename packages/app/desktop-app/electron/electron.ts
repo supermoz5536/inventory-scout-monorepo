@@ -240,7 +240,7 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
           createMainWindow();
           // ウィンドウが完全にロードされるのを待つ
           await new Promise<void>((resolve) => {
-            if (mainWindow.isloading()) {
+            if (mainWindow.webContents.isLoading()) {
               mainWindow.webContents.once("did-finish-load", resolve);
             } else {
               resolve();
