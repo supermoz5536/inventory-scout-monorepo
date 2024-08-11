@@ -982,7 +982,7 @@ const scrapePromise = (async () => {
       scrape: any,
       browser: any,
       updateGlobalBrowser: (newBrowser: any) => void,
-      event: Electron.IpcMainInvokeEvent,
+      backGroundWindow: any,
       asinDataList: AsinData[],
       today?: Date // ? はデフォルト値の設定がないことを意味します
     ) => {
@@ -1087,10 +1087,13 @@ const scrapePromise = (async () => {
               await scrape.updateFetchLatestTime(asinData);
               // asinData.isScrapingを更新
               await scrape.updateIsScarapingFalse(asinData);
+              console.log("■ debug 1");
               // Cookie削除でカートをリフレッシュ
               await scrape.clearCart(page);
+              console.log("■ debug 2");
               // レンダラープロセスにデータを送信
-              event.sender.send("scraping-result", asinData);
+              backGroundWindow.webContents.send("scraping-result", asinData);
+              console.log("■ debug 3");
             })(),
             240000,
             "Timeout"
@@ -1100,7 +1103,7 @@ const scrapePromise = (async () => {
         updateGlobalBrowser(null);
         // レンダラープロセスにスクレイピング終了を知らせるデータを送信
         // 第二引数 isEndをtrueで送信
-        event.sender.send("scraping-result", null, true);
+        backGroundWindow.webContents.send("scraping-result", null, true);
       } catch (error: any) {
         console.log("Error message:", error.message);
         if (
@@ -1130,7 +1133,7 @@ const scrapePromise = (async () => {
           updateGlobalBrowser(null);
           // レンダラープロセスにスクレイピング終了を知らせるデータを送信
           // 第二引数 isEndをtrueで送信
-          event.sender.send("scraping-result", null, true);
+          backGroundWindow.webContents.send("scraping-result", null, true);
         }
       }
     },

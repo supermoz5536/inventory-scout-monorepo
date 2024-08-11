@@ -6,28 +6,28 @@ import {
   updateAsinData,
   updateIsScrapingTrueAll,
   updateWithLoadedData,
-} from "./slices/asinDataListSlice";
+} from "../slices/asinDataListSlice";
 import {
   changeShowButtonStatus,
   changeSystemStatus,
-} from "./slices/systemStatusSlice";
-import Top from "./pages/Top";
-import Manage from "./pages/Manage";
-import Setting from "./pages/Setting";
-import LoginPrompt from "./pages/LoginPrompt";
-import StockDetail from "./pages/StockDetail";
+} from "../slices/systemStatusSlice";
+import Top from "../pages/Top";
+import Manage from "../pages/Manage";
+import Setting from "../pages/Setting";
+import LoginPrompt from "../pages/LoginPrompt";
+import StockDetail from "../pages/StockDetail";
 import {
   logInWithEmailAndPassword,
   listenAuthState,
   initLogoutCallBack,
-} from "./firebase/authentication";
-import { updateUser } from "./slices/userSlice";
+} from "../firebase/authentication";
+import { updateUser } from "../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
-import { getUserDoc } from "./firebase/firestore";
-import MainWindow from "./pages/MainWindow";
-import BackGroundWindow from "./pages/BackGroundWindow";
+import { getUserDoc } from "../firebase/firestore";
+import MainWindow from "../pages/MainWindow";
 
-const App: React.FC = () => {
+const BackGroundWindow = () => {
+  console.log("■■■■■■ BackGroundWindow ■■■■■■");
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
   // コンポーネントの再レンダリングに影響されず
   // asinDataListの変更のみに依存して
@@ -260,24 +260,7 @@ const App: React.FC = () => {
     },
     [dispatch]
   );
-
-  return (
-    <div>
-      <Routes>
-        {/* ユーザーがアプリケーションのルートURL (/) にアクセスしたときに、
-        /Topにリダイレクトするための設定です。 */}
-        <Route path="/" element={<Navigate to="/MainWindow" />} />
-        {/* 各ページのURLパスと対応するコンポーネントをルートをマッピングしてます。 */}
-        <Route path="/Top" element={<Top />} />
-        <Route path="/Manage" element={<Manage />} />
-        <Route path="/Setting" element={<Setting />} />
-        <Route path="/LoginPrompt" element={<LoginPrompt />} />
-        <Route path="/StockDetail" element={<StockDetail />} />
-        <Route path="/MainWindow" element={<MainWindow />} />
-        <Route path="/BackGroundWindow" element={<BackGroundWindow />} />
-      </Routes>
-    </div>
-  );
+  return <></>;
 };
 
-export default App;
+export default BackGroundWindow;

@@ -18,6 +18,7 @@ let appURL: string;
 let scrape: any;
 let browser: any;
 let scheduledTask: any;
+let backGroundWindow: any;
 let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
@@ -33,9 +34,17 @@ let isInitScheduledTime: boolean = false;
 /// (Macだと表示されないことがあるので)
 app.whenReady().then(() => {
   createMainWindow();
+  // "activate" はmacの場合のケースで
+  // ウインドウはないが、Docでアプリは起動し続けてる場合に
+  // アイコンをクリックすると、再びアプリがactivate状態になる
+  // この時にウインドウ数が０なので、メインウインドウを生成する
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+    if (BrowserWindow.getAllWindows().length <= 1) createMainWindow();
   });
+});
+
+app.whenReady().then(() => {
+  openBackGroundWindow();
 });
 
 /// 初期化処理として
@@ -193,7 +202,7 @@ ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
       scrape,
       browser,
       updateGlobalBrowser,
-      event,
+      backGroundWindow,
       asinDataList
     );
   } catch (error) {
@@ -256,7 +265,7 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
           scrape,
           browser,
           updateGlobalBrowser,
-          event,
+          backGroundWindow,
           loadedAsinDataList
         );
       }
@@ -293,6 +302,69 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 });
 
 //====================================================================
+
+// バックグラウンドウインドウを生成する関数です
+function openBackGroundWindow() {
+  backGroundWindow = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
+      // preload.tsの読み込みに失敗します。
+      sandbox: false,
+    },
+  });
+
+  // ローカルファイルを指定するパスを指定したいだけなので
+  // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
+  backGroundWindow.loadURL(`${appURL}#/BackGroundWindow`);
+
+  // 起動時のみsystemStatusを初期化
+  // ウィンドウの読み込みが完了した後に処理します
+  mainWindow.webContents.once("did-finish-load", () => {
+    if (isInitSystemStatus === false) {
+      mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
+      isInitSystemStatus = true; // 更新処理が実行されたことを記録
+    }
+  });
+
+  // 起動時のみログアウト処理を実行
+  // ウィンドウの読み込みが完了した後に処理します
+  backGroundWindow.webContents.once("did-finish-load", () => {
+    if (isInitLogoutDone === false) {
+      backGroundWindow.webContents.send("init-logout");
+      isInitLogoutDone = true;
+    }
+  });
+
+  // 起動時のみ「次回からは自動でログイン」が
+  // 有効だった場合のログログイン処理を実行
+  backGroundWindow.webContents.once("did-finish-load", () => {
+    if (isInitLoginDone === false) {
+      backGroundWindow.webContents.send("init-login");
+      isInitLoginDone = true;
+    }
+  });
+
+  // 起動時のみ、ログイン状態の場合で
+  // 前回にスクレイピングが断されてる場合は
+  // 自動でスクレイピングを開始します。
+  backGroundWindow.webContents.once("did-finish-load", () => {
+    if (isInitScraping === false) {
+      backGroundWindow.webContents.send("init-scraping");
+      isInitScraping = true;
+    }
+  });
+
+  // 初回起動時のみ、
+  // 保存された定時スクレイピングの指定時刻を再セットします。
+  backGroundWindow.webContents.once("did-finish-load", () => {
+    if (isInitScheduledTime === false) {
+      backGroundWindow.webContents.send("init-scheduled-time");
+      isInitScheduledTime = true;
+    }
+  });
+}
 
 /// メイン画面を生成する関数です
 function createMainWindow() {
@@ -331,51 +403,51 @@ function createMainWindow() {
 
   mainWindow.loadURL(appURL);
 
-  // 起動時のみsystemStatusを初期化
-  // ウィンドウの読み込みが完了した後に処理します
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isInitSystemStatus === false) {
-      mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
-      isInitSystemStatus = true; // 更新処理が実行されたことを記録
-    }
-  });
+  // // 起動時のみsystemStatusを初期化
+  // // ウィンドウの読み込みが完了した後に処理します
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   if (isInitSystemStatus === false) {
+  //     mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
+  //     isInitSystemStatus = true; // 更新処理が実行されたことを記録
+  //   }
+  // });
 
-  // 起動時のみログアウト処理を実行
-  // ウィンドウの読み込みが完了した後に処理します
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isInitLogoutDone === false) {
-      mainWindow.webContents.send("init-logout");
-      isInitLogoutDone = true;
-    }
-  });
+  // // 起動時のみログアウト処理を実行
+  // // ウィンドウの読み込みが完了した後に処理します
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   if (isInitLogoutDone === false) {
+  //     mainWindow.webContents.send("init-logout");
+  //     isInitLogoutDone = true;
+  //   }
+  // });
 
-  // 起動時のみ「次回からは自動でログイン」が
-  // 有効だった場合のログログイン処理を実行
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isInitLoginDone === false) {
-      mainWindow.webContents.send("init-login");
-      isInitLoginDone = true;
-    }
-  });
+  // // 起動時のみ「次回からは自動でログイン」が
+  // // 有効だった場合のログログイン処理を実行
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   if (isInitLoginDone === false) {
+  //     mainWindow.webContents.send("init-login");
+  //     isInitLoginDone = true;
+  //   }
+  // });
 
-  // 起動時のみ、ログイン状態の場合で
-  // 前回にスクレイピングが断されてる場合は
-  // 自動でスクレイピングを開始します。
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isInitScraping === false) {
-      mainWindow.webContents.send("init-scraping");
-      isInitScraping = true;
-    }
-  });
+  // // 起動時のみ、ログイン状態の場合で
+  // // 前回にスクレイピングが断されてる場合は
+  // // 自動でスクレイピングを開始します。
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   if (isInitScraping === false) {
+  //     mainWindow.webContents.send("init-scraping");
+  //     isInitScraping = true;
+  //   }
+  // });
 
-  // 初回起動時のみ、
-  // 保存された定時スクレイピングの指定時刻を再セットします。
-  mainWindow.webContents.once("did-finish-load", () => {
-    if (isInitScheduledTime === false) {
-      mainWindow.webContents.send("init-scheduled-time");
-      isInitScheduledTime = true;
-    }
-  });
+  // // 初回起動時のみ、
+  // // 保存された定時スクレイピングの指定時刻を再セットします。
+  // mainWindow.webContents.once("did-finish-load", () => {
+  //   if (isInitScheduledTime === false) {
+  //     mainWindow.webContents.send("init-scheduled-time");
+  //     isInitScheduledTime = true;
+  //   }
+  // });
 
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
