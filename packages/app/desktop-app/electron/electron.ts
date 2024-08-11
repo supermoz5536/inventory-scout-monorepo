@@ -321,9 +321,9 @@ function openBackGroundWindow() {
 
   // 起動時のみsystemStatusを初期化
   // ウィンドウの読み込みが完了した後に処理します
-  mainWindow.webContents.once("did-finish-load", () => {
+  backGroundWindow.webContents.once("did-finish-load", () => {
     if (isInitSystemStatus === false) {
-      mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
+      backGroundWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
       isInitSystemStatus = true; // 更新処理が実行されたことを記録
     }
   });
@@ -369,7 +369,7 @@ function openBackGroundWindow() {
     backGroundWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    backGroundWindow.webContents.openDevTools();
+    // backGroundWindow.webContents.openDevTools();
   }
 }
 
@@ -459,7 +459,7 @@ function createMainWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -499,7 +499,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    prefWindow.webContents.openDevTools();
+    // prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -539,7 +539,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    loginPromptWindow.webContents.openDevTools();
+    // loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -581,7 +581,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    StockDetailWindow.webContents.openDevTools();
+    // StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して

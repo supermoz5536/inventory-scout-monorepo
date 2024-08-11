@@ -451,7 +451,10 @@ export const AsinDataTable = ({
         onRowSelectionModelChange={handleSelectionChange} // 選択変更時のコールバック
         getRowId={(row) => row.asin} // 行のIDとしてasinを使用する
         rowSelectionModel={selectedIds}
-        localeText={jaJP.components.MuiDataGrid.defaultProps.localeText} // ここで日本語を設定
+        localeText={{
+          ...jaJP.components.MuiDataGrid.defaultProps.localeText, // 既存の設定を展開
+          noRowsLabel: "ASINの登録がありません。", // カスタムメッセージを追加
+        }}
         // hideFooterPagination // ページネーションエリアを非表示に設定
         // pageSizeOptions={[2]}
         sx={{
