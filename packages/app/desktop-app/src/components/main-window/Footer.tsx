@@ -37,7 +37,7 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
           >
-            `データ取得中...残り${scrapeTimeLeft}分`
+            `データ取得中...残り{scrapeTimeLeft}分`
           </Typography>
         </>
       ) : systemStatus === 2 ? (
@@ -49,7 +49,7 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
           >
-            `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り$
+            `前回のデータ取得処理が途中で中断されました。続きのデータを取得中...残り
             {scrapeTimeLeft}分`
           </Typography>
         </>
@@ -62,7 +62,7 @@ export const Footer = ({ scrapeTimeLeft }: { scrapeTimeLeft: number }) => {
             variant="h5"
             sx={{ color: "#828282", fontWeight: "bold", fontSize: "15px" }}
           >
-            `追加されたASINのデータを取得中...残り${scrapeTimeLeft}分`
+            `追加されたASINのデータを取得中...残り{scrapeTimeLeft}分`
           </Typography>
         </>
       ) : systemStatus === 4 ? (
