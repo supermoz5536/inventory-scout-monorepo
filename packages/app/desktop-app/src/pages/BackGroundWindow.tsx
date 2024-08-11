@@ -27,7 +27,6 @@ import { getUserDoc } from "../firebase/firestore";
 import MainWindow from "../pages/MainWindow";
 
 const BackGroundWindow = () => {
-  console.log("■■■■■■ BackGroundWindow ■■■■■■");
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
   // コンポーネントの再レンダリングに影響されず
   // asinDataListの変更のみに依存して
@@ -62,7 +61,7 @@ const BackGroundWindow = () => {
   /// ⓪ systemStatusを初期化
   /// ① メインプロセスでのスクレイピング結果の取得リスナーの配置と削除
   /// ② 移行データの取得リスナーの配置と削除
-  /// ③ ローカルストレージデータのロード
+  /// ③ ローカルストレージデータのロード(persistorで代わりに運用中)
   /// ④ サーバーサイドの認証ステータスと常に同期するリスナーを設置
   /// ⑤ メインプロセス起動時にログアウト処理のトリガーを受信するリスナーの配置と削除
   /// ⑥ 「次回からは自動でログインする」が有効な場合の自動ログイン処理
@@ -90,9 +89,9 @@ const BackGroundWindow = () => {
             dispatch(updateWithLoadedData(loadedTransferData));
           });
 
-          // ③
-          const loadedData = await window.myAPI.loadData();
-          dispatch(updateWithLoadedData(loadedData));
+          // // ③
+          // const loadedData = await window.myAPI.loadData();
+          // dispatch(updateWithLoadedData(loadedData));
 
           // ④
           const unsubscribe = await listenAuthState();
@@ -117,7 +116,12 @@ const BackGroundWindow = () => {
 
           // ⑦ 定時スクレイピングの設定がTrueの場合
           // 保存されてる指定時刻に予約をセッティングします。
-          if (systemStatusRef.current.isScheduledScrapingAble === true) {
+          if (
+            systemStatusRef.current.isScheduledScrapingAble === true &&
+            userRef.current.isAutoLogIn === true &&
+            userRef.current.isAuthed === true &&
+            (userRef.current.plan === "s" || userRef.current.plan === "p")
+          ) {
             await window.myAPI.initScheduledTime(() => {
               window.myAPI.scheduledScraping(
                 systemStatusRef.current.scheduledScrapingTime

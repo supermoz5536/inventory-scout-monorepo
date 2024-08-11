@@ -258,7 +258,7 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
         }
         // ロードされたら状態変数更新の通知をメインウインドウに送り
         // メインウインドウで更新処理を行う
-        mainWindow.webContents.send("start-scheduled-scraping");
+        backGroundWindow.webContents.send("start-scheduled-scraping");
         scrape = await scrapePromis;
         browser = await scrape.launchBrowser();
         await scrape.runScraping(
@@ -364,6 +364,13 @@ function openBackGroundWindow() {
       isInitScheduledTime = true;
     }
   });
+
+  if (!app.isPackaged) {
+    backGroundWindow.webContents.openDevTools();
+  } else {
+    // パッケージ化された状態でもデベロッパーツールを開く
+    backGroundWindow.webContents.openDevTools();
+  }
 }
 
 /// メイン画面を生成する関数です
@@ -786,13 +793,8 @@ async function loadTransferData() {
       // ローカルストレージへの保存
       saveDataToStorage(parsedData);
 
-      // ウィンドウが存在しない場合は新しく作成
-      if (!mainWindow) {
-        createMainWindow();
-      }
-
       // レンダラープロセスにデータを送信
-      mainWindow.webContents.send("load-transfer-data", parsedData);
+      backGroundWindow.webContents.send("load-transfer-data", parsedData);
 
       return parsedData;
     } else {

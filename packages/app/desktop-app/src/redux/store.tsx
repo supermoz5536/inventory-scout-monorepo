@@ -18,7 +18,7 @@ import {
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "systemStatus"], // 保存するリデューサーを指定
+  whitelist: ["asinDataList", "user", "systemStatus"], // 保存するリデューサーを指定
 };
 
 // combineReducers: reducerを1つのオブジェクトにまとめる関数
