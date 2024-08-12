@@ -1,20 +1,22 @@
-import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
+import { updateIsScrapingTrueAll } from "../../../slices/asinDataListSlice";
 import {
-  removeAbsentFbaAsin,
-  removeUncheckedAsin,
-} from "../../slices/asinDataListSlice";
+  changeShowButtonStatus,
+  changeSystemStatus,
+} from "../../../slices/systemStatusSlice";
 
-const ConfirmDeleteUncheckedDialog = ({
-  isOpenConfirmDeleteUncheckedDialog: isOpenDialog,
-  setIsOpenConfirmDeleteUncheckedDialog: setIsOpenDialog,
-}: ConfirmDeleteUncheckedDialogProps) => {
+const ConfirmReExcuteDialog = ({
+  isOpenConfirmReExcuteDialog: isOpenDialog,
+  setIsOpenConfirmReExcuteDialog: setIsOpenDialog,
+}: ConfirmReExcuteDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const asinDataList = useSelector(
@@ -27,21 +29,18 @@ const ConfirmDeleteUncheckedDialog = ({
 
   const handleActionYes = async () => {
     setIsOpenDialog(false);
-    handleRemoveIsAmazonAsin();
+    console.log("■ excuted runScraping in dialog");
+    dispatch(updateIsScrapingTrueAll());
+    await new Promise((resolve) => setTimeout(resolve, 200)); // 状態変数の更新が完了するまで200ms待機
+    window.myAPI.runScraping(asinDataListRef.current);
+    dispatch(changeSystemStatus(1));
+    dispatch(changeShowButtonStatus(1));
   };
 
   const handleActionNo = () => {
     setIsOpenDialog(false);
-  };
-
-  /// 選択したASIN "以外" のリストを削除して
-  /// ストレージを最新に更新する関数
-  const handleRemoveIsAmazonAsin = async () => {
-    dispatch(removeUncheckedAsin());
-    // 状態変数の更新が完了するまで200ms待機
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    // ストレージに最新のasinDataListを保存
-    await window.myAPI.saveData(asinDataListRef.current);
+    dispatch(changeSystemStatus(4));
+    dispatch(changeShowButtonStatus(0));
   };
 
   return (
@@ -53,11 +52,15 @@ const ConfirmDeleteUncheckedDialog = ({
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"この操作は取り消せません。"}
+          {"本日分のデータ取得は、全てのASINですでに完了しています。"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <p>選択したASIN "以外" の全てのASINを削除してよいですか？</p>
+            <p>
+              もしこのまま実行すると、新規取得データを本日分として上書きします。
+            </p>
+            {/* <br /> */}
+            <p>本当に実行しますか？</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -91,4 +94,4 @@ const ConfirmDeleteUncheckedDialog = ({
   );
 };
 
-export default ConfirmDeleteUncheckedDialog;
+export default ConfirmReExcuteDialog;

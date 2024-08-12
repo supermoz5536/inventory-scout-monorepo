@@ -6,9 +6,9 @@ import {
   addAsin,
   removeAsin,
   switchRemoveCheck,
-} from "../../slices/asinDataListSlice";
-import { calculateRemainingTime } from "../../util/calculateRemainingTime";
-import { ConfirmDeleteDataDialog } from "./ConfirmDeleteDataDialog";
+} from "../../../slices/asinDataListSlice";
+import { calculateRemainingTime } from "../../../util/calculateRemainingTime";
+import { ConfirmDeleteDataDialog } from "../ConfirmDeleteDataDialog";
 import ConfirmDeleteAmazonDialog from "./ConfirmDeleteAmazonDialog";
 import { ConfirmDeleteFbaDialog } from "./ConfirmDeleteFbaDialog";
 import ConfirmDeleteUncheckedDialog from "./ConfirmDeleteUncheckedDialog";

@@ -12,10 +12,10 @@ import {
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logInWithEmailAndPassword } from "../../firebase/authentication";
+import { logInWithEmailAndPassword } from "../../../firebase/authentication";
 import { DocumentData } from "firebase/firestore";
-import { getUserDoc } from "../../firebase/firestore";
-import { updateUser } from "../../slices/userSlice";
+import { getUserDoc } from "../../../firebase/firestore";
+import { updateUser } from "../../../slices/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 

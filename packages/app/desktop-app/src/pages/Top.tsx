@@ -19,7 +19,7 @@ import {
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
-import ConfirmReExcuteDialog from "../components/main-window/ConfirmReExcuteDialog";
+import ConfirmReExcuteDialog from "../components/main-window/top/ConfirmReExcuteDialog";
 import {
   AppBar,
   Box,
@@ -34,8 +34,8 @@ import { ConfirmDeleteDataDialog } from "../components/main-window/ConfirmDelete
 import DoneIcon from "@mui/icons-material/Done";
 import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
 import { Footer } from "../components/main-window/Footer";
-import { AsinDataTable } from "../components/main-window/AsinDataTable";
-import LoginFormDialog from "../components/main-window/LoginFormDialog";
+import { AsinDataTable } from "../components/main-window/top/AsinDataTable";
+import LoginFormDialog from "../components/main-window/top/LoginFormDialog";
 
 function Top() {
   const asinDataList = useSelector(

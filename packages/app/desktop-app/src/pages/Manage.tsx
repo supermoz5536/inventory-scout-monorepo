@@ -10,10 +10,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
-import { ManageMenu } from "../components/main-window/ManageMenu";
+import { ManageMenu } from "../components/main-window/manage/ManageMenu";
 import { Footer } from "../components/main-window/Footer";
 import { Box } from "@mui/material";
-import { AsinDataTableManage } from "../components/main-window/AsinDataTableManage";
+import { AsinDataTableManage } from "../components/main-window/manage/AsinDataTableManage";
 
 function Manage() {
   // グローバル変数のASINリストの値を取得
