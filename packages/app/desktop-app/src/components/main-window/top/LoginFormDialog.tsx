@@ -18,6 +18,7 @@ import { getUserDoc } from "../../../firebase/firestore";
 import { updateUser } from "../../../slices/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import PlanList from "../../plan/PlanList";
 
 const LoginFormDialog = ({
   isOpenLoginFormDialog,
@@ -26,7 +27,7 @@ const LoginFormDialog = ({
   isOpenLoginFormDialog: boolean;
   setIsOpenLoginFormDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const handleClickOpen = () => {
+  const handleOpen = () => {
     setIsOpenLoginFormDialog(true);
   };
   const handleClose = () => {
@@ -39,12 +40,13 @@ const LoginFormDialog = ({
 
   const dispatch = useDispatch<AppDispatch>();
   const [errorFlag, setErrorFlag] = useState("");
-
-  // パスワード表示制御ようのstate
+  // パスワード表示制御のstate
   const [isVisiblePassword, setIsVisiblePassword] = useState(false);
   const toggleVisiblePassword = () => {
     setIsVisiblePassword(!isVisiblePassword);
   };
+  const [isOpenPlanListDialog, setIsOpenPlanListDialog] =
+    useState<boolean>(false);
 
   // グローバル変数のuserの参照を定数で定義
   const user = useSelector((state: RootState) => state.user.value);
@@ -118,157 +120,167 @@ const LoginFormDialog = ({
     }
   };
 
+  const handleLink = () => {
+    setIsOpenPlanListDialog(true);
+  };
+
   return (
-    <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open form dialog
-      </Button>
-      <Dialog open={isOpenLoginFormDialog} onClose={handleClose}>
-        <DialogTitle
-          sx={{
-            marginLeft: "35px",
-            marginBottom: "0px",
-            fontSize: "25px",
-            fontWeight: "bold",
-          }}
-        >
-          アカウントにログイン
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            name="email"
-            label="メールアドレス"
-            type="email"
-            fullWidth
-            variant="standard"
-            value={inputEmail}
-            onChange={handleInputEmailChange}
-          />
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            name="email"
-            label="パスワード"
-            type={isVisiblePassword ? "text" : "password"}
-            fullWidth
-            variant="standard"
-            value={inputPassword}
-            onChange={handleInputPasswordChange}
-          />
-          <Button
-            onClick={toggleVisiblePassword}
+    <>
+      <React.Fragment>
+        <Dialog open={isOpenLoginFormDialog} onClose={handleClose}>
+          <DialogTitle
             sx={{
-              height:
-                "0%" /* ボタンの高さを親要素の高さに一致させ、結果的に中央に配置させる */,
-              position:
-                "absolute" /* 親要素の相対位置を基準にして絶対位置に配置 */,
-              top: "52%",
-              left: "82%",
-              background: "none" /* 背景を透明に設定 */,
-              border: "none" /* ボーダーを取り除く */,
-              cursor:
-                "pointer" /* ホバー時にポインター（手の形のカーソル）を表示 */,
-              outline: "none" /* フォーカス時のアウトラインを取り除く */,
-              color: "black",
+              marginLeft: "35px",
+              marginBottom: "0px",
+              fontSize: "25px",
+              fontWeight: "bold",
             }}
           >
-            <FontAwesomeIcon icon={isVisiblePassword ? faEyeSlash : faEye} />
-          </Button>
-          <div className="login-form-dialog">
-            {errorFlag === "" ? (
-              <p></p>
-            ) : errorFlag === "e0" ? (
-              <p>無効なメールアドレスです</p>
-            ) : errorFlag === "e1" ? (
-              <p>メールアドレスが見つかりません</p>
-            ) : errorFlag === "e2" ? (
-              <p>パスワードが間違っています</p>
-            ) : errorFlag === "e3" ? (
-              <p>ログイン情報に誤りがあります。</p>
-            ) : errorFlag === "e4" ? (
-              <p>
-                ログインの試行回数が多すぎます
-                <br />
-                少し時間をおいてからもう一度お試しください
-              </p>
-            ) : (
-              <p>"不明なエラーです、運営者にお問い合わせください"</p>
-            )}
-          </div>
-          <Box
-            sx={{
-              marginTop: "10px",
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <input
-              type="checkbox"
-              onChange={(event) => {
-                setIsAutoLoginCheckBox(event.target.checked);
-              }}
-              style={{
-                marginRight: "5px",
-              }}
+            アカウントにログイン
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="name"
+              name="email"
+              label="メールアドレス"
+              type="email"
+              fullWidth
+              variant="standard"
+              value={inputEmail}
+              onChange={handleInputEmailChange}
             />
-            <p
-              style={{
-                fontSize: "12.5px",
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="name"
+              name="email"
+              label="パスワード"
+              type={isVisiblePassword ? "text" : "password"}
+              fullWidth
+              variant="standard"
+              value={inputPassword}
+              onChange={handleInputPasswordChange}
+            />
+            <Button
+              onClick={toggleVisiblePassword}
+              sx={{
+                height:
+                  "0%" /* ボタンの高さを親要素の高さに一致させ、結果的に中央に配置させる */,
+                position:
+                  "absolute" /* 親要素の相対位置を基準にして絶対位置に配置 */,
+                top: "52%",
+                left: "82%",
+                background: "none" /* 背景を透明に設定 */,
+                border: "none" /* ボーダーを取り除く */,
+                cursor:
+                  "pointer" /* ホバー時にポインター（手の形のカーソル）を表示 */,
+                outline: "none" /* フォーカス時のアウトラインを取り除く */,
+                color: "black",
               }}
             >
-              次回から自動でログインする
-            </p>
-          </Box>
-          <DialogContentText
-            sx={{
-              marginTop: "10px",
-              fontSize: "12.5px",
-              fontWeight: "bold",
-              // textDecoration: "underline",
-            }}
-          >
-            アカウントがない場合は、
-            <Link
-              component="button"
+              <FontAwesomeIcon icon={isVisiblePassword ? faEyeSlash : faEye} />
+            </Button>
+            <div className="login-form-dialog">
+              {errorFlag === "" ? (
+                <p></p>
+              ) : errorFlag === "e0" ? (
+                <p>無効なメールアドレスです</p>
+              ) : errorFlag === "e1" ? (
+                <p>メールアドレスが見つかりません</p>
+              ) : errorFlag === "e2" ? (
+                <p>パスワードが間違っています</p>
+              ) : errorFlag === "e3" ? (
+                <p>ログイン情報に誤りがあります。</p>
+              ) : errorFlag === "e4" ? (
+                <p>
+                  ログインの試行回数が多すぎます
+                  <br />
+                  少し時間をおいてからもう一度お試しください
+                </p>
+              ) : (
+                <p>"不明なエラーです、運営者にお問い合わせください"</p>
+              )}
+            </div>
+            <Box
               sx={{
+                marginTop: "10px",
+                display: "flex",
+                flexDirection: "row",
+              }}
+            >
+              <input
+                type="checkbox"
+                onChange={(event) => {
+                  setIsAutoLoginCheckBox(event.target.checked);
+                }}
+                style={{
+                  marginRight: "5px",
+                }}
+              />
+              <p
+                style={{
+                  fontSize: "12.5px",
+                }}
+              >
+                次回から自動でログインする
+              </p>
+            </Box>
+            <DialogContentText
+              sx={{
+                marginTop: "10px",
                 fontSize: "12.5px",
                 fontWeight: "bold",
-                textDecoration: "underline",
-                "&:hover": {
-                  backgroundColor: "#ebebeb", // ホバー時の背景色
-                  color: "#1976d2", // ホバー時の文字色
-                  borderRadius: "4px", // 角丸を追加
-                  textDecoration: "none", // 下線をなくす
-                },
+                // textDecoration: "underline",
               }}
             >
-              こちら
-            </Link>
-            から作成
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>キャンセル</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              handleLogIn(inputEmail, inputPassword, isAutoLoginCheckBox);
-            }}
-            sx={{
-              fontWeight: "bold",
-            }}
-          >
-            ログイン
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+              アカウントがない場合は、
+              <Link
+                component="button"
+                onClick={handleLink}
+                sx={{
+                  fontSize: "12.5px",
+                  fontWeight: "bold",
+                  textDecoration: "underline",
+                  "&:hover": {
+                    backgroundColor: "#ebebeb", // ホバー時の背景色
+                    color: "#1976d2", // ホバー時の文字色
+                    borderRadius: "4px", // 角丸を追加
+                    textDecoration: "none", // 下線をなくす
+                  },
+                }}
+              >
+                こちら
+              </Link>
+              から作成
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>キャンセル</Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleLogIn(inputEmail, inputPassword, isAutoLoginCheckBox);
+              }}
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              ログイン
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+      <div>
+        <PlanList
+          isOpenPlanListDialog={isOpenPlanListDialog}
+          setIsOpenPlanListDialog={setIsOpenPlanListDialog}
+        />
+      </div>
+    </>
   );
 };
 
