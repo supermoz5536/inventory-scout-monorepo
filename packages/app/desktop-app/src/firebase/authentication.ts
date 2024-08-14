@@ -9,6 +9,7 @@ import {
   reauthenticateWithCredential,
   updateEmail,
   updatePassword,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {
   changeIsAuthed,
@@ -173,5 +174,22 @@ export const changePassword = async (
   } catch (error) {
     console.error("パスワードの更新に失敗しました:", error);
     return false;
+  }
+};
+
+export const createAuthAccount = async (email: string, password: string) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    if (userCredential) {
+      // Signed in
+      return userCredential.user.uid;
+    }
+  } catch (error: any) {
+    console.log("errorCode", error.code);
+    console.log("errorMessage", error.message);
   }
 };

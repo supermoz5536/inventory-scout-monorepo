@@ -18,15 +18,18 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { createAccount } from "../../service/account";
 
 const CreateAccountForm = ({
   isOpenCreateAccountFormDialog,
   setIsOpenCreateAccountFormDialog,
+  isSelectedPlan,
 }: {
   isOpenCreateAccountFormDialog: boolean;
   setIsOpenCreateAccountFormDialog: React.Dispatch<
     React.SetStateAction<boolean>
   >;
+  isSelectedPlan: string;
 }) => {
   const handleOpen = () => {
     setIsOpenCreateAccountFormDialog(true);
@@ -37,8 +40,12 @@ const CreateAccountForm = ({
   };
 
   // フォーム送信時の処理
-  const onSubmit: SubmitHandler<CreateAccountFormInput> = (data) => {
+  const onSubmit: SubmitHandler<CreateAccountFormInput> = async (data) => {
     // バリデーションチェックOK！なときに行う処理を追加
+    await createAccount(data.email, data.password);
+    if (isSelectedPlan === "s" || isSelectedPlan === "p") {
+      // ■■■■■■■■■■ Stripeのチェックアウト画面への遷移 ■■■■■■■■■■
+    }
     setIsOpenCreateAccountFormDialog(false);
   };
 
