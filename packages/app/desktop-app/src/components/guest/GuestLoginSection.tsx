@@ -14,7 +14,7 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
 
   const [errorFlag, setErrorFlag] = useState("");
 
-  // パスワード表示制御ようのstate
+  // パスワード表示制御のstate
   const [isVisiblePassword, setIsVisiblePassword] = useState(false);
   const toggleVisiblePassword = () => {
     setIsVisiblePassword(!isVisiblePassword);

@@ -12,7 +12,7 @@ import {
   setIsDeleteCheckSelected,
   switchIsDeleteCheckAll,
   switchRemoveCheck,
-} from "../../slices/asinDataListSlice";
+} from "../../../slices/asinDataListSlice";
 import {
   Box,
   Button,
@@ -26,9 +26,9 @@ import {
   calculateDataForChart,
   calculateDecreaseLatestToPrevEl,
   prepareDataForCalculateDecrease,
-} from "../../util/calculateDecrease";
+} from "../../../util/calculateDecrease";
 import InfoIcon from "@mui/icons-material/Info";
-import { getPrevScrapingDate } from "../../util/asinDataUtil";
+import { getPrevScrapingDate } from "../../../util/asinDataUtil";
 
 export const AsinDataTable = ({
   filteredAsinDataList,

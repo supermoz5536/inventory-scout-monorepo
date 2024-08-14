@@ -6,12 +6,15 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { removeAbsentFbaAsin } from "../../slices/asinDataListSlice";
+import {
+  removeAbsentFbaAsin,
+  removeUncheckedAsin,
+} from "../../../slices/asinDataListSlice";
 
-export const ConfirmDeleteFbaDialog = ({
-  isOpenConfirmDeleteFbaDialog: isOpenDialog,
-  setIsOpenConfirmDeleteFbaDialog: setIsOpenDialog,
-}: ConfirmDeleteFbaDialogProps) => {
+const ConfirmDeleteUncheckedDialog = ({
+  isOpenConfirmDeleteUncheckedDialog: isOpenDialog,
+  setIsOpenConfirmDeleteUncheckedDialog: setIsOpenDialog,
+}: ConfirmDeleteUncheckedDialogProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const asinDataList = useSelector(
@@ -31,10 +34,10 @@ export const ConfirmDeleteFbaDialog = ({
     setIsOpenDialog(false);
   };
 
-  /// FBA出品者のいないAsinリストを削除して
+  /// 選択したASIN "以外" のリストを削除して
   /// ストレージを最新に更新する関数
   const handleRemoveIsAmazonAsin = async () => {
-    dispatch(removeAbsentFbaAsin());
+    dispatch(removeUncheckedAsin());
     // 状態変数の更新が完了するまで200ms待機
     await new Promise((resolve) => setTimeout(resolve, 200));
     // ストレージに最新のasinDataListを保存
@@ -54,7 +57,7 @@ export const ConfirmDeleteFbaDialog = ({
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <p>FBA出品者が0人のASINを全て削除してよいですか？</p>
+            <p>選択したASIN "以外" の全てのASINを削除してよいですか？</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -87,3 +90,5 @@ export const ConfirmDeleteFbaDialog = ({
     </React.Fragment>
   );
 };
+
+export default ConfirmDeleteUncheckedDialog;

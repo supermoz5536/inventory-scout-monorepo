@@ -155,6 +155,13 @@ declare global {
       React.SetStateAction<boolean>
     >;
   }
+
+  // フォームの型
+  interface CreateAccountFormInput {
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }
 }
 
 // tsの構文では

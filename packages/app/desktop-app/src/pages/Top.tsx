@@ -19,7 +19,7 @@ import {
   prepareDataForCalculateDecrease,
 } from "../util/calculateDecrease";
 import { calculateRemainingTime } from "../util/calculateRemainingTime";
-import ConfirmReExcuteDialog from "../components/main-window/ConfirmReExcuteDialog";
+import ConfirmReExcuteDialog from "../components/main-window/top/ConfirmReExcuteDialog";
 import {
   AppBar,
   Box,
@@ -34,7 +34,8 @@ import { ConfirmDeleteDataDialog } from "../components/main-window/ConfirmDelete
 import DoneIcon from "@mui/icons-material/Done";
 import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
 import { Footer } from "../components/main-window/Footer";
-import { AsinDataTable } from "../components/main-window/AsinDataTable";
+import { AsinDataTable } from "../components/main-window/top/AsinDataTable";
+import LoginFormDialog from "../components/main-window/top/LoginFormDialog";
 
 function Top() {
   const asinDataList = useSelector(
@@ -75,6 +76,9 @@ function Top() {
     useState<boolean>(false);
 
   const [isOpenConfirmDeleteDataDialog, setIsOpenConfirmDeleteDataDialog] =
+    useState<boolean>(false);
+
+  const [isOpenLoginFormDialog, setIsOpenLoginFormDialog] =
     useState<boolean>(false);
 
   const gotoPlanURL = () => {
@@ -127,7 +131,8 @@ function Top() {
     // ■ ログインウインドウの表示
     if (user.isAuthed === false) {
       console.log("1 handleScrapingButton ");
-      window.myAPI.openLoginPrompt();
+      // window.myAPI.openLoginPrompt();
+      setIsOpenLoginFormDialog(true);
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
@@ -422,6 +427,12 @@ function Top() {
         <ConfirmDeleteDataDialog
           isOpenConfirmDeleteDataDialog={isOpenConfirmDeleteDataDialog}
           setIsOpenConfirmDeleteDataDialog={setIsOpenConfirmDeleteDataDialog}
+        />
+      </div>
+      <div>
+        <LoginFormDialog
+          isOpenLoginFormDialog={isOpenLoginFormDialog}
+          setIsOpenLoginFormDialog={setIsOpenLoginFormDialog}
         />
       </div>
     </div>
