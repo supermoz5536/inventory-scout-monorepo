@@ -153,7 +153,7 @@ exports.createCheckoutSession = functions
         line_items: [
           {
             // Stripeで事前に設定したプライスIDを指定します。
-            price: "price_1PmQbp02YGIp0FEBkbB6siUQ",
+            price: "price_1PncjR02YGIp0FEB0XHuZQaZ",
             // 購入数量を1に設定します。
             quantity: 1,
           },
@@ -163,7 +163,7 @@ exports.createCheckoutSession = functions
         // 支払いが成功した際にリダイレクトするURLを指定します。
         success_url: "https://www.google.co.jp/",
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。
-        cancel_url: "https://www.google.co.jp/",
+        cancel_url: "https://www.yahoo.co.jp/",
       });
       return session.id;
     } catch (error) {
