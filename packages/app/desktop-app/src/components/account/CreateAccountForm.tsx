@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const CreateAccountForm = ({
   isOpenCreateAccountFormDialog,
@@ -41,9 +42,39 @@ const CreateAccountForm = ({
             fontWeight: "bold",
           }}
         >
-          アカウントにログイン
+          アカウントの作成
         </DialogTitle>
-        <DialogContent></DialogContent>
+        <DialogContentText>
+          <p>永久プランの購入にはアカウントが必要です。</p>
+        </DialogContentText>
+        <DialogContent>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="name"
+            name="email"
+            label="メールアドレス"
+            type="email"
+            fullWidth
+            variant="standard"
+            // value={inputEmail}
+            // onChange={handleInputEmailChange}
+          />
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="name"
+            name="email"
+            label="パスワード"
+            // type={isVisiblePassword ? "text" : "password"}
+            fullWidth
+            variant="standard"
+            // value={inputPassword}
+            // onChange={handleInputPasswordChange}
+          />
+        </DialogContent>
       </Dialog>
     </React.Fragment>
   );
