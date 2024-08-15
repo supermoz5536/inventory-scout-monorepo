@@ -1,5 +1,3 @@
-// Axiosライブラリをインポート（HTTPリクエストを行うために使用）
-const axios = require("axios");
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 const functions = require("firebase-functions");
 // 決済ページの用意とリダイレクトを行うStripeのライブラリ

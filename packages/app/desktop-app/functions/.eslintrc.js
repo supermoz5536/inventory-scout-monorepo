@@ -4,16 +4,15 @@ module.exports = {
     node: true,
   },
   parserOptions: {
-    "ecmaVersion": 2018,
+    ecmaVersion: 2018,
   },
-  extends: [
-    "eslint:recommended",
-    "google",
-  ],
+  extends: ["eslint:recommended", "google"],
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    "object-curly-spacing": "off", // オブジェクトの中括弧内のスペースチェックを無効にする
+    "quotes": ["error", "double", { allowTemplateLiterals: true }],
+    "indent": "off", // インデントに関するチェックを無効にする
   },
   overrides: [
     {

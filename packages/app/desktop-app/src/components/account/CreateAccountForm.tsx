@@ -19,6 +19,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createAccount } from "../../service/account";
+import { callCreateCheckoutSession } from "../../firebase/cloudFunctions";
+import handleRedirectToCheckout from "../../service/stripe";
 
 const CreateAccountForm = ({
   isOpenCreateAccountFormDialog,
@@ -31,6 +33,12 @@ const CreateAccountForm = ({
   >;
   isSelectedPlan: string;
 }) => {
+  const user = useSelector((state: RootState) => state.user.value);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   const handleOpen = () => {
     setIsOpenCreateAccountFormDialog(true);
   };
@@ -44,7 +52,14 @@ const CreateAccountForm = ({
     // バリデーションチェックOK！なときに行う処理を追加
     await createAccount(data.email, data.password);
     if (isSelectedPlan === "s" || isSelectedPlan === "p") {
-      // ■■■■■■■■■■ Stripeのチェックアウト画面への遷移 ■■■■■■■■■■
+      // Stripeのチェックアウトセッション画面を作成
+      const sessionId: any = await callCreateCheckoutSession(
+        userRef.current.uid
+      );
+      // Stripeのチェックアウトセッション画面への遷移
+      await handleRedirectToCheckout(sessionId);
+      // Dialogを閉じる
+      setIsOpenCreateAccountFormDialog(false);
     }
     setIsOpenCreateAccountFormDialog(false);
   };

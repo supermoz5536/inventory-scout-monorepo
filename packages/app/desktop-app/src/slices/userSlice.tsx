@@ -24,6 +24,9 @@ export const userSlice = createSlice({
     updateUser: (state, action: PayloadAction<User>) => {
       state.value = action.payload;
     },
+    changeUidOnStore: (state, action: PayloadAction<string>) => {
+      state.value.uid = action.payload;
+    },
     changeEmailOnStore: (state, action: PayloadAction<string>) => {
       state.value.email = action.payload;
     },
@@ -45,6 +48,7 @@ export const userSlice = createSlice({
 // 割り当てるための分割代入を使用した文法です。
 export const {
   updateUser,
+  changeUidOnStore,
   changeIsAuthed,
   changeIsAutoLogIn,
   changeEmailOnStore,
