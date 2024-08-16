@@ -40,6 +40,7 @@ declare global {
         callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
       ) => void;
       disposeAllListeners: () => void;
+      getAppURL: () => Promise<string>;
       disposeListener: (
         channel: string,
         callback: (event: any, asinData: AsinData) => void

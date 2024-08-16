@@ -2,7 +2,11 @@ import React from "react";
 import { functions } from "./firebase";
 import { httpsCallable } from "firebase/functions";
 
-export const callCreateCheckoutSession = async (uid: string) => {
+export const callCreateCheckoutSession = async (
+  uid: string,
+  appURL: string
+) => {
+  console.log("appURL", appURL);
   try {
     // 第１引数としてfunctionsを渡すことで、
     // どのFirebaseプロジェクトのクラウド関数を呼び出すかを指定します。
@@ -10,7 +14,10 @@ export const callCreateCheckoutSession = async (uid: string) => {
       functions,
       "createCheckoutSession"
     );
-    const result: any = await createCheckoutSession({ uid: uid });
+    const result: any = await createCheckoutSession({
+      uid: uid,
+      appURL: appURL,
+    });
     // チェックアウトセッション画面へのリダイレクトに必要な情報を返す
     return result.data;
   } catch (e: any) {

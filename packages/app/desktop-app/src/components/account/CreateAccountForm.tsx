@@ -50,11 +50,13 @@ const CreateAccountForm = ({
   // フォーム送信時の処理
   const onSubmit: SubmitHandler<CreateAccountFormInput> = async (data) => {
     // バリデーションチェックOK！なときに行う処理を追加
+    const appURL = await window.myAPI.getAppURL();
     await createAccount(data.email, data.password);
     if (isSelectedPlan === "s" || isSelectedPlan === "p") {
       // Stripeのチェックアウトセッション画面を作成
       const sessionId: any = await callCreateCheckoutSession(
-        userRef.current.uid
+        userRef.current.uid,
+        appURL
       );
       // Stripeのチェックアウトセッション画面への遷移
       await handleRedirectToCheckout(sessionId);

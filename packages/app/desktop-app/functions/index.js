@@ -37,16 +37,16 @@ exports.stripeWebhook = functions
       switch (event.type) {
         // premiumプラン契約時の処理
         case "customer.subscription.created": {
-          await db.collection("user").doc(firebaseUid).update({
-            subscription_plan: "premium",
+          await db.collection("users").doc(firebaseUid).update({
+            plan: "s",
           });
           response.json({ received: true });
           break;
         }
         // premiumプラン解約時の処理
         case "customer.subscription.deleted": {
-          await db.collection("user").doc(firebaseUid).update({
-            subscription_plan: "free",
+          await db.collection("users").doc(firebaseUid).update({
+            plan: "f",
           });
           response.json({ received: true });
           break;
@@ -159,9 +159,9 @@ exports.createCheckoutSession = functions
         // このセッションのモードを「支払い」に設定します。
         mode: "subscription",
         // 支払いが成功した際にリダイレクトするURLを指定します。
-        success_url: "https://www.google.co.jp/",
+        success_url: data.appURL,
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。
-        cancel_url: "https://www.yahoo.co.jp/",
+        cancel_url: data.appURL,
       });
       return session.id;
     } catch (error) {
