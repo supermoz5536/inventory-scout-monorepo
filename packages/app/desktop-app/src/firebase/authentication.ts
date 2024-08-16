@@ -16,6 +16,7 @@ import {
   changeEmailOnStore,
   changePasswordOnStore,
 } from "../slices/userSlice";
+import { setPlanFieldListener } from "./firestore";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -75,16 +76,25 @@ export const logOut = async (): Promise<boolean> => {
 
 /// サーバーの認証状態の変更を取得するリスナーを設置します
 export const listenAuthState = async () => {
+  let unsubscribePlanFieldListener: any;
+
   const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
     // ログイン状態の場合
     if (user) {
-      console.log("listenAuthState changeIsAuthed(true)");
+      console.log("listenAuthState ログインしました");
       store.dispatch(changeIsAuthed(true));
+      // 既存のリスナー（planの変更取得）があれば解除
+      if (unsubscribePlanFieldListener) unsubscribePlanFieldListener();
+      // リスナーの設置
+      unsubscribePlanFieldListener = setPlanFieldListener(user.uid);
     } else {
       // ログアウト状態の場合
-      console.log("listenAuthState changeIsAuthed(false)");
+      console.log("listenAuthState ログアウトしました");
       store.dispatch(changeIsAuthed(false));
     }
+    // 既存のリスナー（planの変更取得）があれば解除
+    if (unsubscribePlanFieldListener) unsubscribePlanFieldListener();
+    unsubscribePlanFieldListener = null;
   });
   return unsubscribe;
 };

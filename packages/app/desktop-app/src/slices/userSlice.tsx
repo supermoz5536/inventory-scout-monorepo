@@ -39,6 +39,9 @@ export const userSlice = createSlice({
     changeIsAutoLogIn: (state, action: PayloadAction<boolean>) => {
       state.value.isAutoLogIn = action.payload;
     },
+    changePlanOnStore: (state, action: PayloadAction<string>) => {
+      state.value.plan = action.payload;
+    },
   },
 });
 
@@ -53,6 +56,7 @@ export const {
   changeIsAutoLogIn,
   changeEmailOnStore,
   changePasswordOnStore,
+  changePlanOnStore,
 } = userSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
