@@ -1,11 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Divider, Button } from "@mui/material";
 import CreateAccountForm from "../account/CreateAccountForm";
+import { useSelector } from "react-redux";
+import { handleCreateCheckoutSessionAndRedirect } from "../../service/stripe";
+import { callUpdateCancelAtPeriodEnd } from "../../firebase/cloudFunctions";
 
 const FreePlan = () => {
+  const user = useSelector((state: RootState) => state.user.value);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   const [isSelectedPlan, setIsSelectedPlan] = useState<string>("f");
   const [isOpenCreateAccountFormDialog, setIsOpenCreateAccountFormDialog] =
     useState<boolean>(false);
+
+  const handleClickButton = async () => {
+    if (userRef.current.isAuthed === true) {
+      // ログインしてる場合（ = アカウント作成済みなので）
+      // => 月額プランのキャンセル処理
+      const result = await callUpdateCancelAtPeriodEnd(userRef.current.uid);
+      console.log("result", result);
+      if (result === "canceled" || result === "already_canceled") {
+        // プランの枠付のカラーリングを変えて、視覚的にUIでプラン変更
+      } else {
+        // ■■■■■■■ SnackBarでエラー表示 ■■■■■■■
+      }
+    } else if (userRef.current.isAuthed === false) {
+      // ログインしてない場合（ = アカウント未作成なので）
+      // => アカウント作成フォーム
+      setIsOpenCreateAccountFormDialog(true);
+    }
+  };
 
   return (
     <>
@@ -94,8 +121,12 @@ const FreePlan = () => {
           />
           <Button
             variant="contained"
+            disabled={
+              // 「いずれかの条件を満たさない場合」はボタンを無効化
+              !(userRef.current.plan === "" || userRef.current.plan === "s")
+            }
             onClick={() => {
-              setIsOpenCreateAccountFormDialog(true);
+              handleClickButton();
             }}
             sx={{
               marginTop: "10px",
