@@ -11,6 +11,7 @@ import {
 import React, { useState } from "react";
 import CreateAccountForm from "../account/CreateAccountForm";
 import SubscriptionPlan from "./SubscriptionPlan";
+import FreePlan from "./FreePlan";
 
 const PlanList = ({
   isOpenPlanListDialog,
@@ -32,10 +33,13 @@ const PlanList = ({
   return (
     <>
       <React.Fragment>
-        <Dialog open={isOpenPlanListDialog} onClose={handleClose}>
+        <Dialog
+          open={isOpenPlanListDialog}
+          onClose={handleClose}
+          maxWidth={false}
+        >
           <DialogTitle
             sx={{
-              // marginBottom: "20px",
               display: "flex",
               justifyContent: "center",
               fontSize: "40px",
@@ -60,7 +64,9 @@ const PlanList = ({
                 flexDirection: "row",
               }}
             >
+              <FreePlan />
               <SubscriptionPlan />
+              <FreePlan />
             </Box>
           </DialogContent>
         </Dialog>

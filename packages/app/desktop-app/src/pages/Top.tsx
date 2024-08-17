@@ -357,6 +357,21 @@ function Top() {
               : null}
           </Button>
 
+          <Button
+            className="top-square-space-menu-container-select-plan"
+            onClick={() => setIsOpenPlanListDialog(true)}
+            variant="contained"
+            sx={{
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+            }}
+          >
+            プラン変更
+          </Button>
+
           {/* ASIN検索入力欄 */}
           <TextField
             className="top-square-space-menu-container-left-input"

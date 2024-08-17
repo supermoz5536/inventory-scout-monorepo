@@ -1,31 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { Box, Typography, Divider, Button } from "@mui/material";
 import CreateAccountForm from "../account/CreateAccountForm";
-import { useSelector } from "react-redux";
-import { handleCreateCheckoutSessionAndRedirect } from "../../service/stripe";
 
-const SubscriptionPlan = () => {
-  const user = useSelector((state: RootState) => state.user.value);
-  const userRef = useRef(user);
-  useEffect(() => {
-    userRef.current = user;
-  }, [user]);
-
-  const [isSelectedPlan, setIsSelectedPlan] = useState<string>("s");
+const FreePlan = () => {
+  const [isSelectedPlan, setIsSelectedPlan] = useState<string>("f");
   const [isOpenCreateAccountFormDialog, setIsOpenCreateAccountFormDialog] =
     useState<boolean>(false);
-
-  const handleClickButton = async () => {
-    if (userRef.current.isAuthed === true) {
-      // ログインしてる場合（ = アカウント作成済みなので）
-      // => チェックアウトプロセス
-      await handleCreateCheckoutSessionAndRedirect(userRef.current.uid);
-    } else if (userRef.current.isAuthed === false) {
-      // ログインしてない場合（ = アカウント未作成なので）
-      // => アカウント作成フォーム
-      setIsOpenCreateAccountFormDialog(true);
-    }
-  };
 
   return (
     <>
@@ -49,7 +29,7 @@ const SubscriptionPlan = () => {
             justifyContent: "center",
           }}
         >
-          月額プラン
+          フリープラン
         </Typography>
         <Typography
           sx={{
@@ -61,7 +41,7 @@ const SubscriptionPlan = () => {
             justifyContent: "center",
           }}
         >
-          （2490円 / 月）
+          （0円 / 月）
         </Typography>
         <Divider
           variant="middle"
@@ -114,12 +94,8 @@ const SubscriptionPlan = () => {
           />
           <Button
             variant="contained"
-            disabled={
-              // 「いずれかの条件を満たさない場合」はボタンを無効化
-              !(userRef.current.plan === "" || userRef.current.plan === "f")
-            }
             onClick={() => {
-              handleClickButton();
+              setIsOpenCreateAccountFormDialog(true);
             }}
             sx={{
               marginTop: "10px",
@@ -141,4 +117,4 @@ const SubscriptionPlan = () => {
   );
 };
 
-export default SubscriptionPlan;
+export default FreePlan;
