@@ -36,6 +36,7 @@ import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
 import { Footer } from "../components/main-window/Footer";
 import { AsinDataTable } from "../components/main-window/top/AsinDataTable";
 import LoginFormDialog from "../components/main-window/top/LoginFormDialog";
+import PlanList from "../components/plan/PlanList";
 
 function Top() {
   const asinDataList = useSelector(
@@ -81,10 +82,13 @@ function Top() {
   const [isOpenLoginFormDialog, setIsOpenLoginFormDialog] =
     useState<boolean>(false);
 
-  const gotoPlanURL = () => {
-    const planURL = `https://www.google.co.jp/`;
-    window.myAPI.openExternal(planURL);
-  };
+  const [isOpenPlanListDialog, setIsOpenPlanListDialog] =
+    useState<boolean>(false);
+
+  // const gotoPlanURL = () => {
+  //   const planURL = `https://www.google.co.jp/`;
+  //   window.myAPI.openExternal(planURL);
+  // };
 
   /// 最後に入力のあった検索クエリ欄のタイプが設定され
   /// それの値で現在ユーザーの利用してる検索モードを判別します。
@@ -138,8 +142,7 @@ function Top() {
       // プラン加入ページへ誘導
     } else if (user.isAuthed === true && user.plan === "f") {
       console.log("2 handleScrapingButton");
-      gotoPlanURL();
-
+      setIsOpenPlanListDialog(true);
       // ■ 待機状態での「取得開始」のクリック
     } else if (
       user.isAuthed === true &&
@@ -433,6 +436,12 @@ function Top() {
         <LoginFormDialog
           isOpenLoginFormDialog={isOpenLoginFormDialog}
           setIsOpenLoginFormDialog={setIsOpenLoginFormDialog}
+        />
+      </div>
+      <div>
+        <PlanList
+          isOpenPlanListDialog={isOpenPlanListDialog}
+          setIsOpenPlanListDialog={setIsOpenPlanListDialog}
         />
       </div>
     </div>

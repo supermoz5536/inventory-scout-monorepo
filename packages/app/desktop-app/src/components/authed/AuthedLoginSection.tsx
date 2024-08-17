@@ -56,11 +56,11 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
             <p className="authed-login-section-email-text">ご利用状況：</p>
             <p className="authed-login-section-email-adress">
               {user.plan === "f"
-                ? "未加入です。"
+                ? "フリープランです。"
                 : user.plan === "s"
-                ? "月額課金プランに加入中です"
+                ? "月額プランに加入中です"
                 : user.plan === "p"
-                ? "永久利用プランに加入中です。"
+                ? "買い切りプランに加入中です。"
                 : null}
             </p>
           </div>

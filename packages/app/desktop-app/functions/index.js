@@ -1,5 +1,3 @@
-// Axiosライブラリをインポート（HTTPリクエストを行うために使用）
-const axios = require("axios");
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 const functions = require("firebase-functions");
 // 決済ページの用意とリダイレクトを行うStripeのライブラリ
@@ -39,16 +37,16 @@ exports.stripeWebhook = functions
       switch (event.type) {
         // premiumプラン契約時の処理
         case "customer.subscription.created": {
-          await db.collection("user").doc(firebaseUid).update({
-            subscription_plan: "premium",
+          await db.collection("users").doc(firebaseUid).update({
+            plan: "s",
           });
           response.json({ received: true });
           break;
         }
         // premiumプラン解約時の処理
         case "customer.subscription.deleted": {
-          await db.collection("user").doc(firebaseUid).update({
-            subscription_plan: "free",
+          await db.collection("users").doc(firebaseUid).update({
+            plan: "f",
           });
           response.json({ received: true });
           break;
@@ -153,7 +151,7 @@ exports.createCheckoutSession = functions
         line_items: [
           {
             // Stripeで事前に設定したプライスIDを指定します。
-            price: "price_1PmQbp02YGIp0FEBkbB6siUQ",
+            price: "price_1PncjR02YGIp0FEB0XHuZQaZ",
             // 購入数量を1に設定します。
             quantity: 1,
           },
@@ -161,9 +159,9 @@ exports.createCheckoutSession = functions
         // このセッションのモードを「支払い」に設定します。
         mode: "subscription",
         // 支払いが成功した際にリダイレクトするURLを指定します。
-        success_url: "https://www.google.co.jp/",
+        success_url: data.appURL,
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。
-        cancel_url: "https://www.google.co.jp/",
+        cancel_url: data.appURL,
       });
       return session.id;
     } catch (error) {

@@ -49,6 +49,8 @@ contextBridge.exposeInMainWorld("myAPI", {
   scheduledScraping: (time: string, asinDataList: AsinData[]) =>
     ipcRenderer.invoke("schedule-scraping", time, asinDataList),
 
+  getAppURL: () => ipcRenderer.invoke("get-app-url"),
+
   // ====================================================================
 
   initSystemStatus: (callback) =>

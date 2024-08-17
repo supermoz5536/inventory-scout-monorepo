@@ -301,6 +301,9 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
   openStockDetail(asinData);
 });
 
+// レンダラープロセスに appURL を送信
+ipcMain.handle("get-app-url", () => appURL);
+
 //====================================================================
 
 // バックグラウンドウインドウを生成する関数です

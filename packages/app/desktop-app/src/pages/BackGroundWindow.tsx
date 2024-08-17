@@ -23,7 +23,7 @@ import {
 } from "../firebase/authentication";
 import { updateUser } from "../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
-import { getUserDoc } from "../firebase/firestore";
+import { getUserDoc, setPlanFieldListener } from "../firebase/firestore";
 import MainWindow from "../pages/MainWindow";
 
 const BackGroundWindow = () => {
