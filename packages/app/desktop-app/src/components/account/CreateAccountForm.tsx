@@ -20,7 +20,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createAccount } from "../../service/account";
 import { callCreateCheckoutSession } from "../../firebase/cloudFunctions";
-import handleRedirectToCheckout from "../../service/stripe";
+import {
+  handleCreateCheckoutSessionAndRedirect,
+  handleRedirectToCheckout,
+} from "../../service/stripe";
 
 const CreateAccountForm = ({
   isOpenCreateAccountFormDialog,
@@ -50,18 +53,9 @@ const CreateAccountForm = ({
   // フォーム送信時の処理
   const onSubmit: SubmitHandler<CreateAccountFormInput> = async (data) => {
     // バリデーションチェックOK！なときに行う処理を追加
-    const appURL = await window.myAPI.getAppURL();
     await createAccount(data.email, data.password);
     if (isSelectedPlan === "s" || isSelectedPlan === "p") {
-      // Stripeのチェックアウトセッション画面を作成
-      const sessionId: any = await callCreateCheckoutSession(
-        userRef.current.uid,
-        appURL
-      );
-      // Stripeのチェックアウトセッション画面への遷移
-      await handleRedirectToCheckout(sessionId);
-      // Dialogを閉じる
-      setIsOpenCreateAccountFormDialog(false);
+      await handleCreateCheckoutSessionAndRedirect(userRef.current.uid);
     }
     setIsOpenCreateAccountFormDialog(false);
   };

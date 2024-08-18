@@ -96,7 +96,11 @@ exports.updateCancelAtPeriodEnd = functions
 
       if (subscriptions.data[0].cancel_at_period_end) {
         // すでに解約処理がされている場合
-        return { success: false, message: "already_canceled" };
+        return {
+          success: false,
+          message: "already_canceled",
+          cancelAt: subscriptions.data[0].current_period_end,
+        };
       } else {
         // 現在はpremiumプランしかアイテムはなく、
         // 契約時に重複登録は弾いているので[0]番目を指定
@@ -104,7 +108,11 @@ exports.updateCancelAtPeriodEnd = functions
           cancel_at_period_end: true,
         });
         // 成功した場合のレスポンス
-        return { success: true, message: "canceled" };
+        return {
+          success: true,
+          message: "canceled",
+          cancelAt: subscriptions.data[0].current_period_end,
+        };
       }
     } catch (error) {
       throw new functions.https.HttpsError("internal", error.message);
