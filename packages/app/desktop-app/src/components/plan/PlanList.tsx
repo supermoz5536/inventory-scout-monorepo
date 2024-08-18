@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import CreateAccountForm from "../account/CreateAccountForm";
 import SubscriptionPlan from "./SubscriptionPlan";
 import FreePlan from "./FreePlan";
+import { PermanentPlan } from "./PermanentPlan";
 
 const PlanList = ({
   isOpenPlanListDialog,
@@ -66,7 +67,7 @@ const PlanList = ({
             >
               <FreePlan />
               <SubscriptionPlan />
-              <FreePlan />
+              <PermanentPlan />
             </Box>
           </DialogContent>
         </Dialog>

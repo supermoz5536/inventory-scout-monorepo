@@ -21,7 +21,7 @@ import * as yup from "yup";
 import { createAccount } from "../../service/account";
 import { callCreateCheckoutSession } from "../../firebase/cloudFunctions";
 import {
-  handleCreateCheckoutSessionAndRedirect,
+  handleCheckoutSessionAndRedirect,
   handleRedirectToCheckout,
 } from "../../service/stripe";
 
@@ -55,7 +55,10 @@ const CreateAccountForm = ({
     // バリデーションチェックOK！なときに行う処理を追加
     await createAccount(data.email, data.password);
     if (isSelectedPlan === "s" || isSelectedPlan === "p") {
-      await handleCreateCheckoutSessionAndRedirect(userRef.current.uid);
+      await handleCheckoutSessionAndRedirect(
+        userRef.current.uid,
+        isSelectedPlan
+      );
     }
     setIsOpenCreateAccountFormDialog(false);
   };

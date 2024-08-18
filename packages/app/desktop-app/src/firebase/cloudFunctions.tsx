@@ -2,21 +2,24 @@ import React from "react";
 import { functions } from "./firebase";
 import { httpsCallable } from "firebase/functions";
 
+// 月額プランの購入プロセスのハンドル関数です。
+// チェックアウトセッション作成とリダイレクトを行います。
 export const callCreateCheckoutSession = async (
   uid: string,
-  appURL: string
+  appURL: string,
+  plan: string,
 ) => {
-  console.log("appURL", appURL);
   try {
     // 第１引数としてfunctionsを渡すことで、
     // どのFirebaseプロジェクトのクラウド関数を呼び出すかを指定します。
     const createCheckoutSession = httpsCallable(
       functions,
-      "createCheckoutSession"
+      "createCheckoutSession",
     );
     const result: any = await createCheckoutSession({
       uid: uid,
       appURL: appURL,
+      plan: plan,
     });
     // チェックアウトセッション画面へのリダイレクトに必要な情報を返す
     return result.data;
@@ -32,11 +35,11 @@ export const callCreateCheckoutSession = async (
 // 処理した月の月末に自動で解約される
 export const callUpdateCancelAtPeriodEnd = async (uid: string) => {
   try {
-    const createCheckoutSession = httpsCallable(
+    const updateCancelAtPeriodEnd = httpsCallable(
       functions,
-      "updateCancelAtPeriodEnd"
+      "updateCancelAtPeriodEnd",
     );
-    const result: any = await createCheckoutSession({
+    const result: any = await updateCancelAtPeriodEnd({
       uid: uid,
     });
     // レスポンスデータから'message'キーに対応する値を取得
@@ -51,5 +54,29 @@ export const callUpdateCancelAtPeriodEnd = async (uid: string) => {
     console.log(`callUpdateCancelAtPeriodEnd エラーコード: ${e.code}`);
     console.log(`callUpdateCancelAtPeriodEnd エラーメッセージ: ${e.message}`);
     console.log(`callUpdateCancelAtPeriodEnd 詳細: ${e.details}`);
+  }
+};
+
+// 月額プランの自動解約処理の予約を行う関数
+// 処理した月の月末に自動で解約される
+export const callCancelSubscriptionImmediately = async (uid: string) => {
+  try {
+    const cancelSubscriptionImmediately = httpsCallable(
+      functions,
+      "cancelSubscriptionImmediately",
+    );
+    const result: any = await cancelSubscriptionImmediately({
+      uid: uid,
+    });
+    // レスポンスデータから'message'キーに対応する値を取得
+    const message = result.data["message"];
+    return message;
+  } catch (e: any) {
+    // Firebase Functions からのエラーをキャッチ
+    console.log(`callCancelSubscriptionImmediately エラーコード: ${e.code}`);
+    console.log(
+      `callCancelSubscriptionImmediately エラーメッセージ: ${e.message}`,
+    );
+    console.log(`callCancelSubscriptionImmediately 詳細: ${e.details}`);
   }
 };

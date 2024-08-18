@@ -44,7 +44,7 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
     console.log("1 handleLogIn");
     const userCredential = await logInWithEmailAndPassword(
       inputEmail,
-      inputPassword
+      inputPassword,
     );
     console.log("2 handleLogIn");
     // オブジェクトが存在し
@@ -55,7 +55,7 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
       const userDocData: DocumentData | undefined = await getUserDoc(
-        userCredential.user.uid
+        userCredential.user.uid,
       );
       console.log("3 handleLogIn");
 
@@ -68,6 +68,7 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
           password: inputPassword,
           isAuthed: true,
           isAutoLogIn: userRef.current.isAutoLogIn,
+          is_cancel_progress: false,
           plan: userDocData["plan"],
           createdAt: userDocData["created_at"],
         };

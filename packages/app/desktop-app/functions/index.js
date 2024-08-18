@@ -24,33 +24,122 @@ exports.stripeWebhook = functions
       const stripe = new Stripe(process.env.STRIPE_API_KEY, {
         apiVersion: "2023-10-16",
       });
+
+      // Firestoreのインスタンスの参照を取得
+      // リクエストボディからイベントデータを取得
       const db = getFirestoreRef();
-      // リクエストボディからイベントデータを取得し、
       const event = request.body;
-      // StripeのCustomer ID
-      const customerId = event.data.object.customer;
-      // StripeからCustomerオブジェクトを取得
-      const customer = await stripe.customers.retrieve(customerId);
-      // CustomerのmetadataからFirebase UIDを取得
-      const firebaseUid = customer.metadata.firebaseUid;
 
       switch (event.type) {
-        // premiumプラン契約時の処理
-        case "customer.subscription.created": {
-          await db.collection("users").doc(firebaseUid).update({
-            plan: "s",
-          });
+        // セッション画面で決済が正常に完了した時のコールバック
+        case "checkout.session.completed": {
+          const session = event.data.object;
+          const customerId = event.data.object.customer;
+          const customer = await stripe.customers.retrieve(customerId);
+          const firebaseUid = customer.metadata.firebaseUid;
+
+          if (session.mode === "subscription") {
+            // 月額プランにフラグ変更
+            await db.collection("users").doc(firebaseUid).update({
+              plan: "s",
+            });
+          } else if (session.mode === "payment") {
+            // ① 月額プランを即時キャンセル
+
+            // Firebase UIDを使用して顧客を検索
+            // (customerIdだと、セッション間で紐付けできない)
+            let activeSubscription = null;
+            const customers = await stripe.customers.search({
+              query: `metadata['firebaseUid']:'${firebaseUid}'`,
+              limit: 100, // 1回のリクエストで最大100件まで取得
+              // page: nextPage, // 次のページを取得するためのカーソル
+            });
+
+            console.log("■■■ firebaseUid", firebaseUid);
+            console.log("■■■ customers.length =", customers.data.length);
+            if (customers.data.length === 0) {
+              throw new functions.https.HttpsError(
+                "not-found",
+                "No customer found",
+              );
+            }
+
+            // avtiveなサブスクリプションプランを保持してる顧客を探す
+            // (一人が複数のcustomerIdを生成している場合があるので、
+            // 共通のFiresbaseUidでフィルタして抽出したIdで振るいにかけている)
+            for (const customer of customers.data) {
+              // 任意の顧客のサブスクリプションプランのリストを取得
+              const subscriptions = await stripe.subscriptions.list({
+                customer: customer.id,
+                status: "active",
+              });
+
+              // リストの中身がある顧客を見つけたら
+              // その中身のactiveなプランに更新してbreak
+              if (subscriptions.data.length > 0) {
+                activeSubscription = subscriptions.data[0];
+                break;
+              }
+            }
+
+            if (activeSubscription === null) {
+              throw new functions.https.HttpsError(
+                "not-found",
+                "No activeSubscription found",
+              );
+            }
+
+            // キャンセル前にFirestoreのフラグをON
+            await db.collection("users").doc(firebaseUid).update({
+              is_cancel_progress: true,
+            });
+
+            // サブスクリプションを即時にキャンセルする
+            // 残りの未使用の期間分の返金はされない。
+            await stripe.subscriptions.cancel(activeSubscription.id, {
+              invoice_now: true, // 未請求の使用量や新規/保留中の割合請求アイテムを請求する最終請求書を生成します
+              prorate: true, // サブスクリプション期間終了までの残りの未使用時間をクレジットする比例請求アイテムを生成します
+            });
+
+            await db.collection("users").doc(firebaseUid).update({
+              plan: "p",
+            });
+
+            // 額プラン解約時の case で
+            // 確実にフラグを get してスキップさせるように待機
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+
+            // キャンセル後にFirestoreのフラグをOFF
+            await db.collection("users").doc(firebaseUid).update({
+              is_cancel_progress: false,
+            });
+          }
+
           response.json({ received: true });
           break;
         }
-        // premiumプラン解約時の処理
+
+        // 月額プラン解約時の処理
         case "customer.subscription.deleted": {
+          const customerId = event.data.object.customer;
+          const customer = await stripe.customers.retrieve(customerId);
+          const firebaseUid = customer.metadata.firebaseUid;
+
+          // Firestoreのフラグをチェック
+          const userDoc = await db.collection("users").doc(firebaseUid).get();
+          if (userDoc.exists && userDoc.data()["is_cancel_progress"]) {
+            // 買い切りプラン購入による cancel なら処理をスキップ
+            response.json({ received: true });
+            return;
+          }
+
           await db.collection("users").doc(firebaseUid).update({
             plan: "f",
           });
           response.json({ received: true });
           break;
         }
+
         default: {
           response.status(400).end();
           break;
@@ -63,6 +152,56 @@ exports.stripeWebhook = functions
       // StripeのWebhookを送信してきたシステムや、
       // APIを叩いている他のクライアント
       response.status(500).send("Internal Server Error");
+    }
+  });
+
+exports.cancelSubscriptionImmediately = functions
+  .runWith({
+    memory: "512MB", // メモリの割り当てを増やす
+  })
+  .https.onCall(async (data, context) => {
+    try {
+      const stripe = new Stripe(process.env.STRIPE_API_KEY, {
+        apiVersion: "2023-10-16",
+      });
+
+      const firebaseUid = data.uid;
+      // StripeのCustomerをメタデータのFirebase UIDで検索
+      const customers = await stripe.customers.search({
+        query: `metadata['firebaseUid']:'${firebaseUid}'`,
+      });
+
+      if (customers.data.length === 0) {
+        throw new functions.https.HttpsError("not-found", "not found");
+      }
+
+      const customerId = customers.data[0].id;
+
+      // 顧客に紐づくアクティブなサブスクリプションリストを取得する
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "active",
+      });
+
+      // 購入プランデータ取得時のエラーハンドリング
+      if (subscriptions.data.length === 0) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "Active subscription not found",
+        );
+      }
+
+      // サブスクリプションを即時にキャンセルする
+      // 残りの未使用の期間分の返金はされない。
+      const subscription = subscriptions.data[0];
+      await stripe.subscriptions.cancel(subscription.id, {
+        invoice_now: true, // 未請求の使用量や新規/保留中の割合請求アイテムを請求する最終請求書を生成します
+        prorate: true, // サブスクリプション期間終了までの残りの未使用時間をクレジットする比例請求アイテムを生成します
+      });
+
+      return { success: true, message: "Subscription canceled successfully" };
+    } catch (error) {
+      throw new functions.https.HttpsError("internal", error.message);
     }
   });
 
@@ -136,6 +275,40 @@ exports.createCheckoutSession = functions
         // myUidをメタデータとして設定
         metadata: { firebaseUid: firebaseUid },
       });
+
+      // 選択されたプラン名と一致するように
+      // Stripeで事前に設定したプライスIDを指定します。
+      const priceId =
+        data.plan === "s"
+          ? "price_1PncjR02YGIp0FEB0XHuZQaZ"
+          : data.plan === "p"
+          ? "price_1Pp2ca02YGIp0FEBZyRU9N2B"
+          : null;
+
+      // プライスIDがnullの場合のエラーハンドリング
+      if (!priceId) {
+        throw new functions.https.HttpsError(
+          "invalid-argument",
+          "priceId is null",
+        );
+      }
+
+      // 商品がサブスクか一括払いかで決済モードを切り替えます。
+      const paymentMode =
+        data.plan === "s"
+          ? "subscription"
+          : data.plan === "p"
+          ? "payment"
+          : null;
+
+      // 決済モードがnullの場合のエラーハンドリング
+      if (!paymentMode) {
+        throw new functions.https.HttpsError(
+          "invalid-argument",
+          "paymentMode is null",
+        );
+      }
+
       // StripeのCheckoutセッションを新規作成し、その設定を行います。
       const session = await stripe.checkout.sessions.create({
         // 作成した顧客のIDをセッションに紐付けます。
@@ -158,14 +331,15 @@ exports.createCheckoutSession = functions
         // 請求項目の設定を開始します。
         line_items: [
           {
+            // 選択されたプラン名と一致するように
             // Stripeで事前に設定したプライスIDを指定します。
-            price: "price_1PncjR02YGIp0FEB0XHuZQaZ",
+            price: priceId,
             // 購入数量を1に設定します。
             quantity: 1,
           },
         ],
         // このセッションのモードを「支払い」に設定します。
-        mode: "subscription",
+        mode: paymentMode,
         // 支払いが成功した際にリダイレクトするURLを指定します。
         success_url: data.appURL,
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。

@@ -25,9 +25,10 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
           password: "",
           isAuthed: false,
           isAutoLogIn: false,
+          is_cancel_progress: false,
           plan: "",
           createdAt: "",
-        })
+        }),
       );
     }
   };
