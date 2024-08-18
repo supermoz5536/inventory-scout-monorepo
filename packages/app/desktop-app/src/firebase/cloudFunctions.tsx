@@ -44,7 +44,8 @@ export const callUpdateCancelAtPeriodEnd = async (uid: string) => {
     // "canceled" : キャンセル処理が成功
     // "already_canceled" : 既にキャンセル済み
     const message = result.data["message"];
-    return message;
+    const cancelAt = result.data["cancelAt"];
+    return { message, cancelAt };
   } catch (e: any) {
     // Firebase Functions からのエラーをキャッチ
     console.log(`callUpdateCancelAtPeriodEnd エラーコード: ${e.code}`);
