@@ -32,7 +32,7 @@ const BackGroundWindow = () => {
   // asinDataListの変更のみに依存して
   // 最新のデータを参照できるようにします。
   const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
+    (state: RootState) => state.asinDataList.value,
   );
   const asinDataListRef = useRef(asinDataList);
   useEffect(() => {
@@ -40,7 +40,7 @@ const BackGroundWindow = () => {
   }, [asinDataList]);
 
   const systemStatus: any = useSelector(
-    (state: RootState) => state.systemStatus.value
+    (state: RootState) => state.systemStatus.value,
   );
 
   const systemStatusRef = useRef(systemStatus);
@@ -124,7 +124,7 @@ const BackGroundWindow = () => {
           ) {
             await window.myAPI.initScheduledTime(() => {
               window.myAPI.scheduledScraping(
-                systemStatusRef.current.scheduledScrapingTime
+                systemStatusRef.current.scheduledScrapingTime,
               );
             });
           }
@@ -172,7 +172,7 @@ const BackGroundWindow = () => {
     console.log("init login done");
     const userCredential = await logInWithEmailAndPassword(
       userRef.current.email!,
-      userRef.current.password!
+      userRef.current.password!,
     );
 
     // オブジェクトが存在し
@@ -183,7 +183,7 @@ const BackGroundWindow = () => {
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
       const userDocData: DocumentData | undefined = await getUserDoc(
-        userCredential.user.uid
+        userCredential.user.uid,
       );
 
       if (userDocData) {
@@ -194,6 +194,7 @@ const BackGroundWindow = () => {
           password: userRef.current.password,
           isAuthed: true,
           isAutoLogIn: userRef.current.isAutoLogIn,
+          is_cancel_progress: false,
           plan: userDocData["plan"] ?? "not found",
           createdAt: userDocData["created_at"] ?? "not found",
         };
@@ -207,7 +208,7 @@ const BackGroundWindow = () => {
   const handleInitScraping = async () => {
     const today = new Date();
     const todayFormatted = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     const checkArray = asinDataListRef.current.find((asinData: AsinData) => {
@@ -218,8 +219,8 @@ const BackGroundWindow = () => {
         asinData.isScraping === true &&
         (asinData.fbaSellerDatas.some((fbaSellerData) =>
           fbaSellerData.stockCountDatas.some((stockCountData) =>
-            Object.keys(stockCountData).includes(todayFormatted)
-          )
+            Object.keys(stockCountData).includes(todayFormatted),
+          ),
         ) ||
           asinData.fetchLatestDate === "")
       );
@@ -241,7 +242,7 @@ const BackGroundWindow = () => {
     (
       event: Electron.IpcRendererEvent,
       asinData: AsinData | null,
-      isEnd: boolean | null
+      isEnd: boolean | null,
     ) => {
       (async () => {
         if (isEnd) {
@@ -262,7 +263,7 @@ const BackGroundWindow = () => {
         }
       })();
     },
-    [dispatch]
+    [dispatch],
   );
   return <></>;
 };

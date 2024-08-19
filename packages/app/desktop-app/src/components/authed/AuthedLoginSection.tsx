@@ -4,6 +4,7 @@ import { getFirstUserEmail } from "../../firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import { logOut } from "../../firebase/authentication";
 import { changeIsAutoLogIn, updateUser } from "../../slices/userSlice";
+import { callFetchPeriodEndDate } from "../../firebase/cloudFunctions";
 
 export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
   const user: User = useSelector((state: RootState) => state.user.value);
@@ -12,6 +13,19 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
     userRef.current = user;
   }, [user]);
   const dispatch = useDispatch<AppDispatch>();
+
+  const [periodEndDate, setPeriodEndDate] = useState<string>("");
+
+  // マウント時に一回だけ月額プランの期末日を取得します。
+  useEffect(() => {
+    // 即時関数で非同期処理
+    (async () => {
+      const result = await callFetchPeriodEndDate(userRef.current.uid);
+      setPeriodEndDate(result);
+    })();
+
+    callFetchPeriodEndDate(userRef.current.uid);
+  }, []);
 
   const handleLogout = async () => {
     const signOutResult: boolean = await logOut();
@@ -25,9 +39,10 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
           password: "",
           isAuthed: false,
           isAutoLogIn: false,
+          is_cancel_progress: false,
           plan: "",
           createdAt: "",
-        })
+        }),
       );
     }
   };
@@ -50,21 +65,30 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
         <div className="authed-login-section-email">
           <div className="authed-login-section-email-line">
             <p className="authed-login-section-email-text">ログイン中：</p>
-            <p className="authed-login-section-email-adress">{user.email}</p>
+            <p className="authed-login-section-email-adress">
+              {userRef.current.email}
+            </p>
           </div>
           <div className="authed-login-section-email-line">
             <p className="authed-login-section-email-text">ご利用状況：</p>
             <p className="authed-login-section-email-adress">
-              {user.plan === "f"
-                ? "フリープランです。"
-                : user.plan === "s"
-                ? "月額プランに加入中です"
-                : user.plan === "p"
-                ? "買い切りプランに加入中です。"
+              {userRef.current.plan === "f"
+                ? "フリープランに加入中"
+                : userRef.current.plan === "s"
+                ? `月額プランに加入中`
+                : userRef.current.plan === "p"
+                ? "買い切りプランに加入中"
                 : null}
             </p>
           </div>
         </div>
+        {userRef.current.plan === "s" ? (
+          <div className="authed-login-section-email-line">
+            <p className="authed-login-section-email-text">次回更新日：</p>
+            <p className="authed-login-section-email-adress">{periodEndDate}</p>
+          </div>
+        ) : null}
+
         <button
           className="authed-login-section-login-button"
           onClick={() => {

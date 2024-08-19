@@ -74,12 +74,12 @@ const LoginFormDialog = ({
   const handleLogIn = async (
     inputEmail: string,
     inputPassword: string,
-    isAutoLoginCheckBox: boolean
+    isAutoLoginCheckBox: boolean,
   ) => {
     console.log("1 handleLogIn");
     const userCredential = await logInWithEmailAndPassword(
       inputEmail,
-      inputPassword
+      inputPassword,
     );
     console.log("2 handleLogIn");
     // オブジェクトが存在し
@@ -90,7 +90,7 @@ const LoginFormDialog = ({
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
       const userDocData: DocumentData | undefined = await getUserDoc(
-        userCredential.user.uid
+        userCredential.user.uid,
       );
       console.log("3 handleLogIn");
 
@@ -103,6 +103,7 @@ const LoginFormDialog = ({
           password: inputPassword,
           isAuthed: true,
           isAutoLogIn: isAutoLoginCheckBox,
+          is_cancel_progress: false,
           plan: userDocData["plan"],
           createdAt: userDocData["created_at"],
         };

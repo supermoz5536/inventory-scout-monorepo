@@ -23,9 +23,16 @@ export const handleRedirectToCheckout = async (sessionId: any) => {
   });
 };
 
-export const handleCreateCheckoutSessionAndRedirect = async (uid: string) => {
+export const handleCheckoutSessionAndRedirect = async (
+  uid: string,
+  selectedPlan: string
+) => {
   const appURL = await window.myAPI.getAppURL();
-  const sessionId: any = await callCreateCheckoutSession(uid, appURL);
+  const sessionId: any = await callCreateCheckoutSession(
+    uid,
+    appURL,
+    selectedPlan
+  );
   // Stripeのチェックアウトセッション画面への遷移
   await handleRedirectToCheckout(sessionId);
 };

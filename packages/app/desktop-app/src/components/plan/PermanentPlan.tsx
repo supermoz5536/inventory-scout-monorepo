@@ -4,28 +4,37 @@ import CreateAccountForm from "../account/CreateAccountForm";
 import { useSelector } from "react-redux";
 import { handleCheckoutSessionAndRedirect } from "../../service/stripe";
 
-const SubscriptionPlan = () => {
+export const PermanentPlan = () => {
   const user = useSelector((state: RootState) => state.user.value);
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
   }, [user]);
 
-  const [isSelectedPlan, setIsSelectedPlan] = useState<string>("s");
+  const [isSelectedPlan, setIsSelectedPlan] = useState<string>("p");
   const [isOpenCreateAccountFormDialog, setIsOpenCreateAccountFormDialog] =
     useState<boolean>(false);
 
   const handleClickButton = async () => {
+    // ログインしてる場合（ = アカウント作成済みなので）
+    // => チェックアウトプロセス
     if (userRef.current.isAuthed === true) {
-      // ログインしてる場合（ = アカウント作成済みなので）
-      // => チェックアウトプロセス
+      // // 月額プランの場合は先に解約処理のハンドリング
+      // if (userRef.current.plan === "s") {
+      //   const result = await callCancelSubscriptionImmediately(
+      //     userRef.current.uid,
+      //   );
+      //   console.log("result", result);
+      // }
+
       await handleCheckoutSessionAndRedirect(
         userRef.current.uid,
-        isSelectedPlan
+        isSelectedPlan,
       );
-    } else if (userRef.current.isAuthed === false) {
+
       // ログインしてない場合（ = アカウント未作成なので）
       // => アカウント作成フォーム
+    } else if (userRef.current.isAuthed === false) {
       setIsOpenCreateAccountFormDialog(true);
     }
   };
@@ -52,7 +61,7 @@ const SubscriptionPlan = () => {
             justifyContent: "center",
           }}
         >
-          月額プラン
+          買い切りプラン
         </Typography>
         <Typography
           sx={{
@@ -64,7 +73,7 @@ const SubscriptionPlan = () => {
             justifyContent: "center",
           }}
         >
-          （2490円 / 月）
+          （49800円 / 一括）
         </Typography>
         <Divider
           variant="middle"
@@ -88,7 +97,7 @@ const SubscriptionPlan = () => {
               backgroundColor: "grey",
             }}
           >
-            <p>無料で利用することができますが、いくつかの制限がつきます 。</p>
+            <p>全ての機能を無制限に利用することができます。</p>
             <br />
             <p>データ取得機能が使えます。</p>
           </Box>
@@ -118,8 +127,8 @@ const SubscriptionPlan = () => {
           <Button
             variant="contained"
             disabled={
-              // 「いずれかの条件を満たさない場合」はボタンを無効化
-              !(userRef.current.plan === "" || userRef.current.plan === "f")
+              // 既に一括プランを購入済みの場合はボタンを無効化
+              userRef.current.plan === "p"
             }
             onClick={() => {
               handleClickButton();
@@ -143,5 +152,3 @@ const SubscriptionPlan = () => {
     </>
   );
 };
-
-export default SubscriptionPlan;

@@ -12,8 +12,8 @@ declare global {
         callback: (
           event: Electron.IpcRendererEvent,
           data: AsinData,
-          isEnd: boolean
-        ) => void
+          isEnd: boolean,
+        ) => void,
       ) => void;
       saveData: (asinDataList: AsinData[]) => Promise<void>;
       loadData: () => Promise<AsinData[]>;
@@ -21,7 +21,7 @@ declare global {
       openLoginPrompt: () => void;
       openStockDetail: (asinDataList: AsinData) => void;
       receiveAsinData: (
-        callback: (event: any, asinData: AsinData) => void
+        callback: (event: any, asinData: AsinData) => void,
       ) => void;
       initSystemStatus: (callback: () => void) => void;
       initLogout: (callback: () => void) => Promise<void>;
@@ -29,21 +29,21 @@ declare global {
         callback: (
           event: any,
           savedEmail: string,
-          savedPassword: string
-        ) => Promise<void>
+          savedPassword: string,
+        ) => Promise<void>,
       ) => Promise<void>;
       initScraping: (callback: () => void) => Promise<void>;
       initScheduledTime: (callback: () => void) => Promise<void>;
       startScheduledScraping: (callback: () => void) => void;
       scheduledScraping: (time: string) => void;
       loadTransferData: (
-        callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void
+        callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void,
       ) => void;
       disposeAllListeners: () => void;
       getAppURL: () => Promise<string>;
       disposeListener: (
         channel: string,
-        callback: (event: any, asinData: AsinData) => void
+        callback: (event: any, asinData: AsinData) => void,
       ) => void;
     };
   }
@@ -98,6 +98,7 @@ declare global {
     password: string;
     isAuthed: boolean;
     isAutoLogIn: boolean;
+    is_cancel_progress: boolean;
     plan: string;
     createdAt: string;
   }

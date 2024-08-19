@@ -13,6 +13,7 @@ module.exports = {
     "object-curly-spacing": "off", // オブジェクトの中括弧内のスペースチェックを無効にする
     "quotes": ["error", "double", { allowTemplateLiterals: true }],
     "indent": "off", // インデントに関するチェックを無効にする
+    "operator-linebreak": "off", // 演算子の改行位置のチェックを無効にする
   },
   overrides: [
     {

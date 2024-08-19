@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, Divider, Button, IconButton } from "@mui/material";
 import CreateAccountForm from "../account/CreateAccountForm";
 import { useSelector } from "react-redux";
-import { handleCreateCheckoutSessionAndRedirect } from "../../service/stripe";
+import { handleCheckoutSessionAndRedirect } from "../../service/stripe";
 import { callUpdateCancelAtPeriodEnd } from "../../firebase/cloudFunctions";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";

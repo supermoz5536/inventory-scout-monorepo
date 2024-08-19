@@ -18,9 +18,10 @@ export const createAccount = async (email: string, password: string) => {
         password: password,
         isAuthed: true,
         isAutoLogIn: false,
+        is_cancel_progress: false,
         plan: "f",
         createdAt: "",
-      })
+      }),
     );
   } else {
     console.log("createAuthAccount関数で返り値のuidを取得できませんでした");

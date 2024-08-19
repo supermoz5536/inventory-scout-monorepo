@@ -7,6 +7,7 @@ const initialState: { value: User } = {
     password: "",
     isAuthed: false,
     isAutoLogIn: false,
+    is_cancel_progress: false,
     plan: "",
     createdAt: "",
   },
