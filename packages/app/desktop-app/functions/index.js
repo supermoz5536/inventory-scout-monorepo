@@ -13,6 +13,79 @@ initializeApp(); //
 // Firestoreのインスタンスが作成され
 // メモリにロード（格納）される
 
+exports.fetchPeriodEndDate = functions
+  .runWith({
+    memory: "512MB", // メモリの割り当てを増やす
+  })
+  .https.onCall(async (data, context) => {
+    try {
+      const stripe = new Stripe(process.env.STRIPE_API_KEY, {
+        apiVersion: "2023-10-16",
+      });
+      let activeSubscription = null;
+      const firebaseUid = data.uid;
+
+      // Firebase UIDを使用して顧客を検索
+      // (customerIdだと、セッション間で紐付けできない)
+      const customers = await stripe.customers.search({
+        query: `metadata['firebaseUid']:'${firebaseUid}'`,
+        limit: 100, // 1回のリクエストで最大100件まで取得
+      });
+
+      if (customers.data.length === 0) {
+        throw new functions.https.HttpsError("not-found", "No customer found");
+      }
+
+      // avtiveなサブスクリプションプランを保持してる顧客を探す
+      // (一人が複数のcustomerIdを生成している場合があるので、
+      // 共通のFiresbaseUidでフィルタして抽出したIdで振るいにかけている)
+      for (const customer of customers.data) {
+        // 任意の顧客のサブスクリプションプランのリストを取得
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: "active",
+        });
+
+        // リストの中身がある顧客を見つけたら
+        // その中身のactiveなプランに更新してbreak
+        if (subscriptions.data.length > 0) {
+          activeSubscription = subscriptions.data[0];
+          break;
+        }
+      }
+
+      // リストの中身がある顧客を見つけられなかった場合のハンドリング
+      if (activeSubscription === null) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "No activeSubscription found",
+        );
+      }
+
+      // サブスクリプションの現在の期間の終了日を取得
+      const periodEnd = activeSubscription.current_period_end;
+
+      // UNIXタイムスタンプを人間が読みやすい形式に変換
+      const periodEndDate = new Date(periodEnd * 1000).toLocaleString("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      console.log("■■■■■ periodEndDate", periodEndDate);
+
+      // 成功した場合のレスポンス
+      return {
+        success: true,
+        periodEndDate: periodEndDate,
+      };
+    } catch (error) {
+      throw new functions.https.HttpsError("internal", error.message);
+    }
+  });
+
 // StripeからのWebhookリクエストを受け取る関数です
 exports.stripeWebhook = functions
   .runWith({
@@ -52,11 +125,8 @@ exports.stripeWebhook = functions
             const customers = await stripe.customers.search({
               query: `metadata['firebaseUid']:'${firebaseUid}'`,
               limit: 100, // 1回のリクエストで最大100件まで取得
-              // page: nextPage, // 次のページを取得するためのカーソル
             });
 
-            console.log("■■■ firebaseUid", firebaseUid);
-            console.log("■■■ customers.length =", customers.data.length);
             if (customers.data.length === 0) {
               throw new functions.https.HttpsError(
                 "not-found",
@@ -152,56 +222,6 @@ exports.stripeWebhook = functions
       // StripeのWebhookを送信してきたシステムや、
       // APIを叩いている他のクライアント
       response.status(500).send("Internal Server Error");
-    }
-  });
-
-exports.cancelSubscriptionImmediately = functions
-  .runWith({
-    memory: "512MB", // メモリの割り当てを増やす
-  })
-  .https.onCall(async (data, context) => {
-    try {
-      const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: "2023-10-16",
-      });
-
-      const firebaseUid = data.uid;
-      // StripeのCustomerをメタデータのFirebase UIDで検索
-      const customers = await stripe.customers.search({
-        query: `metadata['firebaseUid']:'${firebaseUid}'`,
-      });
-
-      if (customers.data.length === 0) {
-        throw new functions.https.HttpsError("not-found", "not found");
-      }
-
-      const customerId = customers.data[0].id;
-
-      // 顧客に紐づくアクティブなサブスクリプションリストを取得する
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "active",
-      });
-
-      // 購入プランデータ取得時のエラーハンドリング
-      if (subscriptions.data.length === 0) {
-        throw new functions.https.HttpsError(
-          "not-found",
-          "Active subscription not found",
-        );
-      }
-
-      // サブスクリプションを即時にキャンセルする
-      // 残りの未使用の期間分の返金はされない。
-      const subscription = subscriptions.data[0];
-      await stripe.subscriptions.cancel(subscription.id, {
-        invoice_now: true, // 未請求の使用量や新規/保留中の割合請求アイテムを請求する最終請求書を生成します
-        prorate: true, // サブスクリプション期間終了までの残りの未使用時間をクレジットする比例請求アイテムを生成します
-      });
-
-      return { success: true, message: "Subscription canceled successfully" };
-    } catch (error) {
-      throw new functions.https.HttpsError("internal", error.message);
     }
   });
 

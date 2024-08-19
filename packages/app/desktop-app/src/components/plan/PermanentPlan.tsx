@@ -3,7 +3,6 @@ import { Box, Typography, Divider, Button } from "@mui/material";
 import CreateAccountForm from "../account/CreateAccountForm";
 import { useSelector } from "react-redux";
 import { handleCheckoutSessionAndRedirect } from "../../service/stripe";
-import { callCancelSubscriptionImmediately } from "../../firebase/cloudFunctions";
 
 export const PermanentPlan = () => {
   const user = useSelector((state: RootState) => state.user.value);

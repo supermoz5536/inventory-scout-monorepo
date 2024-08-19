@@ -57,26 +57,24 @@ export const callUpdateCancelAtPeriodEnd = async (uid: string) => {
   }
 };
 
-// 月額プランの自動解約処理の予約を行う関数
-// 処理した月の月末に自動で解約される
-export const callCancelSubscriptionImmediately = async (uid: string) => {
+// 月額プランの当月分の期末日を取得する関数
+export const callFetchPeriodEndDate = async (uid: string) => {
   try {
-    const cancelSubscriptionImmediately = httpsCallable(
-      functions,
-      "cancelSubscriptionImmediately",
-    );
-    const result: any = await cancelSubscriptionImmediately({
+    const fetchPeriodEndDate = httpsCallable(functions, "fetchPeriodEndDate");
+    const result: any = await fetchPeriodEndDate({
       uid: uid,
     });
     // レスポンスデータから'message'キーに対応する値を取得
-    const message = result.data["message"];
-    return message;
+    // 以下のいずれかのメッセージ
+    // "canceled" : キャンセル処理が成功
+    // "already_canceled" : 既にキャンセル済み
+    const periodEndDate = result.data["periodEndDate"];
+
+    return periodEndDate;
   } catch (e: any) {
     // Firebase Functions からのエラーをキャッチ
-    console.log(`callCancelSubscriptionImmediately エラーコード: ${e.code}`);
-    console.log(
-      `callCancelSubscriptionImmediately エラーメッセージ: ${e.message}`,
-    );
-    console.log(`callCancelSubscriptionImmediately 詳細: ${e.details}`);
+    console.log(`callFetchPeriodEndDate エラーコード: ${e.code}`);
+    console.log(`callFetchPeriodEndDate エラーメッセージ: ${e.message}`);
+    console.log(`callFetchPeriodEndDate 詳細: ${e.details}`);
   }
 };
