@@ -31,7 +31,7 @@ export const getFirstUserEmail = async () => {
 };
 
 export const getUserDoc = async (
-  uid: string
+  uid: string,
 ): Promise<DocumentData | undefined> => {
   const docRef = doc(db, "users", uid);
 
@@ -54,6 +54,7 @@ export const createUserDoc = async (uid: string, email: string) => {
       email: email,
       plan: "f",
       is_authed: false,
+      is_cancel_progress: false,
       createdAt: new Date(),
     };
 
@@ -62,7 +63,7 @@ export const createUserDoc = async (uid: string, email: string) => {
   } catch (error) {
     console.error(
       "Firestoreへのユーザーデータドキュメントの作成時にエラーが発生:",
-      error
+      error,
     );
   }
 };

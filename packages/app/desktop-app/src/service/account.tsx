@@ -6,14 +6,15 @@ import { changeUidOnStore, updateUser } from "../slices/userSlice";
 
 export const createAccount = async (email: string, password: string) => {
   // Authenticationにアカウント作成
-  const uid: string | undefined = await createAuthAccount(email, password);
-  if (uid) {
+  const result = await createAuthAccount(email, password);
+  if (result.success) {
     // Firestoreにアカウント情報の管理ドキュメント作成
-    await createUserDoc(uid, email);
+    // .suucess === trueの場合は、.bodyにuidが格納されている
+    await createUserDoc(result.body, email);
     // 作成したuidにStoreを更新
     store.dispatch(
       updateUser({
-        uid: uid,
+        uid: result.body,
         email: email,
         password: password,
         isAuthed: true,
@@ -23,7 +24,9 @@ export const createAccount = async (email: string, password: string) => {
         createdAt: "",
       }),
     );
+    return true;
   } else {
-    console.log("createAuthAccount関数で返り値のuidを取得できませんでした");
+    // .suucess === falseの場合は、.bodyにエラーコードが格納されている
+    return result.body;
   }
 };

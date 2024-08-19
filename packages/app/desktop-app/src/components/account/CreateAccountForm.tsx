@@ -1,3 +1,4 @@
+import "./CreateAccountForm.css";
 import {
   Box,
   Button,
@@ -42,9 +43,8 @@ const CreateAccountForm = ({
     userRef.current = user;
   }, [user]);
 
-  const handleOpen = () => {
-    setIsOpenCreateAccountFormDialog(true);
-  };
+  const [errorFlag, setErrorFlag] = useState("");
+
   const handleClose = () => {
     setIsOpenCreateAccountFormDialog(false);
     reset({ email: "", password: "", confirmPassword: "" }); // フォームの入力値とエラーステートをリセット
@@ -53,14 +53,22 @@ const CreateAccountForm = ({
   // フォーム送信時の処理
   const onSubmit: SubmitHandler<CreateAccountFormInput> = async (data) => {
     // バリデーションチェックOK！なときに行う処理を追加
-    await createAccount(data.email, data.password);
-    if (isSelectedPlan === "s" || isSelectedPlan === "p") {
-      await handleCheckoutSessionAndRedirect(
-        userRef.current.uid,
-        isSelectedPlan
-      );
+    const result: string | true = await createAccount(
+      data.email,
+      data.password,
+    );
+    if (result === true) {
+      if (isSelectedPlan === "s" || isSelectedPlan === "p") {
+        await handleCheckoutSessionAndRedirect(
+          userRef.current.uid,
+          isSelectedPlan,
+        );
+      }
+      setIsOpenCreateAccountFormDialog(false);
+    } else {
+      // エラコードの部分をONにする
+      setErrorFlag(result);
     }
-    setIsOpenCreateAccountFormDialog(false);
   };
 
   // バリデーションルール
@@ -75,7 +83,7 @@ const CreateAccountForm = ({
       .min(6, "パスワードは６文字以上が必要です。")
       .matches(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&].*$/,
-        "パスワードは、英字、数字、および特殊文字をそれぞれ1文字以上含む必要があります。"
+        "パスワードは、英字、数字、および特殊文字をそれぞれ1文字以上含む必要があります。",
       ),
     confirmPassword: yup
       .string()
@@ -162,6 +170,23 @@ const CreateAccountForm = ({
             error={"confirmPassword" in errors}
             helperText={errors.confirmPassword?.message}
           />
+          <div className="create-accout-from-error-text">
+            {errorFlag === "" ? (
+              <p></p>
+            ) : errorFlag === "e0" ? (
+              <p>無効なメールアドレスです</p>
+            ) : errorFlag === "e1" ? (
+              <p>既に登録済みのメールアドレスです。</p>
+            ) : errorFlag === "e2" ? (
+              <p>このユーザーは無効化されています。</p>
+            ) : errorFlag === "e3" ? (
+              <p>ネットワークエラーが発生しました。</p>
+            ) : errorFlag === "e4" ? (
+              <p>不明のエラーです、運営者にお問い合わせください</p>
+            ) : (
+              ""
+            )}
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>キャンセル</Button>

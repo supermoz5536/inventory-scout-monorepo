@@ -23,7 +23,7 @@ import { setPlanFieldListener } from "./firestore";
 /// credentialオブジェクトを返します。
 export const logInWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
 ) => {
   try {
     // signInWithEmailAndPassword は
@@ -32,11 +32,11 @@ export const logInWithEmailAndPassword = async (
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     return userCredential;
   } catch (e: any) {
-    console.log("logInWithEmailAndPassword( ): e.message", e.code.message);
+    console.log("logInWithEmailAndPassword( ): e.message", e.message);
 
     if (e.code == "auth/invalid-email") {
       console.log("logInWithEmailAndPassword( ): failed e0", e.code);
@@ -113,7 +113,7 @@ export const initLogoutCallBack = async () => {
 // メールアドレスを更新する関数
 export const changeEmailAdress = async (
   newEmail: string,
-  currentPassword: string
+  currentPassword: string,
 ) => {
   try {
     const user = auth.currentUser;
@@ -121,7 +121,7 @@ export const changeEmailAdress = async (
       // ユーザーを再認証する
       const credential = EmailAuthProvider.credential(
         user.email as string,
-        currentPassword
+        currentPassword,
       );
       await reauthenticateWithCredential(user, credential);
 
@@ -161,7 +161,7 @@ export const changeEmailAdress = async (
 // パスワードを更新する関数
 export const changePassword = async (
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ) => {
   try {
     const user = auth.currentUser;
@@ -169,7 +169,7 @@ export const changePassword = async (
       // ユーザーを再認証する
       const credential = EmailAuthProvider.credential(
         user.email as string,
-        currentPassword
+        currentPassword,
       );
       await reauthenticateWithCredential(user, credential);
 
@@ -192,14 +192,32 @@ export const createAuthAccount = async (email: string, password: string) => {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
-    if (userCredential) {
-      // Signed in
-      return userCredential.user.uid;
+
+    return { success: true, body: userCredential.user.uid };
+  } catch (e: any) {
+    console.log("createAuthAccount( ): e.message", e.message);
+
+    if (e.code == "auth/invalid-email") {
+      console.log("createAuthAccount( ): failed e0", e.code);
+      // 無効なメールアドレスです
+      return { success: false, body: "e0" };
+    } else if (e.code == "auth/email-already-in-use") {
+      console.log("createAuthAccount( ): failed e1", e.code);
+      // 既に登録済みのメールアドレスです。
+      return { success: false, body: "e1" };
+    } else if (e.code == "auth/user-disabled") {
+      console.log("createAuthAccount( ): failed e2", e.code);
+      // このユーザーは無効化されています。
+      return { success: false, body: "e2" };
+    } else if (e.code == "auth/network-request-failed") {
+      console.log("createAuthAccount( ): failed e3", e.code);
+      // ネットワークエラーが発生しました。
+      return { success: false, body: "e3" };
     }
-  } catch (error: any) {
-    console.log("errorCode", error.code);
-    console.log("errorMessage", error.message);
+    // 原因不明のエラーが発生しました。
+    console.log("createAuthAccount( ): failed e4", e.code);
+    return { success: false, body: "e4" };
   }
 };
