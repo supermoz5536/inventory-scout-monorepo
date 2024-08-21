@@ -10,6 +10,7 @@ import { convertTimeStampFromUnixToStandard } from "../../util/dateFormatter";
 import ConfirmChangeToFreePlanDialog from "./ConfirmChangeToFreePlanDialog";
 import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import DoneIcon from "@mui/icons-material/Done";
+import { CheckCircle } from "@mui/icons-material";
 
 const FreePlan = () => {
   const user = useSelector((state: RootState) => state.user.value);
@@ -78,13 +79,23 @@ const FreePlan = () => {
           height: "600px",
           width: "400px",
           backgroundColor: "white",
-          // backgroundColor: "#819BFA",
           marginX: "20px",
           marginTop: "60px",
           marginBottom: "40px",
           boxShadow: 4,
+          position: "relative",
         }}
       >
+        {userRef.current.plan === "f" ? (
+          <CheckCircle
+            sx={{
+              color: "#69d16e",
+              position: "absolute",
+              top: "1%",
+              right: "2%",
+            }}
+          />
+        ) : null}
         <Typography
           sx={{
             marginTop: "15px",
@@ -126,9 +137,6 @@ const FreePlan = () => {
               height: "157.5px",
               width: "350px",
               marginY: "20px",
-              // backgroundColor: "#819bfa",
-              // backgroundColor: "#7a6dff",
-              // backgroundColor: "#f47c71",
               backgroundColor: "#69d16e",
             }}
           >
@@ -328,10 +336,6 @@ const FreePlan = () => {
             }}
             sx={{
               marginTop: "30px",
-              // backgroundColor: "#819bfa",
-              // backgroundColor: "#7a6dff",
-              // backgroundColor: "#f47c71",
-              // backgroundColor: "#06da76",
               backgroundColor: "#5ac95f",
               fontWeight: "bold",
               "&:hover": {

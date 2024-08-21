@@ -43,9 +43,20 @@ const SubscriptionPlan = () => {
           marginX: "20px",
           marginTop: "60px",
           marginBottom: "40px",
-          boxShadow: 3,
+          boxShadow: 4,
+          position: "relative",
         }}
       >
+        {userRef.current.plan === "s" ? (
+          <CheckCircle
+            sx={{
+              color: "#8da4f9",
+              position: "absolute",
+              top: "1%",
+              right: "2%",
+            }}
+          />
+        ) : null}
         <Typography
           sx={{
             marginTop: "15px",
@@ -87,9 +98,6 @@ const SubscriptionPlan = () => {
               height: "157.5px",
               width: "350px",
               marginY: "20px",
-              // backgroundColor: "#819bfa",
-              // backgroundColor: "#7a6dff",
-              // backgroundColor: "#2cc839",
               backgroundColor: "#8da4f9",
             }}
           >
@@ -287,7 +295,6 @@ const SubscriptionPlan = () => {
             }}
             sx={{
               marginTop: "30px",
-              // backgroundColor: "#7a6dff",
               backgroundColor: "#819bfa",
               fontWeight: "bold",
               "&:hover": {

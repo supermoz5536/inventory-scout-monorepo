@@ -52,9 +52,20 @@ export const PermanentPlan = () => {
           marginX: "20px",
           marginTop: "60px",
           marginBottom: "40px",
-          boxShadow: 3,
+          boxShadow: 4,
+          position: "relative",
         }}
       >
+        {userRef.current.plan === "p" ? (
+          <CheckCircle
+            sx={{
+              color: "#f58c83",
+              position: "absolute",
+              top: "1%",
+              right: "2%",
+            }}
+          />
+        ) : null}
         <Typography
           sx={{
             marginTop: "15px",
@@ -96,11 +107,7 @@ export const PermanentPlan = () => {
               height: "157.5px",
               width: "350px",
               marginY: "20px",
-              // backgroundColor: "#819bfa",
-              // backgroundColor: "#7a6dff",
-              // backgroundColor: "#4c8aea",
               backgroundColor: "#f58c83",
-              // backgroundColor: "#7a6dff",
             }}
           >
             <Box
@@ -299,7 +306,6 @@ export const PermanentPlan = () => {
             sx={{
               marginTop: "30px",
               backgroundColor: "#f47c71",
-              // backgroundColor: "#7a6dff",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
