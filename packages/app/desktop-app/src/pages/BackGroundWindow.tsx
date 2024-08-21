@@ -42,7 +42,6 @@ const BackGroundWindow = () => {
   const systemStatus: any = useSelector(
     (state: RootState) => state.systemStatus.value,
   );
-
   const systemStatusRef = useRef(systemStatus);
   useEffect(() => {
     systemStatusRef.current = systemStatus;

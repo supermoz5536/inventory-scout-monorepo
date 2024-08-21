@@ -106,7 +106,7 @@ export const PermanentPlan = () => {
               marginTop: "30px",
               height: "100px",
               width: "300px",
-              backgroundColor: "red",
+              backgroundColor: "grey",
             }}
           ></Box>
           <Divider
@@ -135,10 +135,14 @@ export const PermanentPlan = () => {
             }}
             sx={{
               marginTop: "10px",
-              width: "50px",
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
             }}
           >
-            aa
+            プランを選択
           </Button>
         </Box>
       </Box>

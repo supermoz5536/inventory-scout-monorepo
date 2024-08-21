@@ -21,7 +21,7 @@ const SubscriptionPlan = () => {
       // => チェックアウトプロセス
       await handleCheckoutSessionAndRedirect(
         userRef.current.uid,
-        isSelectedPlan
+        isSelectedPlan,
       );
     } else if (userRef.current.isAuthed === false) {
       // ログインしてない場合（ = アカウント未作成なので）
@@ -97,7 +97,7 @@ const SubscriptionPlan = () => {
               marginTop: "30px",
               height: "100px",
               width: "300px",
-              backgroundColor: "red",
+              backgroundColor: "grey",
             }}
           ></Box>
           <Divider
@@ -126,10 +126,14 @@ const SubscriptionPlan = () => {
             }}
             sx={{
               marginTop: "10px",
-              width: "50px",
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
             }}
           >
-            aa
+            プランを選択
           </Button>
         </Box>
       </Box>

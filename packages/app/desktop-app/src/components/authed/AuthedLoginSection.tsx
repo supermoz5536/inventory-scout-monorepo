@@ -23,8 +23,6 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
       const result = await callFetchPeriodEndDate(userRef.current.uid);
       setPeriodEndDate(result);
     })();
-
-    callFetchPeriodEndDate(userRef.current.uid);
   }, []);
 
   const handleLogout = async () => {

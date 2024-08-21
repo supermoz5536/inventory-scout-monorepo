@@ -7,6 +7,7 @@ import { callUpdateCancelAtPeriodEnd } from "../../firebase/cloudFunctions";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import { convertTimeStampFromUnixToStandard } from "../../util/dateFormatter";
+import ConfirmChangeToFreePlanDialog from "./ConfirmChangeToFreePlanDialog";
 
 const FreePlan = () => {
   const user = useSelector((state: RootState) => state.user.value);
@@ -20,24 +21,16 @@ const FreePlan = () => {
   const [isSelectedPlan, setIsSelectedPlan] = useState<string>("f");
   const [isOpenCreateAccountFormDialog, setIsOpenCreateAccountFormDialog] =
     useState<boolean>(false);
+  const [
+    isOpenConfirmChangeToFreePlanDialog,
+    setIsOpenConfirmChangeToFreePlanDialog,
+  ] = useState<boolean>(false);
 
   const handleClickButton = async () => {
     if (userRef.current.isAuthed === true) {
       // ログインしてる場合（ = アカウント作成済みなので）
-      // => 月額プランのキャンセル処理
-      const result = await callUpdateCancelAtPeriodEnd(userRef.current.uid);
-
-      if (result) {
-        const { message, cancelAt } = result;
-        setMessage(message);
-        setCancelAt(convertTimeStampFromUnixToStandard(cancelAt));
-
-        if (message === "canceled" || message === "already_canceled") {
-          // 月額プラン => フリープランへの変更処理が
-          // 成功したのでスナックバーで通知
-          setIsOpenSnackBar(true);
-        }
-      }
+      // => フリープラン変更の確認のダイアログ
+      setIsOpenConfirmChangeToFreePlanDialog(true);
     } else if (userRef.current.isAuthed === false) {
       // ログインしてない場合（ = アカウント未作成なので）
       // => アカウント作成フォーム
@@ -49,7 +42,7 @@ const FreePlan = () => {
 
   const handleClose = async (
     event: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason
+    reason?: SnackbarCloseReason,
   ) => {
     setIsOpenSnackBar(false);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -143,7 +136,7 @@ const FreePlan = () => {
               marginTop: "30px",
               height: "100px",
               width: "300px",
-              backgroundColor: "red",
+              backgroundColor: "grey",
             }}
           ></Box>
           <Divider
@@ -172,10 +165,14 @@ const FreePlan = () => {
             }}
             sx={{
               marginTop: "10px",
-              width: "50px",
+              backgroundColor: "#287fd5",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "#CB0000", // ホバー時の背景色
+              },
             }}
           >
-            aa
+            プランを選択
           </Button>
         </Box>
       </Box>
@@ -208,6 +205,16 @@ const FreePlan = () => {
               : "プランの変更手続きの途中でシステムエラー(error:0001)が発生しました、管理者にお問い合わせください。"
           }
           action={action}
+        />
+      </div>
+      <div>
+        <ConfirmChangeToFreePlanDialog
+          isOpenConfirmChangeToFreePlanDialog={
+            isOpenConfirmChangeToFreePlanDialog
+          }
+          setIsOpenConfirmChangeToFreePlanDialog={
+            setIsOpenConfirmChangeToFreePlanDialog
+          }
         />
       </div>
     </>
