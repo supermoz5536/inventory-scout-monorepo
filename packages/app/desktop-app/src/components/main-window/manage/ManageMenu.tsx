@@ -23,7 +23,7 @@ export const ManageMenu = ({
   setInputAsin: any;
 }) => {
   const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
+    (state: RootState) => state.asinDataList.value,
   );
   const asinDataListRef = useRef(asinDataList);
 
@@ -112,8 +112,8 @@ export const ManageMenu = ({
       const inputAsinDatasFilterd: AsinData[] = inputAsinDatas.filter(
         (inputAsinData: AsinData) =>
           !asinDataList.some(
-            (asinData: AsinData) => asinData.asin === inputAsinData.asin
-          )
+            (asinData: AsinData) => asinData.asin === inputAsinData.asin,
+          ),
       );
 
       // dispatch関数を使って、
@@ -138,7 +138,7 @@ export const ManageMenu = ({
       component={"div"}
       sx={{
         width: "100%",
-        height: "50px",
+        height: "65px",
         marginTop: "0px",
         marginBottom: "17.5px",
         boxShadow: "2",
@@ -166,8 +166,9 @@ export const ManageMenu = ({
             height: "30px",
             width: "100px",
             fontWeight: "bold",
+            backgroundColor: "#7a6dff",
             position: "absolute",
-            top: "19%",
+            top: "28%",
             left: "7.5%",
             "&:hover": {
               backgroundColor: "#CB0000", // ホバー時の背景色
@@ -179,7 +180,7 @@ export const ManageMenu = ({
         <Box
           sx={{
             position: "absolute",
-            top: "29%",
+            top: "37%",
             left: "75%",
             fontSize: "16px",
           }}
@@ -206,8 +207,9 @@ export const ManageMenu = ({
             height: "30px",
             width: "170px",
             fontWeight: "bold",
+            backgroundColor: "#7a6dff",
             position: "absolute",
-            top: "21%",
+            top: "28%",
             left: "2.3%",
             fontSize: "14px",
             "&:hover": {
@@ -226,8 +228,9 @@ export const ManageMenu = ({
             height: "30px",
             width: "320px",
             fontWeight: "bold",
+            backgroundColor: "#7a6dff",
             position: "absolute",
-            top: "21%",
+            top: "28%",
             left: "17%",
             fontSize: "14px",
             "&:hover": {
@@ -246,8 +249,9 @@ export const ManageMenu = ({
             height: "30px",
             width: "280px",
             fontWeight: "bold",
+            backgroundColor: "#7a6dff",
             position: "absolute",
-            top: "21%",
+            top: "28%",
             left: "42.5%",
             fontSize: "14px",
             "&:hover": {
@@ -267,8 +271,9 @@ export const ManageMenu = ({
             height: "30px",
             width: "250px",
             fontWeight: "bold",
+            backgroundColor: "#7a6dff",
             position: "absolute",
-            top: "21%",
+            top: "28%",
             left: "79.5%",
             fontSize: "14px",
             "&:hover": {

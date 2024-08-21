@@ -32,7 +32,7 @@ import { getPrevScrapingDate } from "../../../util/asinDataUtil";
 
 export const AsinDataTableManage = () => {
   const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
+    (state: RootState) => state.asinDataList.value,
   );
 
   const dispatch = useDispatch<AppDispatch>();
@@ -429,7 +429,7 @@ export const AsinDataTableManage = () => {
   };
 
   return (
-    <Box sx={{ height: 792.5, width: 1350, backgroundColor: "white" }}>
+    <Box sx={{ height: 777.5, width: 1350, backgroundColor: "white" }}>
       <DataGrid
         rows={asinDataList}
         columns={columns}

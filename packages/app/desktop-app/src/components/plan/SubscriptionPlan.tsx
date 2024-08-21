@@ -3,6 +3,9 @@ import { Box, Typography, Divider, Button } from "@mui/material";
 import CreateAccountForm from "../account/CreateAccountForm";
 import { useSelector } from "react-redux";
 import { handleCheckoutSessionAndRedirect } from "../../service/stripe";
+import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
+import DoneIcon from "@mui/icons-material/Done";
+import { CheckCircle } from "@mui/icons-material";
 
 const SubscriptionPlan = () => {
   const user = useSelector((state: RootState) => state.user.value);
@@ -56,8 +59,7 @@ const SubscriptionPlan = () => {
         </Typography>
         <Typography
           sx={{
-            marginTop: "0px",
-            marginBottom: "5px",
+            marginBottom: "20px",
             fontSize: "20px",
             fontWeight: "bold",
             display: "flex",
@@ -82,37 +84,196 @@ const SubscriptionPlan = () => {
         >
           <Box
             sx={{
-              marginTop: "10px",
-              height: "100px",
-              width: "300px",
-              backgroundColor: "grey",
+              height: "157.5px",
+              width: "350px",
+              marginY: "20px",
+              // backgroundColor: "#819bfa",
+              // backgroundColor: "#7a6dff",
+              // backgroundColor: "#2cc839",
+              backgroundColor: "#8da4f9",
             }}
           >
-            <p>無料で利用することができますが、いくつかの制限がつきます 。</p>
-            <br />
-            <p>データ取得機能が使えます。</p>
+            <Box
+              sx={{
+                marginTop: "20px",
+                marginLeft: "13px",
+                height: "50px",
+                width: "350px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "start",
+              }}
+            >
+              <TipsAndUpdatesIcon
+                sx={{
+                  marginTop: "2px",
+                  color: "white",
+                  fontSize: "21px",
+                  marginRight: "10px",
+                }}
+              />
+              <p
+                style={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                全ての機能が制限なく利用できます。
+                <br />
+                スポット利用の人におすすのプラン。
+              </p>
+            </Box>
+            <Box
+              sx={{
+                marginTop: "20px",
+                marginLeft: "12.5px",
+                height: "50px",
+                width: "350px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "start",
+              }}
+            >
+              <CheckCircle
+                sx={{
+                  marginTop: "1px",
+                  color: "white",
+                  fontSize: "22px",
+                  marginRight: "10px",
+                }}
+              />
+              <p
+                style={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                在庫データ取得 & 指定時刻での予約機能
+                <br />
+                を利用できます。
+              </p>
+            </Box>
+          </Box>
+          <Divider
+            variant="middle"
+            sx={{
+              borderWidth: "1px",
+              color: "black",
+              width: "363px",
+            }}
+          />
+          <Box
+            sx={{
+              marginTop: "20px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>在庫データの閲覧</p>
           </Box>
           <Box
             sx={{
-              marginTop: "30px",
-              height: "100px",
-              width: "300px",
-              backgroundColor: "grey",
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
             }}
-          ></Box>
-          <Divider
-            variant="middle"
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>在庫データのCSV形式出力</p>
+          </Box>
+          <Box
             sx={{
               marginTop: "10px",
-              borderWidth: "2px",
-              color: "black",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
             }}
-          />
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ASINリストの追加、削除、編集機能</p>
+          </Box>
+          <Box
+            sx={{
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ASINリストのファイル書き出し、読み込み</p>
+          </Box>
+          <Box
+            sx={{
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ユーザー設定画面へのアクセス</p>
+          </Box>
           <Divider
             variant="middle"
             sx={{
-              width: "363px",
+              marginTop: "20px",
               borderWidth: "1px",
+              color: "black",
+              width: "363px",
             }}
           />
           <Button
@@ -125,8 +286,9 @@ const SubscriptionPlan = () => {
               handleClickButton();
             }}
             sx={{
-              marginTop: "10px",
-              backgroundColor: "#287fd5",
+              marginTop: "30px",
+              // backgroundColor: "#7a6dff",
+              backgroundColor: "#819bfa",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色

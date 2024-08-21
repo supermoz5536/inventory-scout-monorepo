@@ -40,7 +40,7 @@ import PlanList from "../components/plan/PlanList";
 
 function Top() {
   const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
+    (state: RootState) => state.asinDataList.value,
   );
   const asinDataListRef = useRef(asinDataList);
   useEffect(() => {
@@ -49,10 +49,10 @@ function Top() {
 
   // システム関係の状態変数の取得
   const systemStatus: number = useSelector(
-    (state: RootState) => state.systemStatus.value.systemStatus
+    (state: RootState) => state.systemStatus.value.systemStatus,
   );
   const showButtonStatus = useSelector(
-    (state: RootState) => state.systemStatus.value.showButtonStatus
+    (state: RootState) => state.systemStatus.value.showButtonStatus,
   );
 
   // ユーザーの状態変数の取得
@@ -71,7 +71,7 @@ function Top() {
   const [parentQuery, setParentQuery] = useState("");
   const [searchType, setSearchType] = useState("asin");
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
-    asinDataListRef.current
+    asinDataListRef.current,
   );
   const [isOpenConfirmReExcuteDialog, setIsOpenConfirmReExcuteDialog] =
     useState<boolean>(false);
@@ -121,7 +121,7 @@ function Top() {
         // つまり、3つのクエリ全てに合致する要素のみtrueを返し
         // 新規配列に追加する
         return asinMatch && nameMatch && parentMatch;
-      }
+      },
     );
 
     setFilteredAsinDataList(newFilteredList);
@@ -185,7 +185,7 @@ function Top() {
   const handleRunScraping = async () => {
     const today = new Date();
     const todayFormatted = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     // 全てのasinDataが取得完了の状態
@@ -198,7 +198,7 @@ function Top() {
     const isScrapingFalseAll: boolean = asinDataListRef.current.every(
       (asinData: AsinData) => {
         return asinData.isScraping === false;
-      }
+      },
     );
 
     // データ取得日が当日の要素を保持してるasinDataが
@@ -207,10 +207,10 @@ function Top() {
       (asinData: AsinData) => {
         return asinData.fbaSellerDatas.some((fbaSellerData) =>
           fbaSellerData.stockCountDatas.some((stockCountData) =>
-            Object.keys(stockCountData).includes(todayFormatted)
-          )
+            Object.keys(stockCountData).includes(todayFormatted),
+          ),
         );
-      }
+      },
     );
 
     // fetchLatestDateが空文字のアイテムが少なくとも1つ存在するかを確認
@@ -341,7 +341,7 @@ function Top() {
             onClick={() => handleScrapingButton()}
             variant="contained"
             sx={{
-              backgroundColor: "#287fd5",
+              backgroundColor: "#7a6dff",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
@@ -362,7 +362,7 @@ function Top() {
             onClick={() => setIsOpenPlanListDialog(true)}
             variant="contained"
             sx={{
-              backgroundColor: "#287fd5",
+              backgroundColor: "#7a6dff",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
@@ -405,7 +405,7 @@ function Top() {
             }}
             variant="contained"
             sx={{
-              backgroundColor: "#287fd5",
+              backgroundColor: "#7a6dff",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色

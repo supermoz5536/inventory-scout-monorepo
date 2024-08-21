@@ -8,6 +8,8 @@ import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import { convertTimeStampFromUnixToStandard } from "../../util/dateFormatter";
 import ConfirmChangeToFreePlanDialog from "./ConfirmChangeToFreePlanDialog";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import DoneIcon from "@mui/icons-material/Done";
 
 const FreePlan = () => {
   const user = useSelector((state: RootState) => state.user.value);
@@ -76,10 +78,11 @@ const FreePlan = () => {
           height: "600px",
           width: "400px",
           backgroundColor: "white",
+          // backgroundColor: "#819BFA",
           marginX: "20px",
           marginTop: "60px",
           marginBottom: "40px",
-          boxShadow: 3,
+          boxShadow: 4,
         }}
       >
         <Typography
@@ -95,8 +98,7 @@ const FreePlan = () => {
         </Typography>
         <Typography
           sx={{
-            marginTop: "0px",
-            marginBottom: "5px",
+            marginBottom: "20px",
             fontSize: "20px",
             fontWeight: "bold",
             display: "flex",
@@ -121,37 +123,198 @@ const FreePlan = () => {
         >
           <Box
             sx={{
-              marginTop: "10px",
-              height: "100px",
-              width: "300px",
-              backgroundColor: "grey",
+              height: "157.5px",
+              width: "350px",
+              marginY: "20px",
+              // backgroundColor: "#819bfa",
+              // backgroundColor: "#7a6dff",
+              // backgroundColor: "#f47c71",
+              backgroundColor: "#69d16e",
             }}
           >
-            <p>無料で利用することができますが、いくつかの制限がつきます 。</p>
-            <br />
-            <p>データ取得機能が使えます。</p>
+            <Box
+              sx={{
+                marginTop: "20px",
+                marginLeft: "13px",
+                height: "50px",
+                width: "350px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "start",
+              }}
+            >
+              <EmojiObjectsIcon
+                sx={{
+                  marginTop: "2px",
+                  color: "white",
+                  fontSize: "21px",
+                  marginRight: "10px",
+                }}
+              />
+              <p
+                style={{
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                無料で利用することができますが
+                <br />
+                いくつかの機能が制限されます。
+              </p>
+            </Box>
+            <Box
+              sx={{
+                marginTop: "20px",
+                marginLeft: "13px",
+                height: "50px",
+                width: "350px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "start",
+              }}
+            >
+              <CloseIcon
+                sx={{
+                  marginTop: "1px",
+                  color: "white",
+                  opacity: 0.6,
+                  fontSize: "22px",
+                  marginRight: "10px",
+                }}
+              />
+              <p
+                style={{
+                  color: "white",
+                  opacity: 0.6,
+                  fontWeight: "bold",
+                }}
+              >
+                在庫データ取得 & 指定時刻での予約機能
+                <br />
+                を利用できます。
+              </p>
+            </Box>
+          </Box>
+          <Divider
+            variant="middle"
+            sx={{
+              borderWidth: "1px",
+              color: "black",
+              width: "363px",
+            }}
+          />
+          <Box
+            sx={{
+              marginTop: "20px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>在庫データの閲覧</p>
           </Box>
           <Box
             sx={{
-              marginTop: "30px",
-              height: "100px",
-              width: "300px",
-              backgroundColor: "grey",
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
             }}
-          ></Box>
-          <Divider
-            variant="middle"
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>在庫データのCSV形式出力</p>
+          </Box>
+          <Box
             sx={{
               marginTop: "10px",
-              borderWidth: "2px",
-              color: "black",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
             }}
-          />
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ASINリストの追加、削除、編集機能</p>
+          </Box>
+          <Box
+            sx={{
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ASINリストのファイル書き出し、読み込み</p>
+          </Box>
+          <Box
+            sx={{
+              marginTop: "10px",
+              marginLeft: "40px",
+              width: "350px",
+              fontSize: "14px",
+              backgroundColor: "white",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+            }}
+          >
+            <DoneIcon
+              sx={{
+                color: "#4caf50",
+                fontSize: "17.5px",
+                marginRight: "7.5px",
+              }}
+            />
+            <p>ユーザー設定画面へのアクセス</p>
+          </Box>
           <Divider
             variant="middle"
             sx={{
-              width: "363px",
+              marginTop: "20px",
               borderWidth: "1px",
+              color: "black",
+              width: "363px",
             }}
           />
           <Button
@@ -164,8 +327,12 @@ const FreePlan = () => {
               handleClickButton();
             }}
             sx={{
-              marginTop: "10px",
-              backgroundColor: "#287fd5",
+              marginTop: "30px",
+              // backgroundColor: "#819bfa",
+              // backgroundColor: "#7a6dff",
+              // backgroundColor: "#f47c71",
+              // backgroundColor: "#06da76",
+              backgroundColor: "#5ac95f",
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
