@@ -5,6 +5,7 @@ import {
   changeEmailAdress,
   changePassword,
 } from "../../firebase/authentication";
+import { updateEmailOnFirestore } from "../../firebase/firestore";
 
 const AuthedAccountSection = () => {
   const user: User = useSelector((state: RootState) => state.user.value);
@@ -24,6 +25,7 @@ const AuthedAccountSection = () => {
         if (result === "e0") {
           setIsEmailChanged(result);
           setInputEmail("");
+          updateEmailOnFirestore(user.uid, inputEmail);
         } else {
           setIsEmailChanged(result);
         }
@@ -48,7 +50,7 @@ const AuthedAccountSection = () => {
     } else {
       const result: boolean = await changePassword(
         inputCurrentPassword,
-        inputNewPassword
+        inputNewPassword,
       );
       if (result) {
         setIsPasswordChanged(5);

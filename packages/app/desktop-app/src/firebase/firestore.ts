@@ -13,10 +13,14 @@ import {
   where,
   onSnapshot,
   Unsubscribe,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { store } from "../redux/store";
-import { changePlanOnStore } from "../slices/userSlice";
+import {
+  changeIsLockedRunScraping,
+  changePlanOnStore,
+} from "../slices/userSlice";
 
 export const getFirstUserEmail = async () => {
   try {
@@ -55,6 +59,7 @@ export const createUserDoc = async (uid: string, email: string) => {
       plan: "f",
       is_authed: false,
       is_cancel_progress: false,
+      is_locked_run_scraping: true,
       createdAt: new Date(),
     };
 
@@ -69,21 +74,31 @@ export const createUserDoc = async (uid: string, email: string) => {
 };
 
 // usersコレクションのuidの一致するドキュメントの変更を取得するリスナーの設置関数
-export const setPlanFieldListener = (uid: string): any => {
-  console.log("setUsersDocListener 1");
+export const setUserDocListener = (uid: string): any => {
   const docRef = doc(db, "users", uid);
-  console.log("setUsersDocListener 2");
   const unsubscribe: Unsubscribe = onSnapshot(docRef, (querySnapshot) => {
-    console.log("setUsersDocListener 3");
     // ドキュメントが存在するか確認
     if (querySnapshot.exists()) {
-      console.log("setUsersDocListener 4");
       // Stripeのhookで変更されたfirestoreのplanフィールドの変更をリスン
       const latestPlan = querySnapshot.data().plan;
-      console.log("setUsersDocListener 5 latestPlan", latestPlan);
+      // フリープランの機能制限のハンドリング値の変更をリスン
+      const latestIsLockedRunScraping =
+        querySnapshot.data().is_locked_run_scraping;
       // リスンした最新のプラン名にstoreを更新
       store.dispatch(changePlanOnStore(latestPlan));
+      store.dispatch(changeIsLockedRunScraping(latestIsLockedRunScraping));
     }
     return unsubscribe;
   });
+};
+
+export const updateEmailOnFirestore = async (uid: string, email: string) => {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    await updateDoc(userDocRef, {
+      email: email,
+    });
+  } catch (e) {
+    console.log("updateEmailOnFirestore エラー：", e);
+  }
 };

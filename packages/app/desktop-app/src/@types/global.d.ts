@@ -98,7 +98,8 @@ declare global {
     password: string;
     isAuthed: boolean;
     isAutoLogIn: boolean;
-    is_cancel_progress: boolean;
+    isCancelProgress: boolean;
+    isLockedRunScraping: boolean;
     plan: string;
     createdAt: string;
   }

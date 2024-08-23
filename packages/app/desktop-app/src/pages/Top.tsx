@@ -85,13 +85,6 @@ function Top() {
   const [isOpenPlanListDialog, setIsOpenPlanListDialog] =
     useState<boolean>(false);
 
-  // const gotoPlanURL = () => {
-  //   const planURL = `https://www.google.co.jp/`;
-  //   window.myAPI.openExternal(planURL);
-  // };
-
-  /// 最後に入力のあった検索クエリ欄のタイプが設定され
-  /// それの値で現在ユーザーの利用してる検索モードを判別します。
   const handleAsinQuery = (inputData: string) => {
     setAsinQuery(inputData);
     setSearchType("asin");
@@ -140,17 +133,27 @@ function Top() {
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
-    } else if (user.isAuthed === true && user.plan === "f") {
+    } else if (
+      user.isAuthed === true &&
+      user.plan === "f" &&
+      user.isLockedRunScraping === true
+    ) {
       console.log("2 handleScrapingButton");
+
+      // プランリストのダイアログを表示
       setIsOpenPlanListDialog(true);
+
       // ■ 待機状態での「取得開始」のクリック
     } else if (
       user.isAuthed === true &&
-      (user.plan === "s" || user.plan === "p") &&
+      // (user.plan === "s" ||
+      //   user.plan === "p" ||
+      //   user.isLockedRunScraping === false) &&
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
       console.log("3 handleScrapingButton");
+
       // スクレイピングを開始
       dispatch(changeShowButtonStatus(1));
       handleRunScraping();
@@ -158,7 +161,9 @@ function Top() {
       // スクレイピング中の「取得停止」のクリック
     } else if (
       user.isAuthed === true &&
-      (user.plan === "s" || user.plan === "p") &&
+      // (user.plan === "s" ||
+      //   user.plan === "p" ||
+      //   user.isLockedRunScraping === false) &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
@@ -169,11 +174,14 @@ function Top() {
       // スクレイピング中の「本当に？」のクリック
     } else if (
       user.isAuthed === true &&
-      (user.plan === "s" || user.plan === "p") &&
+      // (user.plan === "s" ||
+      //   user.plan === "p" ||
+      //   user.isLockedRunScraping === false) &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {
       console.log("5 handleScrapingButton");
+
       // スクレイピングの終了処理を実行
       dispatch(changeShowButtonStatus(0));
       window.myAPI.stopScraping();

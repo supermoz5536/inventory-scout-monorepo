@@ -16,7 +16,7 @@ import {
   changeEmailOnStore,
   changePasswordOnStore,
 } from "../slices/userSlice";
-import { setPlanFieldListener } from "./firestore";
+import { setUserDocListener } from "./firestore";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -86,7 +86,7 @@ export const listenAuthState = async () => {
       // 既存のリスナー（planの変更取得）があれば解除
       if (unsubscribePlanFieldListener) unsubscribePlanFieldListener();
       // リスナーの設置
-      unsubscribePlanFieldListener = setPlanFieldListener(user.uid);
+      unsubscribePlanFieldListener = setUserDocListener(user.uid);
     } else {
       // ログアウト状態の場合
       console.log("listenAuthState ログアウトしました");
@@ -103,7 +103,6 @@ export const initLogoutCallBack = async () => {
   console.log("initLogoutCallBackがトリガーされました");
   try {
     await signOut(auth);
-    store.dispatch(changeIsAuthed(false));
     console.log("Logged out successfully");
   } catch (error) {
     console.error("Failed to log out:", error);

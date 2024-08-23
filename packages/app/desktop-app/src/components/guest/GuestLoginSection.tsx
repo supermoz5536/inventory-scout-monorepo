@@ -68,7 +68,8 @@ const GuestLoginSection = ({ handleCheckBoxChange }: IsAutoLoginProps) => {
           password: inputPassword,
           isAuthed: true,
           isAutoLogIn: userRef.current.isAutoLogIn,
-          is_cancel_progress: false,
+          isCancelProgress: false,
+          isLockedRunScraping: userDocData["is_locked_run_scraping"],
           plan: userDocData["plan"],
           createdAt: userDocData["created_at"],
         };

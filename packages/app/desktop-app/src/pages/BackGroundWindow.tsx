@@ -21,9 +21,13 @@ import {
   listenAuthState,
   initLogoutCallBack,
 } from "../firebase/authentication";
-import { updateUser } from "../slices/userSlice";
+import {
+  changeIsAuthed,
+  changePlanOnStore,
+  updateUser,
+} from "../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
-import { getUserDoc, setPlanFieldListener } from "../firebase/firestore";
+import { getUserDoc, setUserDocListener } from "../firebase/firestore";
 import MainWindow from "../pages/MainWindow";
 
 const BackGroundWindow = () => {
@@ -100,6 +104,8 @@ const BackGroundWindow = () => {
           // 関数自体を渡す必要があるため
           // ()なしで関数名のみ記述
           await window.myAPI.initLogout(initLogoutCallBack);
+          dispatch(changeIsAuthed(false));
+          dispatch(changePlanOnStore(""));
 
           // ⑥ ウインドウ生成時に毎回ログイン処理をしてしまってるので
           // isAutoLogInがtrueの場合のみログイン処理を実行
@@ -173,7 +179,6 @@ const BackGroundWindow = () => {
       userRef.current.email!,
       userRef.current.password!,
     );
-
     // オブジェクトが存在し
     // string型（エラーメッセージ）ではない場合は
     // 取得成功してる
@@ -184,7 +189,6 @@ const BackGroundWindow = () => {
       const userDocData: DocumentData | undefined = await getUserDoc(
         userCredential.user.uid,
       );
-
       if (userDocData) {
         // 最新のUserオブジェクトを生成
         const newUser: User = {
@@ -193,11 +197,11 @@ const BackGroundWindow = () => {
           password: userRef.current.password,
           isAuthed: true,
           isAutoLogIn: userRef.current.isAutoLogIn,
-          is_cancel_progress: false,
+          isCancelProgress: false,
+          isLockedRunScraping: userDocData["is_locked_run_scraping"],
           plan: userDocData["plan"] ?? "not found",
           createdAt: userDocData["created_at"] ?? "not found",
         };
-
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
       }

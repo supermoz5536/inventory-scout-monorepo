@@ -7,7 +7,8 @@ const initialState: { value: User } = {
     password: "",
     isAuthed: false,
     isAutoLogIn: false,
-    is_cancel_progress: false,
+    isCancelProgress: false,
+    isLockedRunScraping: true,
     plan: "",
     createdAt: "",
   },
@@ -40,6 +41,9 @@ export const userSlice = createSlice({
     changeIsAutoLogIn: (state, action: PayloadAction<boolean>) => {
       state.value.isAutoLogIn = action.payload;
     },
+    changeIsLockedRunScraping: (state, action: PayloadAction<boolean>) => {
+      state.value.isLockedRunScraping = action.payload;
+    },
     changePlanOnStore: (state, action: PayloadAction<string>) => {
       state.value.plan = action.payload;
     },
@@ -55,6 +59,7 @@ export const {
   changeUidOnStore,
   changeIsAuthed,
   changeIsAutoLogIn,
+  changeIsLockedRunScraping,
   changeEmailOnStore,
   changePasswordOnStore,
   changePlanOnStore,
