@@ -150,7 +150,7 @@ const CreateAccountForm = ({
             margin="dense"
             id="password"
             label="パスワード"
-            // type={isVisiblePassword ? "text" : "password"}
+            type="password"
             fullWidth
             variant="standard"
             {...register("password")}
@@ -163,7 +163,7 @@ const CreateAccountForm = ({
             margin="dense"
             id="confirmPassword"
             label="パスワードの確認"
-            // type={isVisiblePassword ? "text" : "password"}
+            type="password"
             fullWidth
             variant="standard"
             {...register("confirmPassword")}
