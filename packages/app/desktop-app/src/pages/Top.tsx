@@ -37,6 +37,8 @@ import { Footer } from "../components/main-window/Footer";
 import { AsinDataTable } from "../components/main-window/top/AsinDataTable";
 import LoginFormDialog from "../components/main-window/top/LoginFormDialog";
 import PlanList from "../components/plan/PlanList";
+import { fetchSessionIdOnFirestore } from "../firebase/firestore";
+import { logOut } from "../firebase/authentication";
 
 function Top() {
   const asinDataList = useSelector(
@@ -122,14 +124,25 @@ function Top() {
     // 最新のフィルター状態を反映する。
   }, [asinQuery, nameQuery, parentQuery, searchType, asinDataList]);
 
-  /// スクレイピングボタンを押した際の
-  /// 条件分岐を管理する関数
-  const handleScrapingButton = () => {
+  /// 「取得開始」ボタンのハンドリング関数
+  const handleScrapingButton = async () => {
+    // セッションIDの照合でアカウント認証をするために
+    // Firestore上の現在のセッションIDを事前に取得しておきます。
+    const sessionIdOnFiretore: string | undefined =
+      await fetchSessionIdOnFirestore(user.uid);
+
     // ■ ログインウインドウの表示
     if (user.isAuthed === false) {
       console.log("1 handleScrapingButton ");
       // window.myAPI.openLoginPrompt();
       setIsOpenLoginFormDialog(true);
+
+      // ■ 同一アカウントの複数ログインをセッションIDでチェック
+      // 一致しない場合 => ダイアログの表示 & ログアウト。
+    } else if (user.sessionId !== sessionIdOnFiretore) {
+      // ログアウト
+      await logOut();
+      // ダイアログの表示
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
@@ -146,9 +159,6 @@ function Top() {
       // ■ 待機状態での「取得開始」のクリック
     } else if (
       user.isAuthed === true &&
-      // (user.plan === "s" ||
-      //   user.plan === "p" ||
-      //   user.isLockedRunScraping === false) &&
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
@@ -161,9 +171,6 @@ function Top() {
       // スクレイピング中の「取得停止」のクリック
     } else if (
       user.isAuthed === true &&
-      // (user.plan === "s" ||
-      //   user.plan === "p" ||
-      //   user.isLockedRunScraping === false) &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
@@ -174,9 +181,6 @@ function Top() {
       // スクレイピング中の「本当に？」のクリック
     } else if (
       user.isAuthed === true &&
-      // (user.plan === "s" ||
-      //   user.plan === "p" ||
-      //   user.isLockedRunScraping === false) &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {

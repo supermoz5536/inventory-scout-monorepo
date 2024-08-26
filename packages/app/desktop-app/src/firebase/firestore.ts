@@ -121,3 +121,19 @@ export const updateSessionIdOnFirestore = async (
     console.log("updateSessionIdOnFirestore エラー：", e);
   }
 };
+
+export const fetchSessionIdOnFirestore = async (
+  uid: string,
+): Promise<string | undefined> => {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userDocRef);
+
+    if (docSnap.exists()) {
+      const sessionId = docSnap.data().session_id;
+      return sessionId;
+    }
+  } catch (e) {
+    console.log("fetchSessionId エラー：", e);
+  }
+};
