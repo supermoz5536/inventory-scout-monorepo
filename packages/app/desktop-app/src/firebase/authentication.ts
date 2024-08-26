@@ -76,7 +76,7 @@ export const logOut = async (): Promise<boolean> => {
 
 /// サーバーの認証状態の変更を取得するリスナーを設置します
 export const listenAuthState = async () => {
-  let unsubscribePlanFieldListener: any;
+  let unsubscribeUserDocListener: any;
 
   const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
     // ログイン状態の場合
@@ -84,17 +84,17 @@ export const listenAuthState = async () => {
       console.log("listenAuthState ログインしました");
       store.dispatch(changeIsAuthed(true));
       // 既存のリスナー（planの変更取得）があれば解除
-      if (unsubscribePlanFieldListener) unsubscribePlanFieldListener();
+      if (unsubscribeUserDocListener) unsubscribeUserDocListener();
       // リスナーの設置
-      unsubscribePlanFieldListener = setUserDocListener(user.uid);
+      unsubscribeUserDocListener = setUserDocListener(user.uid);
     } else {
       // ログアウト状態の場合
       console.log("listenAuthState ログアウトしました");
       store.dispatch(changeIsAuthed(false));
     }
     // 既存のリスナー（planの変更取得）があれば解除
-    if (unsubscribePlanFieldListener) unsubscribePlanFieldListener();
-    unsubscribePlanFieldListener = null;
+    if (unsubscribeUserDocListener) unsubscribeUserDocListener();
+    unsubscribeUserDocListener = null;
   });
   return unsubscribe;
 };
