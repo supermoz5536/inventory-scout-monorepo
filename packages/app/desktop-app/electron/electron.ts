@@ -203,7 +203,7 @@ ipcMain.handle("runScraping", async (event, asinDataList: AsinData[]) => {
       browser,
       updateGlobalBrowser,
       backGroundWindow,
-      asinDataList
+      asinDataList,
     );
   } catch (error) {
     console.error("runScraping ERROR", error);
@@ -266,7 +266,7 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
           browser,
           updateGlobalBrowser,
           backGroundWindow,
-          loadedAsinDataList
+          loadedAsinDataList,
         );
       }
     } catch (error) {
@@ -309,7 +309,9 @@ ipcMain.handle("get-app-url", () => appURL);
 // バックグラウンドウインドウを生成する関数です
 function openBackGroundWindow() {
   backGroundWindow = new BrowserWindow({
-    show: false,
+    width: 450,
+    height: 300,
+    // show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
@@ -788,7 +790,7 @@ async function loadTransferData() {
     if (!canceled && filePaths.length > 0) {
       const loadedTransferData = await fs.promises.readFile(
         filePaths[0],
-        "utf8"
+        "utf8",
       );
       const parsedData = parseJsonToJS(loadedTransferData);
       console.log("移行データを読み込みました");

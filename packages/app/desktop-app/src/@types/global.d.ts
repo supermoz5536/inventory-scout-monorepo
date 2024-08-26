@@ -101,6 +101,7 @@ declare global {
     isCancelProgress: boolean;
     isLockedRunScraping: boolean;
     plan: string;
+    sessionId: string;
     createdAt: string;
   }
 

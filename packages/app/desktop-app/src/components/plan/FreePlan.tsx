@@ -41,7 +41,7 @@ const FreePlan = () => {
     }
   };
 
-  const [isOpenSnackBar, setIsOpenSnackBar] = React.useState<boolean>(false);
+  const [isOpenSnackBar, setIsOpenSnackBar] = useState<boolean>(false);
 
   const handleClose = async (
     event: React.SyntheticEvent | Event,

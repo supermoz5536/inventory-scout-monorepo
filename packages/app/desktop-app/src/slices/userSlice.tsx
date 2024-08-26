@@ -10,6 +10,7 @@ const initialState: { value: User } = {
     isCancelProgress: false,
     isLockedRunScraping: true,
     plan: "",
+    sessionId: "",
     createdAt: "",
   },
 };
@@ -47,6 +48,9 @@ export const userSlice = createSlice({
     changePlanOnStore: (state, action: PayloadAction<string>) => {
       state.value.plan = action.payload;
     },
+    changeSessionIdOnStore: (state, action: PayloadAction<string>) => {
+      state.value.sessionId = action.payload;
+    },
   },
 });
 
@@ -63,6 +67,7 @@ export const {
   changeEmailOnStore,
   changePasswordOnStore,
   changePlanOnStore,
+  changeSessionIdOnStore,
 } = userSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので

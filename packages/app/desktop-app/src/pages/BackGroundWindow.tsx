@@ -20,6 +20,7 @@ import {
   logInWithEmailAndPassword,
   listenAuthState,
   initLogoutCallBack,
+  logOut,
 } from "../firebase/authentication";
 import {
   changeIsAuthed,
@@ -27,8 +28,13 @@ import {
   updateUser,
 } from "../slices/userSlice";
 import { DocumentData } from "firebase/firestore";
-import { getUserDoc, setUserDocListener } from "../firebase/firestore";
+import {
+  fetchSessionIdOnFirestore,
+  getUserDoc,
+  setUserDocListener,
+} from "../firebase/firestore";
 import MainWindow from "../pages/MainWindow";
+import { Logout } from "@mui/icons-material";
 
 const BackGroundWindow = () => {
   // asinDataList の初期値を保持する ref オブジェクトを作成し、
@@ -186,6 +192,9 @@ const BackGroundWindow = () => {
       // ■ userCredential.user.uid と一致するドキュメントが存在する場合
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
+      // Authにログイン後に、
+      // その変更をリスンしてsessionIdの書き換え処理が完了するまで待機時間を設定
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const userDocData: DocumentData | undefined = await getUserDoc(
         userCredential.user.uid,
       );
@@ -200,6 +209,7 @@ const BackGroundWindow = () => {
           isCancelProgress: false,
           isLockedRunScraping: userDocData["is_locked_run_scraping"],
           plan: userDocData["plan"] ?? "not found",
+          sessionId: user.sessionId,
           createdAt: userDocData["created_at"] ?? "not found",
         };
         // ストアのUserオブジェクトを更新
@@ -253,6 +263,19 @@ const BackGroundWindow = () => {
           //「データ取得完了」
           dispatch(changeSystemStatus(5));
         } else if (asinData) {
+          // Firestore上の最新のセッションIDを取得して照合
+          // 一致しなければ、他の場所からのログインによる変更なので
+          // 強制ログアウト & スクレイピング処理の終了
+          const sessionIdOnFiretore: string | undefined =
+            await fetchSessionIdOnFirestore(user.uid);
+          if (userRef.current.sessionId !== sessionIdOnFiretore) {
+            await logOut();
+            // スクレイピングの終了処理を実行
+            dispatch(changeShowButtonStatus(0));
+            dispatch(changeSystemStatus(6));
+            window.myAPI.stopScraping();
+          }
+
           // グローバル変数のASINリストの
           // 取得したasinDataと合致するオブジェクトを
           // 取得したデータに更新

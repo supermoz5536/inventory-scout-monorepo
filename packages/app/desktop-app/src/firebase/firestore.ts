@@ -52,7 +52,11 @@ export const getUserDoc = async (
 };
 
 // Firestoreにドキュメントを作成する関数
-export const createUserDoc = async (uid: string, email: string) => {
+export const createUserDoc = async (
+  uid: string,
+  email: string,
+  sessionId: string,
+) => {
   try {
     const initialData = {
       email: email,
@@ -60,6 +64,7 @@ export const createUserDoc = async (uid: string, email: string) => {
       is_authed: false,
       is_cancel_progress: false,
       is_locked_run_scraping: true,
+      session_id: sessionId,
       createdAt: new Date(),
     };
 
@@ -100,5 +105,35 @@ export const updateEmailOnFirestore = async (uid: string, email: string) => {
     });
   } catch (e) {
     console.log("updateEmailOnFirestore エラー：", e);
+  }
+};
+
+export const updateSessionIdOnFirestore = async (
+  uid: string,
+  sessionId: string,
+): Promise<void> => {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    await updateDoc(userDocRef, {
+      session_id: sessionId,
+    });
+  } catch (e) {
+    console.log("updateSessionIdOnFirestore エラー：", e);
+  }
+};
+
+export const fetchSessionIdOnFirestore = async (
+  uid: string,
+): Promise<string | undefined> => {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userDocRef);
+
+    if (docSnap.exists()) {
+      const sessionId = docSnap.data().session_id;
+      return sessionId;
+    }
+  } catch (e) {
+    console.log("fetchSessionId エラー：", e);
   }
 };

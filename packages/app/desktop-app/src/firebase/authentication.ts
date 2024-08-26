@@ -14,9 +14,10 @@ import {
 import {
   changeIsAuthed,
   changeEmailOnStore,
-  changePasswordOnStore,
+  changeSessionIdOnStore,
 } from "../slices/userSlice";
-import { setUserDocListener } from "./firestore";
+import { setUserDocListener, updateSessionIdOnFirestore } from "./firestore";
+import { v4 as uuidv4 } from "uuid";
 
 /// emailとpasswordでログイン処理を行い
 /// 成功した場合は、ユーザーデータを格納した
@@ -74,27 +75,39 @@ export const logOut = async (): Promise<boolean> => {
   }
 };
 
-/// サーバーの認証状態の変更を取得するリスナーを設置します
+/// Authの認証状態のリスナー設置関数
 export const listenAuthState = async () => {
   let unsubscribeUserDocListener: any;
-
-  const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+  const state = store.getState();
+  // Authのリスナーを設置
+  const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
     // ログイン状態の場合
     if (user) {
       console.log("listenAuthState ログインしました");
-      store.dispatch(changeIsAuthed(true));
-      // 既存のリスナー（planの変更取得）があれば解除
+      // 既存のリスナーがあれば解除
       if (unsubscribeUserDocListener) unsubscribeUserDocListener();
-      // リスナーの設置
+      // FirestoreのDocリスナーの設置
       unsubscribeUserDocListener = setUserDocListener(user.uid);
+      // ユニークなセッションIDを作成
+      const sessionId: string = uuidv4();
+      // ユニークなセッションIDをDocにwrite
+      await updateSessionIdOnFirestore(user.uid, sessionId);
+      // 最新の値にStoreの状態を更新
+      store.dispatch(changeIsAuthed(true));
+      console.log("before ", store.getState().user.value.sessionId);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      store.dispatch(changeSessionIdOnStore(sessionId));
+
+      console.log("after ", store.getState().user.value.sessionId);
     } else {
       // ログアウト状態の場合
       console.log("listenAuthState ログアウトしました");
+      // ログイン時に設置したリスナーを解除して
+      // 安全のために変数を空にしておく。
+      if (unsubscribeUserDocListener) unsubscribeUserDocListener();
+      unsubscribeUserDocListener = null;
       store.dispatch(changeIsAuthed(false));
     }
-    // 既存のリスナー（planの変更取得）があれば解除
-    if (unsubscribeUserDocListener) unsubscribeUserDocListener();
-    unsubscribeUserDocListener = null;
   });
   return unsubscribe;
 };
@@ -220,3 +233,6 @@ export const createAuthAccount = async (email: string, password: string) => {
     return { success: false, body: "e4" };
   }
 };
+function changeSeesionIdOnStore(sessionId: string): any {
+  throw new Error("Function not implemented.");
+}

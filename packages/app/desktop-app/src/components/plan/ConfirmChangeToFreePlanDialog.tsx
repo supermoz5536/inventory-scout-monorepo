@@ -72,8 +72,10 @@ const ConfirmChangeToFreePlanDialog = ({
   useEffect(() => {
     // 即時関数で非同期処理
     (async () => {
-      const result = await callFetchPeriodEndDate(userRef.current.uid);
-      setPeriodEndDate(result);
+      if (userRef.current.plan === "s") {
+        const result = await callFetchPeriodEndDate(userRef.current.uid);
+        setPeriodEndDate(result);
+      }
     })();
   }, []);
 
