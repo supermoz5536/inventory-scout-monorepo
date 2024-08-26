@@ -78,9 +78,9 @@ export const logOut = async (): Promise<boolean> => {
 /// Authの認証状態のリスナー設置関数
 export const listenAuthState = async () => {
   let unsubscribeUserDocListener: any;
-
+  const state = store.getState();
   // Authのリスナーを設置
-  const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+  const unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
     // ログイン状態の場合
     if (user) {
       console.log("listenAuthState ログインしました");
@@ -91,10 +91,14 @@ export const listenAuthState = async () => {
       // ユニークなセッションIDを作成
       const sessionId: string = uuidv4();
       // ユニークなセッションIDをDocにwrite
-      updateSessionIdOnFirestore(user.uid, sessionId);
+      await updateSessionIdOnFirestore(user.uid, sessionId);
       // 最新の値にStoreの状態を更新
-      store.dispatch(changeSessionIdOnStore(sessionId));
       store.dispatch(changeIsAuthed(true));
+      console.log("before ", store.getState().user.value.sessionId);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      store.dispatch(changeSessionIdOnStore(sessionId));
+
+      console.log("after ", store.getState().user.value.sessionId);
     } else {
       // ログアウト状態の場合
       console.log("listenAuthState ログアウトしました");

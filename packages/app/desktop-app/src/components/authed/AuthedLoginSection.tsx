@@ -40,6 +40,7 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
           isCancelProgress: false,
           isLockedRunScraping: true,
           plan: "",
+          sessionId: "",
           createdAt: "",
         }),
       );

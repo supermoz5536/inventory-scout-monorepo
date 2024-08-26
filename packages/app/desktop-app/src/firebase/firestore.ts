@@ -111,7 +111,7 @@ export const updateEmailOnFirestore = async (uid: string, email: string) => {
 export const updateSessionIdOnFirestore = async (
   uid: string,
   sessionId: string,
-) => {
+): Promise<void> => {
   try {
     const userDocRef = doc(db, "users", uid);
     await updateDoc(userDocRef, {

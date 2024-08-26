@@ -39,6 +39,7 @@ import LoginFormDialog from "../components/main-window/top/LoginFormDialog";
 import PlanList from "../components/plan/PlanList";
 import { fetchSessionIdOnFirestore } from "../firebase/firestore";
 import { logOut } from "../firebase/authentication";
+import { BlockMultiLoginSnackBar } from "../components/main-window/top/BlockMultiLoginSnackBar";
 
 function Top() {
   const asinDataList = useSelector(
@@ -56,6 +57,13 @@ function Top() {
   const showButtonStatus = useSelector(
     (state: RootState) => state.systemStatus.value.showButtonStatus,
   );
+
+  useEffect(() => {
+    if (systemStatus === 6) {
+      setIsOpenBlockMultiLoginSnackBar(true);
+      dispatch(changeSystemStatus(0));
+    }
+  }, [systemStatus]);
 
   // ユーザーの状態変数の取得
   const user = useSelector((state: RootState) => state.user.value);
@@ -85,6 +93,9 @@ function Top() {
     useState<boolean>(false);
 
   const [isOpenPlanListDialog, setIsOpenPlanListDialog] =
+    useState<boolean>(false);
+
+  const [isOpenBlockMultiLoginSnackBar, setIsOpenBlockMultiLoginSnackBar] =
     useState<boolean>(false);
 
   const handleAsinQuery = (inputData: string) => {
@@ -143,6 +154,9 @@ function Top() {
       // ログアウト
       await logOut();
       // ダイアログの表示
+      setIsOpenBlockMultiLoginSnackBar(true);
+      console.log("user.sessionId", user.sessionId);
+      console.log("sessionIdOnFiretore", sessionIdOnFiretore);
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
@@ -469,6 +483,12 @@ function Top() {
         <PlanList
           isOpenPlanListDialog={isOpenPlanListDialog}
           setIsOpenPlanListDialog={setIsOpenPlanListDialog}
+        />
+      </div>
+      <div>
+        <BlockMultiLoginSnackBar
+          isOpenBlockMultiLoginSnackBar={isOpenBlockMultiLoginSnackBar}
+          setIsOpenBlockMultiLoginSnackBar={setIsOpenBlockMultiLoginSnackBar}
         />
       </div>
     </div>

@@ -89,6 +89,9 @@ const LoginFormDialog = ({
       // ■ userCredential.user.uid と一致するドキュメントが存在する場合
       // firestoreからドキュメントデータを取得
       // プラン名とアカウント作成日を取得し、割り当てる
+      // Authにログイン後に、
+      // その変更をリスンしてsessionIdの書き換え処理が完了するまで待機時間を設定
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const userDocData: DocumentData | undefined = await getUserDoc(
         userCredential.user.uid,
       );
@@ -106,6 +109,7 @@ const LoginFormDialog = ({
           isCancelProgress: false,
           isLockedRunScraping: userDocData["is_locked_run_scraping"],
           plan: userDocData["plan"],
+          sessionId: user.sessionId,
           createdAt: userDocData["created_at"],
         };
         console.log("5 handleLogIn");
@@ -124,6 +128,7 @@ const LoginFormDialog = ({
 
   const handleLink = () => {
     setIsOpenPlanListDialog(true);
+    setIsOpenLoginFormDialog(false);
   };
 
   return (
