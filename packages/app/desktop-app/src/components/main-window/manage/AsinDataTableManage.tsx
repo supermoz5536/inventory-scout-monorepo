@@ -163,7 +163,7 @@ export const AsinDataTableManage = () => {
     {
       field: "name",
       headerName: "商品名",
-      width: 550,
+      width: 610,
       disableColumnMenu: false,
       sortable: false,
       renderHeader: (params) => params.colDef.headerName,
@@ -175,6 +175,17 @@ export const AsinDataTableManage = () => {
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.amazonSellerNOP}
+        </Box>
+      ),
     },
     {
       field: "fbaSellerNOP",
@@ -183,6 +194,17 @@ export const AsinDataTableManage = () => {
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.fbaSellerNOP}
+        </Box>
+      ),
     },
     // {
     //   field: "totalStock",
@@ -390,12 +412,22 @@ export const AsinDataTableManage = () => {
       width: 100,
       disableColumnMenu: false,
       sortable: false,
-      renderCell: (params) =>
-        params.row.isScraping === null
-          ? ""
-          : params.row.isScraping
-          ? "取得中"
-          : "取得完了",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            marginLeft: "-20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.isScraping === null
+            ? ""
+            : params.row.isScraping
+            ? "取得中"
+            : "取得完了"}
+        </Box>
+      ),
     },
     {
       field: "asinParent",
@@ -429,7 +461,7 @@ export const AsinDataTableManage = () => {
   };
 
   return (
-    <Box sx={{ height: 777.5, width: 1350, backgroundColor: "white" }}>
+    <Box sx={{ height: 777.5, width: 1380, backgroundColor: "white" }}>
       <DataGrid
         rows={asinDataList}
         columns={columns}
