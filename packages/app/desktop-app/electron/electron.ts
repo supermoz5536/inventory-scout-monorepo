@@ -309,9 +309,9 @@ ipcMain.handle("get-app-url", () => appURL);
 // バックグラウンドウインドウを生成する関数です
 function openBackGroundWindow() {
   backGroundWindow = new BrowserWindow({
-    width: 450,
-    height: 300,
-    // show: false,
+    // width: 450,
+    // height: 300,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
