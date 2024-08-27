@@ -38,7 +38,7 @@ export const AsinDataTable = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const asinDataList = useSelector(
-    (state: RootState) => state.asinDataList.value
+    (state: RootState) => state.asinDataList.value,
   );
 
   const initialSelectedIds = asinDataList
@@ -180,6 +180,17 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.amazonSellerNOP}
+        </Box>
+      ),
     },
     {
       field: "fbaSellerNOP",
@@ -188,14 +199,71 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.fbaSellerNOP}
+        </Box>
+      ),
     },
     {
       field: "totalStock",
       headerName: "FBA合計在庫",
-      width: 100,
+      width: 130,
       disableColumnMenu: false,
       sortable: true,
-      renderHeader: (params) => params.colDef.headerName,
+      renderHeader: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Tooltip
+            title={
+              '在庫Zは「購入制限がないセラーの在庫数 "のみ" 」を集計しています。「FBA合計在庫」が "0" と表示されていても、購入制限のあるセラーの在庫は存在している場合がありますので、ご注意ください。'
+            }
+            placement="top"
+            arrow
+            PopperProps={{
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, -5], // ここでピクセル単位で位置を調整
+                  },
+                },
+              ],
+            }}
+          >
+            <InfoIcon
+              sx={{
+                marginRight: "3px",
+                color: "#E0E0E0",
+              }}
+            />
+          </Tooltip>
+
+          {params.colDef.headerName}
+        </Box>
+      ),
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.totalStock}
+        </Box>
+      ),
     },
     {
       field: "cartPrice",
@@ -204,7 +272,17 @@ export const AsinDataTable = ({
       disableColumnMenu: false,
       sortable: true,
       renderHeader: (params) => params.colDef.headerName,
-      renderCell: (params) => params.row.cartPrice,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.cartPrice}
+        </Box>
+      ),
       valueGetter: (prams, row) => Number(row.cartPrice.replace(/,/g, "")),
     },
     {
@@ -395,12 +473,22 @@ export const AsinDataTable = ({
       width: 100,
       disableColumnMenu: false,
       sortable: false,
-      renderCell: (params) =>
-        params.row.isScraping === null
-          ? ""
-          : params.row.isScraping
-          ? "取得中"
-          : "取得完了",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            marginLeft: "-20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {params.row.isScraping === null
+            ? ""
+            : params.row.isScraping
+            ? "取得中"
+            : "取得完了"}
+        </Box>
+      ),
     },
     {
       field: "asinParent",
@@ -434,7 +522,7 @@ export const AsinDataTable = ({
   };
 
   return (
-    <Box sx={{ height: 740, width: 1570, backgroundColor: "white" }}>
+    <Box sx={{ height: 740, width: 1600, backgroundColor: "white" }}>
       <DataGrid
         rows={filteredAsinDataList}
         columns={columns}
