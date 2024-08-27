@@ -1,3 +1,4 @@
+import { store } from "../redux/store";
 import { useNavigate } from "react-router-dom";
 import "./Top.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,6 +41,7 @@ import PlanList from "../components/plan/PlanList";
 import { fetchSessionIdOnFirestore } from "../firebase/firestore";
 import { logOut } from "../firebase/authentication";
 import { BlockMultiLoginSnackBar } from "../components/main-window/top/BlockMultiLoginSnackBar";
+import { changeIsAutoLogIn, changePlanOnStore } from "../slices/userSlice";
 
 function Top() {
   const asinDataList = useSelector(
@@ -67,6 +69,10 @@ function Top() {
 
   // ユーザーの状態変数の取得
   const user = useSelector((state: RootState) => state.user.value);
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   // dispatch: storeへのreducer起動のお知らせ役
   // dispatch関数を取得し、
@@ -140,30 +146,31 @@ function Top() {
     // セッションIDの照合でアカウント認証をするために
     // Firestore上の現在のセッションIDを事前に取得しておきます。
     const sessionIdOnFiretore: string | undefined =
-      await fetchSessionIdOnFirestore(user.uid);
+      await fetchSessionIdOnFirestore(userRef.current.uid);
+    // const sessionIdOnLocal = store.getState().user.value.sessionId;
 
     // ■ ログインウインドウの表示
-    if (user.isAuthed === false) {
+    if (userRef.current.isAuthed === false) {
       console.log("1 handleScrapingButton ");
       // window.myAPI.openLoginPrompt();
       setIsOpenLoginFormDialog(true);
 
       // ■ 同一アカウントの複数ログインをセッションIDでチェック
       // 一致しない場合 => ダイアログの表示 & ログアウト。
-    } else if (user.sessionId !== sessionIdOnFiretore) {
+    } else if (userRef.current.sessionId !== sessionIdOnFiretore) {
       // ログアウト
       await logOut();
       // ダイアログの表示
       setIsOpenBlockMultiLoginSnackBar(true);
-      console.log("user.sessionId", user.sessionId);
+      console.log("sessionIdOnLocal", userRef.current.sessionId);
       console.log("sessionIdOnFiretore", sessionIdOnFiretore);
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導
     } else if (
-      user.isAuthed === true &&
-      user.plan === "f" &&
-      user.isLockedRunScraping === true
+      userRef.current.isAuthed === true &&
+      userRef.current.plan === "f" &&
+      userRef.current.isLockedRunScraping === true
     ) {
       console.log("2 handleScrapingButton");
 
@@ -172,7 +179,7 @@ function Top() {
 
       // ■ 待機状態での「取得開始」のクリック
     } else if (
-      user.isAuthed === true &&
+      userRef.current.isAuthed === true &&
       [0, 4, 5].includes(systemStatus) &&
       asinDataListRef.current.length > 0
     ) {
@@ -184,7 +191,7 @@ function Top() {
 
       // スクレイピング中の「取得停止」のクリック
     } else if (
-      user.isAuthed === true &&
+      userRef.current.isAuthed === true &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 1
     ) {
@@ -194,7 +201,7 @@ function Top() {
 
       // スクレイピング中の「本当に？」のクリック
     } else if (
-      user.isAuthed === true &&
+      userRef.current.isAuthed === true &&
       [1, 2, 3].includes(systemStatus) &&
       showButtonStatus === 2
     ) {

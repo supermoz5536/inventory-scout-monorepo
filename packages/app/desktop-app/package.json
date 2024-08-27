@@ -103,7 +103,8 @@
     ],
     "directories": {
       "buildResources": "assets"
-    }
+    },
+    "productName": "在庫Z"
   },
   "mac": {
     "target": [
@@ -116,8 +117,8 @@
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.plist",
     "gatekeeperAssess": false,
-    "executableName": "在庫スカウター",
-    "productName": "在庫スカウター"
+    "executableName": "在庫Z",
+    "productName": "在庫Z"
   },
   "win": {
     "target": [

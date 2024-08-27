@@ -309,9 +309,11 @@ ipcMain.handle("get-app-url", () => appURL);
 // バックグラウンドウインドウを生成する関数です
 function openBackGroundWindow() {
   backGroundWindow = new BrowserWindow({
-    // width: 450,
-    // height: 300,
-    show: false,
+    width: 0,
+    height: 0,
+    show: true,
+    focusable: false, // ユーザーが誤って操作することを防ぐ
+    resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
@@ -323,6 +325,12 @@ function openBackGroundWindow() {
   // ローカルファイルを指定するパスを指定したいだけなので
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
   backGroundWindow.loadURL(`${appURL}#/BackGroundWindow`);
+
+  // 一応表示はしないと did-finished系のトリガーが着火しないので。
+  backGroundWindow.once("ready-to-show", () => {
+    backGroundWindow.show(); // 一瞬表示して
+    backGroundWindow.hide(); // すぐに非表示にする
+  });
 
   // 起動時のみsystemStatusを初期化
   // ウィンドウの読み込みが完了した後に処理します
@@ -383,7 +391,7 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1650,
     height: 1050,
-    // resizable: false, // ウィンドウサイズを変更できないようにする
+    resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて
@@ -487,7 +495,7 @@ function openPreferences() {
   prefWindow = new BrowserWindow({
     width: 500,
     height: 900,
-    resizable: true, // ウィンドウサイズを変更できないようにする
+    resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // sandbox: trueにするとmainとrendererプロセス間の隔離が強化されて

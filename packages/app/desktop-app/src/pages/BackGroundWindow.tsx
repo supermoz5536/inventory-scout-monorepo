@@ -274,18 +274,18 @@ const BackGroundWindow = () => {
             dispatch(changeShowButtonStatus(0));
             dispatch(changeSystemStatus(6));
             window.myAPI.stopScraping();
+          } else {
+            // グローバル変数のASINリストの
+            // 取得したasinDataと合致するオブジェクトを
+            // 取得したデータに更新
+            dispatch(updateAsinData(asinData));
+            // 状態変数の更新が完了するまで200ms待機
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            // ローカルストレージへasinDataListを保存
+            // 最新の参照を利用してるので
+            // 依存関係の指定は必要ない
+            await window.myAPI.saveData(asinDataListRef.current);
           }
-
-          // グローバル変数のASINリストの
-          // 取得したasinDataと合致するオブジェクトを
-          // 取得したデータに更新
-          dispatch(updateAsinData(asinData));
-          // 状態変数の更新が完了するまで200ms待機
-          await new Promise((resolve) => setTimeout(resolve, 200));
-          // ローカルストレージへasinDataListを保存
-          // 最新の参照を利用してるので
-          // 依存関係の指定は必要ない
-          await window.myAPI.saveData(asinDataListRef.current);
         }
       })();
     },

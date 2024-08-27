@@ -15,6 +15,7 @@ import {
   changeIsAuthed,
   changeEmailOnStore,
   changeSessionIdOnStore,
+  changePlanOnStore,
 } from "../slices/userSlice";
 import { setUserDocListener, updateSessionIdOnFirestore } from "./firestore";
 import { v4 as uuidv4 } from "uuid";
@@ -106,7 +107,10 @@ export const listenAuthState = async () => {
       // 安全のために変数を空にしておく。
       if (unsubscribeUserDocListener) unsubscribeUserDocListener();
       unsubscribeUserDocListener = null;
+      // ログアウトを状態に反映
       store.dispatch(changeIsAuthed(false));
+      // プラン状態を初期化
+      store.dispatch(changePlanOnStore(""));
     }
   });
   return unsubscribe;

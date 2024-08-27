@@ -33,7 +33,7 @@ const scrapePromise = (async () => {
   const withTimeout = (
     promise: Promise<any>,
     timeout: number,
-    errorMessage: string
+    errorMessage: string,
     // この関数は、Promiseを返すことを示しています。
   ): Promise<any> => {
     let timer: any;
@@ -205,7 +205,7 @@ const scrapePromise = (async () => {
           }
         },
         // 第二引数
-        productNameElement
+        productNameElement,
       );
       // 取得したデータに更新
       asinData.name = productName ?? "";
@@ -223,7 +223,7 @@ const scrapePromise = (async () => {
           }
         },
         // 第二引数
-        imageURLElement
+        imageURLElement,
       );
       // 取得したデータに更新
       asinData.imageURL = imageURL ?? "";
@@ -242,7 +242,7 @@ const scrapePromise = (async () => {
           }
         },
         // 第二引数
-        cartPriceElement
+        cartPriceElement,
       );
       // 取得したデータに更新
       asinData.cartPrice = cartPrice ?? "";
@@ -257,9 +257,9 @@ const scrapePromise = (async () => {
         scriptElements.map(async (scriptElement) => {
           return await page.evaluate(
             (scriptElement) => scriptElement.textContent,
-            scriptElement
+            scriptElement,
           );
-        })
+        }),
       );
 
       // 親ASINを含むscriptタグを見つける
@@ -304,7 +304,7 @@ const scrapePromise = (async () => {
           // マウスポインタを boundingBox の中心に移動させます。
           await page.mouse.move(
             boundingBox.x + boundingBox.width / 2,
-            boundingBox.y + boundingBox.height / 2
+            boundingBox.y + boundingBox.height / 2,
           );
 
           let previousPosition = await page.evaluate(() => window.scrollY);
@@ -339,7 +339,7 @@ const scrapePromise = (async () => {
       page: Page,
       asinData: AsinData,
       totalAmazonSeller: { value: number },
-      totalFbaSeller: { value: number }
+      totalFbaSeller: { value: number },
     ) => {
       // 各コンテナ情報を取得
       // .$は指定したCSSセレクタと一致する「最初の要素」を取得
@@ -358,12 +358,12 @@ const scrapePromise = (async () => {
 
         // 出荷元の名前が含まれる要素の参照を取得
         const shippingSourceElement = await offer.$(
-          "#aod-offer-shipsFrom .a-size-small.a-color-base"
+          "#aod-offer-shipsFrom .a-size-small.a-color-base",
         );
 
         // 販売元の名前が含まれる要素の参照を取得
         const sellerNameElement = await offer.$(
-          "#aod-offer-soldBy .a-size-small.a-link-normal"
+          "#aod-offer-soldBy .a-size-small.a-link-normal",
         );
 
         // セラーIDの抽出処理
@@ -387,7 +387,7 @@ const scrapePromise = (async () => {
                 return match ? match[1] : null;
               },
               // 第二引数
-              sellerIdElement
+              sellerIdElement,
             )
           : // セラーIDのタグが見つからなかった場合
             null;
@@ -413,7 +413,7 @@ const scrapePromise = (async () => {
 
         // 既存のリスト内に、fetchしたセラーIdがあるかを確認する
         const foundSellerData = asinData.fbaSellerDatas.find(
-          (asinData) => asinData.sellerId === sellerId
+          (asinData) => asinData.sellerId === sellerId,
         );
 
         console.log("■ foundSellerData =", foundSellerData);
@@ -473,11 +473,11 @@ const scrapePromise = (async () => {
 
         // console.log("3.8.1");
         let addCartButton = await offers[i].$(
-          `span.a-button-inner .a-button-input`
+          `span.a-button-inner .a-button-input`,
         );
         // 出荷元の名前が含まれる要素の参照を取得
         const shippingSourceElement = await offers[i].$(
-          "#aod-offer-shipsFrom .a-size-small.a-color-base"
+          "#aod-offer-shipsFrom .a-size-small.a-color-base",
         );
 
         const shippingSource = shippingSourceElement
@@ -505,7 +505,7 @@ const scrapePromise = (async () => {
             // エラーが発生した場合、要素を再取得して再試行
             await sleep(1000, 0);
             addCartButton = await offers[i].$(
-              "span.a-button-inner .a-button-input"
+              "span.a-button-inner .a-button-input",
             );
             if (addCartButton) {
               try {
@@ -514,7 +514,7 @@ const scrapePromise = (async () => {
               } catch (retryError) {
                 console.error(
                   `Retry failed to add offer ${i} to cart:`,
-                  retryError
+                  retryError,
                 );
               }
             }
@@ -546,7 +546,7 @@ const scrapePromise = (async () => {
       page: Page,
       asinData: AsinData,
       totalAmazonSeller: { value: number },
-      totalFbaSeller: { value: number }
+      totalFbaSeller: { value: number },
     ) => {
       console.log("B 0.0.0");
       // セラーIDが含まれる要素を取得
@@ -554,12 +554,12 @@ const scrapePromise = (async () => {
       console.log("B 0.0.1");
       // 出荷元の名前が含まれる要素を取得
       const shippingSourceElement = await page.$(
-        `div.offer-display-features-container span.a-size-small.offer-display-feature-text-message`
+        `div.offer-display-features-container span.a-size-small.offer-display-feature-text-message`,
       );
       console.log("B 0.0.2");
       // 販売元の名前が含まれる要素を取得
       const sellerNameElement = await page.$(
-        `div.offer-display-features-container a#sellerProfileTriggerId`
+        `div.offer-display-features-container a#sellerProfileTriggerId`,
       );
       console.log("B 0.0.3");
       // セラーIDの抽出処理
@@ -583,7 +583,7 @@ const scrapePromise = (async () => {
               return match ? match[1] : null;
             },
             // 第二引数
-            sellerIdElement
+            sellerIdElement,
           )
         : // セラーIDのタグが見つからなかった場合
           null;
@@ -612,7 +612,7 @@ const scrapePromise = (async () => {
 
       // 既存のリスト内に、fetchしたセラーIdがあるかを確認する
       const foundSellerData = asinData.fbaSellerDatas.find(
-        (asinData) => asinData.sellerId === sellerId
+        (asinData) => asinData.sellerId === sellerId,
       );
       console.log("B 0.0.7");
 
@@ -689,7 +689,7 @@ const scrapePromise = (async () => {
     setQuantity: async (page: Page, item: ElementHandle<HTMLDivElement>) => {
       // プルダウンボタンの要素を取得
       const pulldownButton = await item.$(
-        "span.a-button-inner > span.a-button-text.a-declarative"
+        "span.a-button-inner > span.a-button-text.a-declarative",
       );
       console.log("4.2.2");
 
@@ -771,7 +771,7 @@ const scrapePromise = (async () => {
       if (updateButton) {
         await page.evaluate(
           (updateButton) => updateButton.click(),
-          updateButton
+          updateButton,
         );
       }
       console.log("4.3.5");
@@ -844,7 +844,7 @@ const scrapePromise = (async () => {
               return match ? match[1] : null;
             },
             // 第二引数
-            sellerIdElement
+            sellerIdElement,
           )
         : // セラーIDのタグが見つからなかった場合
           null;
@@ -855,7 +855,7 @@ const scrapePromise = (async () => {
     updateAmazonStock(
       asinData: AsinData,
       stockCount: number | null,
-      sellerId: string | null
+      sellerId: string | null,
     ) {
       if (sellerId === "AN1VRQENFRJN5" && stockCount) {
         asinData.amazonSellerNOP = stockCount;
@@ -866,13 +866,13 @@ const scrapePromise = (async () => {
       asinData: AsinData,
       stockCount: number | null,
       sellerId: string | null,
-      today: Date
+      today: Date,
     ) => {
       // 日付を YYYY-MM-DD 形式にフォーマット
       // getMonth() + 1: 月を取得（0から始まるため1を加算）
       // padStart(2, '0'): 月と日が一桁の場合、前に0を追加して二桁にする
       const todayFormatted = `${today.getFullYear()}-${String(
-        today.getMonth() + 1
+        today.getMonth() + 1,
       ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
       // 追加する該当のセラーデータを探す。
@@ -902,7 +902,7 @@ const scrapePromise = (async () => {
             // つまり 今日の日付のオブジェクトを
             // 元の配列から削除するのと同じ結果になります。
             (stockCountData) =>
-              !Object.keys(stockCountData).includes(todayFormatted)
+              !Object.keys(stockCountData).includes(todayFormatted),
           );
 
         // 新規のStockCountDataを追加します。
@@ -923,14 +923,14 @@ const scrapePromise = (async () => {
 
     updateAmazonSellerNOP: async (
       asinData: AsinData,
-      totalAmazonSeller: { value: number }
+      totalAmazonSeller: { value: number },
     ) => {
       asinData.amazonSellerNOP = totalAmazonSeller.value;
     },
 
     updateFbaSellerNOP: async (
       asinData: AsinData,
-      totalFbaSeller: { value: number }
+      totalFbaSeller: { value: number },
     ) => {
       asinData.fbaSellerNOP = totalFbaSeller.value;
     },
@@ -938,7 +938,7 @@ const scrapePromise = (async () => {
     updateTotalStock: async (
       asinData: AsinData,
       totalStock: { value: number },
-      totalFbaSeller: { value: number }
+      totalFbaSeller: { value: number },
     ) => {
       // 現在の仕様だと
       // 出荷元が自社発送の場合でもカート画面に遷移して
@@ -950,7 +950,7 @@ const scrapePromise = (async () => {
     updateFetchLatestDate: async (asinData: AsinData) => {
       const today = new Date();
       const todayFormatted = `${today.getFullYear()}-${String(
-        today.getMonth() + 1
+        today.getMonth() + 1,
       ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
       asinData.fetchLatestDate = todayFormatted;
@@ -984,7 +984,7 @@ const scrapePromise = (async () => {
       updateGlobalBrowser: (newBrowser: any) => void,
       backGroundWindow: any,
       asinDataList: AsinData[],
-      today?: Date // ? はデフォルト値の設定がないことを意味します
+      today?: Date, // ? はデフォルト値の設定がないことを意味します
     ) => {
       // try-catchのリトライ用変数
       const maxRetries = 3;
@@ -1028,7 +1028,7 @@ const scrapePromise = (async () => {
                   page,
                   asinData,
                   totalAmazonSeller,
-                  totalFbaSeller
+                  totalFbaSeller,
                 );
                 await scrape.addToCartOnDrawer(page);
                 await scrape.closeDrawer(page);
@@ -1040,7 +1040,7 @@ const scrapePromise = (async () => {
                   page,
                   asinData,
                   totalAmazonSeller,
-                  totalFbaSeller
+                  totalFbaSeller,
                 );
                 await scrape.reloadPage(page);
                 await scrape.avoidPopupClick(page);
@@ -1050,7 +1050,7 @@ const scrapePromise = (async () => {
 
               // ■ カート画面の処理
               const items = await page.$$(
-                `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`
+                `div[data-name="Active Items"] div[data-asin="${asinData.asin}"]`,
               );
               for (const item of items) {
                 await sleep(1000, 3500);
@@ -1064,7 +1064,7 @@ const scrapePromise = (async () => {
                   asinData,
                   stockCount,
                   sellerId,
-                  today
+                  today,
                 );
               }
 
@@ -1078,7 +1078,7 @@ const scrapePromise = (async () => {
               await scrape.updateTotalStock(
                 asinData,
                 totalStock,
-                totalFbaSeller
+                totalFbaSeller,
               );
               console.log("totalStock = ", totalStock);
               // asinData.fetchLatestDateの更新
@@ -1096,7 +1096,7 @@ const scrapePromise = (async () => {
               console.log("■ debug 3");
             })(),
             240000,
-            "Timeout"
+            "Timeout",
           );
         }
         await browser.close();
@@ -1125,7 +1125,7 @@ const scrapePromise = (async () => {
             updateGlobalBrowser,
             event,
             asinDataList,
-            today
+            today,
           );
         } else {
           console.log("最大リトライ回数に達しました。処理を終了します。");
