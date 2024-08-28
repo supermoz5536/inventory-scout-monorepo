@@ -733,7 +733,7 @@ const scrapePromise = (async () => {
       }
       console.log("4.2.9");
 
-      const inputBoxSelector = `input[type="text"]`;
+      const inputBoxSelector = `input[type="number"][name="quantityBox"]`;
 
       // 入力欄の表示を待機
       await page.waitForSelector(inputBoxSelector);
@@ -746,6 +746,8 @@ const scrapePromise = (async () => {
         // 入力欄を選択
         await page.evaluate((inputBox) => inputBox.click(), inputBox);
         console.log("4.3.2");
+
+        await sleep(500, 0);
 
         // 入力欄に値を入力
         await page.evaluate((inputBox) => {
