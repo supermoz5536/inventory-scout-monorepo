@@ -270,6 +270,8 @@ const BackGroundWindow = () => {
             await fetchSessionIdOnFirestore(user.uid);
           if (userRef.current.sessionId !== sessionIdOnFiretore) {
             await logOut();
+            dispatch(changeIsAuthed(false));
+            dispatch(changePlanOnStore(""));
             // スクレイピングの終了処理を実行
             dispatch(changeShowButtonStatus(0));
             dispatch(changeSystemStatus(6));
