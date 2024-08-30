@@ -94,6 +94,8 @@ function Top() {
   const [nameQuery, setNameQuery] = useState("");
   const [parentQuery, setParentQuery] = useState("");
   const [searchType, setSearchType] = useState("asin");
+  const [isRunScrapingButtonDisabled, setIsRunScrapingButtonDisabled] =
+    useState(false);
   const [filteredAsinDataList, setFilteredAsinDataList] = useState<AsinData[]>(
     asinDataListRef.current,
   );
@@ -151,6 +153,13 @@ function Top() {
 
   /// 「取得開始」ボタンのハンドリング関数
   const handleScrapingButton = async () => {
+    // ボタンを無効化する
+    setIsRunScrapingButtonDisabled(true);
+    // 1秒後にボタンを再度有効化する
+    setTimeout(() => {
+      setIsRunScrapingButtonDisabled(false);
+    }, 1250);
+
     // セッションIDの照合でアカウント認証をするために
     // Firestore上の現在のセッションIDを事前に取得しておきます。
     const sessionIdOnFiretore: string | undefined =
@@ -388,6 +397,7 @@ function Top() {
           {/* Scraperコンポーネントの実行ボタン */}
           <Button
             className="top-square-space-menu-container-left-scraping"
+            disabled={isRunScrapingButtonDisabled}
             onClick={() => handleScrapingButton()}
             variant="contained"
             sx={{
@@ -395,6 +405,12 @@ function Top() {
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+              "&.Mui-disabled": {
+                opacity: 1, // グレーアウトを無効に
+                backgroundColor: "#7a6dff", // 無効時の背景色を設定
+                color: "white", // 無効時のテキストカラーを設定
+                cursor: "not-allowed", // 無効時のカーソルを設定
               },
             }}
           >
