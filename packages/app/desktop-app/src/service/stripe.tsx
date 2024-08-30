@@ -5,7 +5,7 @@ import { callCreateCheckoutSession } from "../firebase/cloudFunctions";
 export const handleRedirectToCheckout = async (sessionId: any) => {
   // Stripeの公開可能APIキーを引数に渡す
   const stripePromise = loadStripe(
-    "pk_test_51OwiwF02YGIp0FEBuakiQxnKE4QAXQoGSJpknDA5yYgB3q3uPCoP4V6a3XmBExB11V0Ap5AnW2oirFZK6Y4DKckZ00nAQ4xL7s"
+    "pk_live_51OwiwF02YGIp0FEBBCMInNVpI7hdnICCpkFC9aDxKW9nYL9aDdt36ps0AAkhBqjWmhXOIzup5cqKIe1XFKvzZvWv000C38OwkG",
   );
 
   // Stripのインスタンスを作成
@@ -25,13 +25,13 @@ export const handleRedirectToCheckout = async (sessionId: any) => {
 
 export const handleCheckoutSessionAndRedirect = async (
   uid: string,
-  selectedPlan: string
+  selectedPlan: string,
 ) => {
   const appURL = await window.myAPI.getAppURL();
   const sessionId: any = await callCreateCheckoutSession(
     uid,
     appURL,
-    selectedPlan
+    selectedPlan,
   );
   // Stripeのチェックアウトセッション画面への遷移
   await handleRedirectToCheckout(sessionId);

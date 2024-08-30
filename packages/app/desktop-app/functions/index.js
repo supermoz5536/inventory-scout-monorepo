@@ -300,9 +300,9 @@ exports.createCheckoutSession = functions
       // Stripeで事前に設定したプライスIDを指定します。
       const priceId =
         data.plan === "s"
-          ? "price_1PncjR02YGIp0FEB0XHuZQaZ"
+          ? "price_1PmQbp02YGIp0FEBkbB6siUQ"
           : data.plan === "p"
-          ? "price_1Pp2ca02YGIp0FEBZyRU9N2B"
+          ? "price_1Ptbpi02YGIp0FEB0T07GZMf"
           : null;
 
       // プライスIDがnullの場合のエラーハンドリング
