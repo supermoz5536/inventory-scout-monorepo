@@ -85,10 +85,8 @@ const BackGroundWindow = () => {
           console.log("Initializing process excuted");
 
           // ⓪
-          window.myAPI.initSystemStatus(() => {
-            dispatch(changeSystemStatus(0));
-            dispatch(changeShowButtonStatus(0));
-          });
+          dispatch(changeSystemStatus(0));
+          dispatch(changeShowButtonStatus(0));
 
           // ①
           window.myAPI.scrapingResult(handleScrapingResult);
@@ -109,7 +107,7 @@ const BackGroundWindow = () => {
           // 引数はリスナーのコールバック関数で
           // 関数自体を渡す必要があるため
           // ()なしで関数名のみ記述
-          await window.myAPI.initLogout(initLogoutCallBack);
+          initLogoutCallBack();
           dispatch(changeIsAuthed(false));
           dispatch(changePlanOnStore(""));
 
@@ -120,9 +118,7 @@ const BackGroundWindow = () => {
             userRef.current.email &&
             userRef.current.password
           ) {
-            await window.myAPI.initLogin(async () => {
-              await handleLogIn();
-            });
+            await handleLogIn();
           }
 
           // ⑦ 定時スクレイピングの設定がTrueの場合
@@ -133,11 +129,9 @@ const BackGroundWindow = () => {
             userRef.current.isAuthed === true &&
             (userRef.current.plan === "s" || userRef.current.plan === "p")
           ) {
-            await window.myAPI.initScheduledTime(() => {
-              window.myAPI.scheduledScraping(
-                systemStatusRef.current.scheduledScrapingTime,
-              );
-            });
+            window.myAPI.scheduledScraping(
+              systemStatusRef.current.scheduledScrapingTime,
+            );
           }
 
           // ⑧ メインプロセスの定時スクレイピング実行をリスンして状態変数を更新
@@ -156,9 +150,7 @@ const BackGroundWindow = () => {
             userRef.current.isAuthed === true &&
             (userRef.current.plan === "s" || userRef.current.plan === "p")
           ) {
-            await window.myAPI.initScraping(async () => {
-              await handleInitScraping();
-            });
+            await handleInitScraping();
           }
 
           return () => {
