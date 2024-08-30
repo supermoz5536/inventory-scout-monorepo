@@ -76,6 +76,10 @@ function Top() {
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
+    // console.log(
+    //   "userRef.current.sessionId in useEffect",
+    //   userRef.current.sessionId,
+    // );
   }, [user]);
 
   // dispatch: storeへのreducer起動のお知らせ役
@@ -172,6 +176,10 @@ function Top() {
       // ダイアログの表示
       setIsOpenBlockMultiLoginSnackBar(true);
       console.log("sessionIdOnLocal", userRef.current.sessionId);
+      console.log(
+        "store.getState().user.value.sessionId",
+        store.getState().user.value.sessionId,
+      );
       console.log("sessionIdOnFiretore", sessionIdOnFiretore);
 
       // ■ freeプランユーザーの場合

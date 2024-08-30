@@ -94,11 +94,16 @@ export const listenAuthState = async () => {
       // ユニークなセッションIDをDocにwrite
       await updateSessionIdOnFirestore(user.uid, sessionId);
       // 最新の値にStoreの状態を更新
-      store.dispatch(changeIsAuthed(true));
-      console.log("before ", store.getState().user.value.sessionId);
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      store.dispatch(changeSessionIdOnStore(sessionId));
 
+      // FirestoreのDocのsessuib_idを更新すると
+      // その変更をリスンして、応答関数でuserの状態が更新されるが
+      // この更新処理が完了する前にローカルのsessionIdを更新してしまうと、
+      // 後からsessionIdの状態が、変更前の状態に上書きされる可能性があるので
+      // 待機時間を用意して、完了を待ってからローカルのsessionIdの状態を更新する
+      console.log("before ", store.getState().user.value.sessionId);
+      await new Promise((resolve) => setTimeout(resolve, 750));
+      store.dispatch(changeIsAuthed(true));
+      store.dispatch(changeSessionIdOnStore(sessionId));
       console.log("after ", store.getState().user.value.sessionId);
     } else {
       // ログアウト状態の場合
