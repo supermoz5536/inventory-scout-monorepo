@@ -41,7 +41,11 @@ import PlanList from "../components/plan/PlanList";
 import { fetchSessionIdOnFirestore } from "../firebase/firestore";
 import { logOut } from "../firebase/authentication";
 import { BlockMultiLoginSnackBar } from "../components/main-window/top/BlockMultiLoginSnackBar";
-import { changeIsAutoLogIn, changePlanOnStore } from "../slices/userSlice";
+import {
+  changeIsAuthed,
+  changeIsAutoLogIn,
+  changePlanOnStore,
+} from "../slices/userSlice";
 
 function Top() {
   const asinDataList = useSelector(
@@ -160,6 +164,11 @@ function Top() {
     } else if (userRef.current.sessionId !== sessionIdOnFiretore) {
       // ログアウト
       await logOut();
+      dispatch(changeIsAuthed(false));
+      dispatch(changePlanOnStore(""));
+      dispatch(changeShowButtonStatus(0));
+      dispatch(changeSystemStatus(0));
+
       // ダイアログの表示
       setIsOpenBlockMultiLoginSnackBar(true);
       console.log("sessionIdOnLocal", userRef.current.sessionId);

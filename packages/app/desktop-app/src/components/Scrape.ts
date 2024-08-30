@@ -1,4 +1,7 @@
-import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
+import { Browser, Page, ElementHandle } from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+
 import { ipcMain } from "electron";
 import { useSelector } from "react-redux";
 import UserAgent from "user-agents";
@@ -9,6 +12,10 @@ import UserAgent from "user-agents";
 // 基本的なクラスを定義した記法と同じ構文になる
 const scrapePromise = (async () => {
   // 即時関数で立ち上げ直後に読み込まれる初期化処理
+
+  // pupeteerをヘッドレスモードで利用する際に
+  // Bot判定されにくくするための機能を実装
+  puppeteer.use(StealthPlugin());
 
   /// ■ 指定された時間だけ処理を遅延させる関数の宣言
   const sleep = (minTime: number, range: number) => {
@@ -97,7 +104,7 @@ const scrapePromise = (async () => {
   return {
     launchBrowser: async () => {
       const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         executablePath:
           process.platform === "win32"
             ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
@@ -733,7 +740,7 @@ const scrapePromise = (async () => {
       }
       console.log("4.2.9");
 
-      const inputBoxSelector = `input[type="text"]`;
+      const inputBoxSelector = `input[type="number"][name="quantityBox"]`;
 
       // 入力欄の表示を待機
       await page.waitForSelector(inputBoxSelector);
@@ -746,6 +753,8 @@ const scrapePromise = (async () => {
         // 入力欄を選択
         await page.evaluate((inputBox) => inputBox.click(), inputBox);
         console.log("4.3.2");
+
+        await sleep(500, 0);
 
         // 入力欄に値を入力
         await page.evaluate((inputBox) => {

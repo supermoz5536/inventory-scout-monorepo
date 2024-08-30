@@ -45,6 +45,8 @@ app.whenReady().then(() => {
 
 app.whenReady().then(() => {
   openBackGroundWindow();
+  // backGroundWindow を表示した後、mainWindow を最前面に表示
+  mainWindow.focus();
 });
 
 /// 初期化処理として
@@ -256,7 +258,7 @@ ipcMain.handle("schedule-scraping", async (event, time: string) => {
             }
           });
         }
-        // ロードされたら状態変数更新の通知をメインウインドウに送り
+        // ロードされたら状態変数更新の通知をバックグランドウインドウに送り
         // メインウインドウで更新処理を行う
         backGroundWindow.webContents.send("start-scheduled-scraping");
         scrape = await scrapePromis;
