@@ -53,8 +53,11 @@ const ConfirmChangeToFreePlanDialog = ({
       if (message === "canceled" || message === "already_canceled") {
         // 月額プラン => フリープランへの変更処理が
         // 成功したのでスナックバーで通知
+        setIsOpenConfirmChangeToFreePlanDialog(false);
         setIsOpenSnackBar(true);
       }
+    } else {
+      setMessage("error");
     }
   };
 
@@ -81,12 +84,12 @@ const ConfirmChangeToFreePlanDialog = ({
 
   const action = (
     <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleClose} />
+      <Button color="secondary" size="small" onClick={handleCloseSnackBar} />
       <IconButton
         size="small"
         aria-label="close"
         color="inherit"
-        onClick={handleClose}
+        onClick={handleCloseSnackBar}
         sx={{
           position: "absolute",
           right: 8,
@@ -171,7 +174,9 @@ const ConfirmChangeToFreePlanDialog = ({
               ? `プラン変更の手続きが完了しました。月額プランは残りのご利用可能期間の最終日（${cancelAt}）に自動解約され、そのタイミングでフリープランへの変更が反映されます。それまでは引き続き月額プランでご利用いただけます。`
               : message === "already_canceled"
               ? `既にプラン変更の手続きは完了しています。月額プランは残りのご利用可能期間の最終日（${cancelAt}）に自動解約され、そのタイミングでフリープランへの変更が反映されます。それまでは引き続き月額プランでご利用いただけます。`
-              : "プランの変更手続きの途中でシステムエラー(error:0001)が発生しました、管理者にお問い合わせください。"
+              : message === "error"
+              ? "サーバーからプランデータを取得する際にエラー(error:0001)が発生しました、管理者にお問い合わせください。"
+              : "プランの変更手続きの途中でシステムエラー(error:0002)が発生しました、管理者にお問い合わせください。"
           }
           action={action}
         />
