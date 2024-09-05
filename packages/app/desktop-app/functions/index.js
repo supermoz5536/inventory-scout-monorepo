@@ -235,42 +235,64 @@ exports.updateCancelAtPeriodEnd = functions
         apiVersion: "2023-10-16",
       });
 
+      let activeSubscription = null;
       const firebaseUid = data.uid;
-      // StripeのCustomerをメタデータのFirebase UIDで検索
+
+      // Firebase UIDを使用して顧客を検索
+      // (customerIdだと、セッション間で紐付けできない)
       const customers = await stripe.customers.search({
         query: `metadata['firebaseUid']:'${firebaseUid}'`,
+        limit: 100, // 1回のリクエストで最大100件まで取得
       });
 
       if (customers.data.length === 0) {
         throw new functions.https.HttpsError("not-found", "not found");
       }
 
-      const customerId = customers.data[0].id;
+      // avtiveなサブスクリプションプランを保持してる顧客を探す
+      // (一人が複数のcustomerIdを生成している場合があるので、
+      // 共通のFiresbaseUidでフィルタして抽出したIdで振るいにかけている)
+      for (const customer of customers.data) {
+        // 任意の顧客のサブスクリプションプランのリストを取得
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: "active",
+        });
 
-      // 顧客に紐づくアクティブなサブスクリプションリストを取得する
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: "active",
-      });
+        // リストの中身がある顧客を見つけたら
+        // その中身のactiveなプランに更新してbreak
+        if (subscriptions.data.length > 0) {
+          activeSubscription = subscriptions.data[0];
+          break;
+        }
+      }
 
-      if (subscriptions.data[0].cancel_at_period_end) {
+      // リストの中身がある顧客を見つけられなかった場合のハンドリング
+      if (activeSubscription === null) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "No activeSubscription found",
+        );
+      }
+
+      if (activeSubscription.cancel_at_period_end) {
         // すでに解約処理がされている場合
         return {
           success: false,
           message: "already_canceled",
-          cancelAt: subscriptions.data[0].current_period_end,
+          cancelAt: activeSubscription.current_period_end,
         };
       } else {
         // 現在はpremiumプランしかアイテムはなく、
         // 契約時に重複登録は弾いているので[0]番目を指定
-        await stripe.subscriptions.update(subscriptions.data[0].id, {
+        await stripe.subscriptions.update(activeSubscription.id, {
           cancel_at_period_end: true,
         });
         // 成功した場合のレスポンス
         return {
           success: true,
           message: "canceled",
-          cancelAt: subscriptions.data[0].current_period_end,
+          cancelAt: activeSubscription.current_period_end,
         };
       }
     } catch (error) {
