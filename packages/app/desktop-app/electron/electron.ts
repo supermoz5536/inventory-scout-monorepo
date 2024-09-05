@@ -45,8 +45,6 @@ app.whenReady().then(() => {
 
 app.whenReady().then(() => {
   openBackGroundWindow();
-  // backGroundWindow を表示した後、mainWindow を最前面に表示
-  mainWindow.focus();
 });
 
 /// 初期化処理として
@@ -313,7 +311,7 @@ function openBackGroundWindow() {
   backGroundWindow = new BrowserWindow({
     // width: 0,
     // height: 0,
-    show: true,
+    show: false,
     focusable: false, // ユーザーが誤って操作することを防ぐ
     resizable: false, // ウィンドウサイズを変更できないようにする
     webPreferences: {
@@ -328,63 +326,11 @@ function openBackGroundWindow() {
   // クライアント側でのみ解釈されるハッシュ部分 (#)を記述します
   backGroundWindow.loadURL(`${appURL}#/BackGroundWindow`);
 
-  // // 一応表示はしないと did-finished系のトリガーが着火しないので。
-  // backGroundWindow.once("ready-to-show", () => {
-  //   backGroundWindow.show(); // 一瞬表示して
-  //   backGroundWindow.hide(); // すぐに非表示にする
-  // });
-
-  // 起動時のみsystemStatusを初期化
-  // ウィンドウの読み込みが完了した後に処理します
-  backGroundWindow.webContents.once("did-finish-load", () => {
-    if (isInitSystemStatus === false) {
-      backGroundWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
-      isInitSystemStatus = true; // 更新処理が実行されたことを記録
-    }
-  });
-
-  // 起動時のみログアウト処理を実行
-  // ウィンドウの読み込みが完了した後に処理します
-  backGroundWindow.webContents.once("did-finish-load", () => {
-    if (isInitLogoutDone === false) {
-      backGroundWindow.webContents.send("init-logout");
-      isInitLogoutDone = true;
-    }
-  });
-
-  // 起動時のみ「次回からは自動でログイン」が
-  // 有効だった場合のログログイン処理を実行
-  backGroundWindow.webContents.once("did-finish-load", () => {
-    if (isInitLoginDone === false) {
-      backGroundWindow.webContents.send("init-login");
-      isInitLoginDone = true;
-    }
-  });
-
-  // 起動時のみ、ログイン状態の場合で
-  // 前回にスクレイピングが断されてる場合は
-  // 自動でスクレイピングを開始します。
-  backGroundWindow.webContents.once("did-finish-load", () => {
-    if (isInitScraping === false) {
-      backGroundWindow.webContents.send("init-scraping");
-      isInitScraping = true;
-    }
-  });
-
-  // 初回起動時のみ、
-  // 保存された定時スクレイピングの指定時刻を再セットします。
-  backGroundWindow.webContents.once("did-finish-load", () => {
-    if (isInitScheduledTime === false) {
-      backGroundWindow.webContents.send("init-scheduled-time");
-      isInitScheduledTime = true;
-    }
-  });
-
   if (!app.isPackaged) {
     backGroundWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // backGroundWindow.webContents.openDevTools();
+    backGroundWindow.webContents.openDevTools();
   }
 }
 
@@ -425,56 +371,10 @@ function createMainWindow() {
 
   mainWindow.loadURL(appURL);
 
-  // // 起動時のみsystemStatusを初期化
-  // // ウィンドウの読み込みが完了した後に処理します
-  // mainWindow.webContents.once("did-finish-load", () => {
-  //   if (isInitSystemStatus === false) {
-  //     mainWindow.webContents.send("init-system-status"); // レンダラープロセスにメッセージを送信
-  //     isInitSystemStatus = true; // 更新処理が実行されたことを記録
-  //   }
-  // });
-
-  // // 起動時のみログアウト処理を実行
-  // // ウィンドウの読み込みが完了した後に処理します
-  // mainWindow.webContents.once("did-finish-load", () => {
-  //   if (isInitLogoutDone === false) {
-  //     mainWindow.webContents.send("init-logout");
-  //     isInitLogoutDone = true;
-  //   }
-  // });
-
-  // // 起動時のみ「次回からは自動でログイン」が
-  // // 有効だった場合のログログイン処理を実行
-  // mainWindow.webContents.once("did-finish-load", () => {
-  //   if (isInitLoginDone === false) {
-  //     mainWindow.webContents.send("init-login");
-  //     isInitLoginDone = true;
-  //   }
-  // });
-
-  // // 起動時のみ、ログイン状態の場合で
-  // // 前回にスクレイピングが断されてる場合は
-  // // 自動でスクレイピングを開始します。
-  // mainWindow.webContents.once("did-finish-load", () => {
-  //   if (isInitScraping === false) {
-  //     mainWindow.webContents.send("init-scraping");
-  //     isInitScraping = true;
-  //   }
-  // });
-
-  // // 初回起動時のみ、
-  // // 保存された定時スクレイピングの指定時刻を再セットします。
-  // mainWindow.webContents.once("did-finish-load", () => {
-  //   if (isInitScheduledTime === false) {
-  //     mainWindow.webContents.send("init-scheduled-time");
-  //     isInitScheduledTime = true;
-  //   }
-  // });
-
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -514,7 +414,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // prefWindow.webContents.openDevTools();
+    prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -554,7 +454,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // loginPromptWindow.webContents.openDevTools();
+    loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -596,7 +496,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // StockDetailWindow.webContents.openDevTools();
+    StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
