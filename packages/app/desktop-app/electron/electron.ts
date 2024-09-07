@@ -13,9 +13,11 @@ import { persistor } from "../src/redux/store";
 import cron from "node-cron";
 import { Parser } from "@json2csv/plainjs";
 import express from "express";
+import { Server } from "http";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
+let appURLForStripe: string;
 let scrape: any;
 let browser: any;
 let scheduledTask: any;
@@ -24,7 +26,7 @@ let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
-const localServer = express();
+let assignedPort: string;
 
 /// アプリ起動時にウインドウがない場合に
 /// 新しいウィンドウを生成する関数
@@ -299,7 +301,7 @@ ipcMain.handle("open-stock-detail", (event, asinData: AsinData) => {
 });
 
 // レンダラープロセスに appURL を送信
-ipcMain.handle("get-app-url", () => appURL);
+ipcMain.handle("get-app-url", () => appURLForStripe);
 
 //====================================================================
 
@@ -332,7 +334,7 @@ function openBackGroundWindow() {
 }
 
 /// メイン画面を生成する関数です
-function createMainWindow() {
+async function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1650,
     height: 1050,
@@ -365,6 +367,26 @@ function createMainWindow() {
       // 開発用ローカルサーバー (localhost:3000) に
       // アクセスするための URL を生成します。
       "http://localhost:3000";
+
+  if (app.isPackaged) {
+    // パッケージ化されたアプリの場合
+    // pathname には、
+    // app.getAppPath() で取得したアプリケーションのパスと、
+    // build/index.html が結合されます。
+    // protocol: 'file:' と slashes: true は、
+    // ローカルファイルシステムの URL であることを示します。
+    appURL = url.format({
+      pathname: path.resolve(app.getAppPath(), "build/index.html"),
+      protocol: "file:",
+      slashes: true,
+    });
+
+    await localServerListener();
+    appURLForStripe = `http://localhost:${assignedPort}`;
+  } else {
+    appURL = "http://localhost:3000";
+    appURLForStripe = "http://localhost:3000";
+  }
 
   mainWindow.loadURL(appURL);
 
@@ -738,3 +760,60 @@ function saveDataToStorage(data: any) {
     });
   });
 }
+
+//========================================================================
+
+// 立ち上がっていないローカルサーバーのインスタンスの作成
+const localServer = express();
+// port = 0 を指定すると、
+// Node.jsが自動的に空いているポートを選んでくれます。
+const port = 0;
+
+localServer.get("/success", (req, res) => {
+  // ここで支払いが成功した際のコールバック
+  mainWindow.loadURL(appURL);
+});
+
+localServer.get("/cancel", (req, res) => {
+  res.send("Payment was canceled. You can close this window.");
+  // ここで支払いがキャンセルされた際のコールバック
+  mainWindow.loadURL(appURL);
+});
+
+// ローカルサーバーを立ち上げる関数
+async function localServerListener(): Promise<void> {
+  // このコールバックは、サーバーが起動したときにのみ
+  // 一度だけ実行されます。
+  return new Promise((resolve, reject) => {
+    const httpServerObj: Server = localServer.listen(port, () => {
+      // 割り当てられたポート番号を取得
+      const address = httpServerObj.address();
+      if (typeof address === "object" && address !== null) {
+        // TCPポートを使っている場合
+        assignedPort = address.port.toString();
+        console.log(
+          `Local server is running at http://localhost:${assignedPort}`,
+        );
+        resolve();
+      } else if (typeof address === "string") {
+        // UNIXドメインソケットを使っている場合
+        assignedPort = address; // これはソケットファイルのパスです
+        console.log(`Server is running at ${assignedPort}`);
+        resolve();
+      } else {
+        assignedPort = "-1";
+        reject();
+        reject(
+          new Error(
+            "Failed to retrieve server address. Using fallback port http://localhost:3001",
+          ),
+        );
+      }
+      // サーバーが起動に失敗した場合のエラーハンドリング
+      httpServerObj.on("error", (err) => {
+        reject(new Error(`Local Server error: ${err.message}`));
+      });
+    });
+  });
+}
+//========================================================================

@@ -383,9 +383,9 @@ exports.createCheckoutSession = functions
         // このセッションのモードを「支払い」に設定します。
         mode: paymentMode,
         // 支払いが成功した際にリダイレクトするURLを指定します。
-        success_url: data.appURL,
+        success_url: `${data.appURL}/success`,
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。
-        cancel_url: data.appURL,
+        cancel_url: `${data.appURL}/cancel`,
       });
       return session.id;
     } catch (error) {
