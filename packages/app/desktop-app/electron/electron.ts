@@ -12,6 +12,7 @@ import scrapePromis from "../src/components/Scrape";
 import { persistor } from "../src/redux/store";
 import cron from "node-cron";
 import { Parser } from "@json2csv/plainjs";
+import express from "express";
 
 /// メインプロセスのグローバル変数です。
 let appURL: string;
@@ -23,11 +24,7 @@ let mainWindow: any;
 let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
-let isInitSystemStatus: boolean = false;
-let isInitLogoutDone: boolean = false;
-let isInitLoginDone: boolean = false;
-let isInitScraping: boolean = false;
-let isInitScheduledTime: boolean = false;
+const localServer = express();
 
 /// アプリ起動時にウインドウがない場合に
 /// 新しいウィンドウを生成する関数
