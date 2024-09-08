@@ -351,6 +351,16 @@ exports.createCheckoutSession = functions
         );
       }
 
+      const successURL =
+        data.appURL === "http://localhost:-1"
+          ? "http://inventoryz.apple-pepper.net/success/"
+          : `${data.appURL}/success`;
+
+      const cancelURL =
+        data.appURL === "http://localhost:-1"
+          ? "http://inventoryz.apple-pepper.net/cancel/"
+          : `${data.appURL}/cancel`;
+
       // StripeのCheckoutセッションを新規作成し、その設定を行います。
       const session = await stripe.checkout.sessions.create({
         // 作成した顧客のIDをセッションに紐付けます。
@@ -383,9 +393,9 @@ exports.createCheckoutSession = functions
         // このセッションのモードを「支払い」に設定します。
         mode: paymentMode,
         // 支払いが成功した際にリダイレクトするURLを指定します。
-        success_url: data.appURL,
+        success_url: successURL,
         // 支払いがキャンセルされた際にリダイレクトするURLを指定します。
-        cancel_url: data.appURL,
+        cancel_url: cancelURL,
       });
       return session.id;
     } catch (error) {
