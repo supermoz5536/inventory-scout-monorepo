@@ -104,7 +104,7 @@ const scrapePromise = (async () => {
   return {
     launchBrowser: async () => {
       const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         executablePath:
           process.platform === "win32"
             ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
