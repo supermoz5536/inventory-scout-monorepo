@@ -329,7 +329,7 @@ function openBackGroundWindow() {
     backGroundWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    backGroundWindow.webContents.openDevTools();
+    // backGroundWindow.webContents.openDevTools();
   }
 }
 
@@ -346,27 +346,6 @@ async function createMainWindow() {
       sandbox: false,
     },
   });
-
-  // アプリケーションがパッケージ化された状態かどうかを判別します
-  appURL = app.isPackaged
-    ? // パッケージ化されてる場合
-      // url.format() を使用して、
-      // ローカルファイルシステム上に配置された
-      // build/index.html へのURLを生成します。
-      url.format({
-        // pathname には、
-        // app.getAppPath() で取得したアプリケーションのパスと、
-        // build/index.html が結合されます。
-        pathname: path.resolve(app.getAppPath(), "build/index.html"),
-        // protocol: 'file:' と slashes: true は、
-        // ローカルファイルシステムの URL であることを示します。
-        protocol: "file:",
-        slashes: true,
-      })
-    : // パッケージ化されていない場合、
-      // 開発用ローカルサーバー (localhost:3000) に
-      // アクセスするための URL を生成します。
-      "http://localhost:3000";
 
   if (app.isPackaged) {
     // パッケージ化されたアプリの場合
@@ -393,7 +372,7 @@ async function createMainWindow() {
   if (!app.isPackaged) {
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
+    // mainWindow.webContents.openDevTools(); // パッケージ化された状態でもデベロッパーツールを開く
   }
 
   // 該当のウインドウに対して
@@ -433,7 +412,7 @@ function openPreferences() {
     prefWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    prefWindow.webContents.openDevTools();
+    // prefWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -473,7 +452,7 @@ function openLoginPrompt() {
     loginPromptWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    loginPromptWindow.webContents.openDevTools();
+    // loginPromptWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -515,7 +494,7 @@ function openStockDetail(asinData: AsinData) {
     StockDetailWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    StockDetailWindow.webContents.openDevTools();
+    // StockDetailWindow.webContents.openDevTools();
   }
 
   // 該当のウインドウに対して
@@ -805,7 +784,7 @@ async function localServerListener(): Promise<void> {
         reject();
         reject(
           new Error(
-            "Failed to retrieve server address. Using fallback port http://localhost:3001",
+            `Failed to retrieve server address. Using fallback value "-1"`,
           ),
         );
       }
