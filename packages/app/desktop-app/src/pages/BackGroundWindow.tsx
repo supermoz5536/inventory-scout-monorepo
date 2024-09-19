@@ -262,12 +262,15 @@ const BackGroundWindow = () => {
           // Firestore上の最新のセッションIDを取得して照合
           // 一致しなければ、他の場所からのログインによる変更なので
           // 強制ログアウト & スクレイピング処理の終了
-          const sessionIdOnFiretore: string | undefined =
-            await fetchSessionIdOnFirestore(user.uid);
-          if (userRef.current.sessionId !== sessionIdOnFiretore) {
+          // const sessionIdOnFiretore: string | undefined =
+          //   await fetchSessionIdOnFirestore(user.uid);
+          if (
+            userRef.current.sessionId !==
+            systemStatusRef.current.sessionIdOnFiretore
+          ) {
             console.log(
-              "runScraping時 sessionIdOnFiretore",
-              sessionIdOnFiretore,
+              "runScraping時 systemStatusRef.current.sessionIdOnFiretore",
+              systemStatusRef.current.sessionIdOnFiretore,
             );
             console.log(
               "runScraping時 userRef.current.sessionId",

@@ -110,6 +110,7 @@ declare global {
     showButtonStatus: number;
     isScheduledScrapingAble: boolean;
     scheduledScrapingTime: string;
+    sessionIdOnServer: string;
   }
 
   interface IsAutoLoginProps {

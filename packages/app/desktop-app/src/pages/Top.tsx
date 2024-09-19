@@ -164,7 +164,6 @@ function Top() {
     // Firestore上の現在のセッションIDを事前に取得しておきます。
     const sessionIdOnFiretore: string | undefined =
       await fetchSessionIdOnFirestore(userRef.current.uid);
-    // const sessionIdOnLocal = store.getState().user.value.sessionId;
 
     console.log("取得開始を押下時 sessionIdOnFiretore", sessionIdOnFiretore);
     console.log(
@@ -190,12 +189,6 @@ function Top() {
 
       // ダイアログの表示
       setIsOpenBlockMultiLoginSnackBar(true);
-      console.log("sessionIdOnLocal", userRef.current.sessionId);
-      console.log(
-        "store.getState().user.value.sessionId",
-        store.getState().user.value.sessionId,
-      );
-      console.log("sessionIdOnFiretore", sessionIdOnFiretore);
 
       // ■ freeプランユーザーの場合
       // プラン加入ページへ誘導

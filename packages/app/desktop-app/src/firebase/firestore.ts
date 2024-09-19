@@ -22,6 +22,7 @@ import {
   changeIsLockedRunScraping,
   changePlanOnStore,
 } from "../slices/userSlice";
+import { changeSessionIdOnServer } from "../slices/systemStatusSlice";
 
 export const getFirstUserEmail = async () => {
   try {
@@ -90,9 +91,12 @@ export const setUserDocListener = (uid: string): any => {
       // フリープランの機能制限のハンドリング値の変更をリスン
       const latestIsLockedRunScraping =
         querySnapshot.data().is_locked_run_scraping;
+      // サーバーのセッションIDの値の変更をリスン
+      const latestSessionIdOnServer = querySnapshot.data().session_id;
       // リスンした最新のプラン名にstoreを更新
       store.dispatch(changePlanOnStore(latestPlan));
       store.dispatch(changeIsLockedRunScraping(latestIsLockedRunScraping));
+      store.dispatch(changeSessionIdOnServer(latestSessionIdOnServer));
     }
     return unsubscribe;
   });

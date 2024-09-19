@@ -6,6 +6,7 @@ const initialState: { value: SystemStatus } = {
     showButtonStatus: 0,
     isScheduledScrapingAble: false,
     scheduledScrapingTime: "00:00",
+    sessionIdOnServer: "",
   },
 };
 
@@ -38,6 +39,10 @@ export const systemStatusSlice = createSlice({
     changeScheduledTime: (state, action: PayloadAction<string>) => {
       state.value.scheduledScrapingTime = action.payload;
     },
+
+    changeSessionIdOnServer: (state, action: PayloadAction<string>) => {
+      state.value.sessionIdOnServer = action.payload;
+    },
   },
 });
 
@@ -50,6 +55,7 @@ export const {
   changeShowButtonStatus,
   changeIsScheduledScrapingAble,
   changeScheduledTime,
+  changeSessionIdOnServer,
 } = systemStatusSlice.actions;
 // Reduxストアは、アプリケーションの全状態を管理します。
 // ストアを作成する際には、リデューサーを渡す必要があるので
