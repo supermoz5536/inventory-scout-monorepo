@@ -101,7 +101,7 @@ export const listenAuthState = async () => {
       // 後からsessionIdの状態が、変更前の状態に上書きされる可能性があるので
       // 待機時間を用意して、完了を待ってからローカルのsessionIdの状態を更新する
       console.log("before ", store.getState().user.value.sessionId);
-      await new Promise((resolve) => setTimeout(resolve, 750));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       store.dispatch(changeIsAuthed(true));
       store.dispatch(changeSessionIdOnStore(sessionId));
       console.log("after ", store.getState().user.value.sessionId);

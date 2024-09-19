@@ -289,7 +289,7 @@ const scrapePromise = (async () => {
     scrollOnDrawer: async (page: Page) => {
       await sleep(2000, 4000);
       // スクロールしたい要素を宣言
-      const drawerSelector = "#all-offers-display";
+      const drawerSelector = "#all-offers-display-scroller";
       // スクロールしたい要素を取得
       const drawerElement = await page.$(drawerSelector);
 
@@ -319,15 +319,47 @@ const scrapePromise = (async () => {
 
           for (let i = 0; i < tryTimes; i++) {
             console.log("i =", i);
-            await page.mouse.wheel({
-              deltaY: boundingBox.height,
-            });
+
+            // // 物理的なマウスホイールのスクロールシミュレート
+            // await page.mouse.wheel({
+            //   deltaY: boundingBox.height,
+            // });@
+
+            // scrollByで強制的にスクロール（全縦幅）
+            await page.evaluate(
+              (drawerSelector, height) => {
+                const drawerElement = document.querySelector(drawerSelector);
+                if (drawerElement) {
+                  drawerElement.scrollBy({
+                    top: height, // 縦方向にスクロール
+                    left: 0, // 横方向はスクロールしない
+                    behavior: "smooth", // スムーズスクロール
+                  });
+                  // drawerElement.scrollTop += 50; // ここでDrawer内部をスクロール
+                }
+              },
+              drawerSelector,
+              boundingBox.height,
+            );
 
             await sleep(1500, 2000);
 
-            await page.mouse.wheel({
-              deltaY: 50,
-            });
+            // // 物理的なマウスホイールのスクロールシミュレート
+            // await page.mouse.wheel({
+            //   deltaY: 50,
+            // });
+
+            // scrollByで強制的にスクロール（50px）
+            await page.evaluate((drawerSelector) => {
+              const drawerElement = document.querySelector(drawerSelector);
+              if (drawerElement) {
+                drawerElement.scrollBy({
+                  top: 50, // 縦方向にスクロール
+                  left: 0, // 横方向はスクロールしない
+                  behavior: "smooth", // スムーズスクロール
+                });
+              }
+            }, drawerSelector);
 
             // 要素のトップの高さを取得して強制的にDOMを更新
             // 返り値を使用しないので実際的には何もしていない更新自体が目的の記述

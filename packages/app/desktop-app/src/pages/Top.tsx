@@ -166,6 +166,12 @@ function Top() {
       await fetchSessionIdOnFirestore(userRef.current.uid);
     // const sessionIdOnLocal = store.getState().user.value.sessionId;
 
+    console.log("取得開始を押下時 sessionIdOnFiretore", sessionIdOnFiretore);
+    console.log(
+      "取得開始を押下時 userRef.current.sessionId",
+      userRef.current.sessionId,
+    );
+
     // ■ ログインウインドウの表示
     if (userRef.current.isAuthed === false) {
       console.log("1 handleScrapingButton ");

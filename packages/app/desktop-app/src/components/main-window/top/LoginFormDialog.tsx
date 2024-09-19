@@ -116,6 +116,11 @@ const LoginFormDialog = ({
         // ストアのUserオブジェクトを更新
         dispatch(updateUser(newUser));
 
+        // 「ログイン」ボタンを押下してから
+        // サーバーとローカルの session_id の更新が確実に行われる前に
+        // 「取得開始」ボタンが押されないように、
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
         // ログイン画面を閉じる
         setIsOpenLoginFormDialog(false);
       }

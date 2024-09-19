@@ -14,6 +14,7 @@ import {
   onSnapshot,
   Unsubscribe,
   updateDoc,
+  getDocFromServer,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { store } from "../redux/store";
@@ -127,7 +128,7 @@ export const fetchSessionIdOnFirestore = async (
 ): Promise<string | undefined> => {
   try {
     const userDocRef = doc(db, "users", uid);
-    const docSnap = await getDoc(userDocRef);
+    const docSnap = await getDocFromServer(userDocRef);
 
     if (docSnap.exists()) {
       const sessionId = docSnap.data().session_id;

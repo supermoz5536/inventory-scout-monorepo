@@ -61,6 +61,10 @@ const BackGroundWindow = () => {
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
+    console.log(
+      "BGPの更新 userRef.current.sessionId in useEffect",
+      userRef.current.sessionId,
+    );
   }, [user]);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -261,6 +265,14 @@ const BackGroundWindow = () => {
           const sessionIdOnFiretore: string | undefined =
             await fetchSessionIdOnFirestore(user.uid);
           if (userRef.current.sessionId !== sessionIdOnFiretore) {
+            console.log(
+              "runScraping時 sessionIdOnFiretore",
+              sessionIdOnFiretore,
+            );
+            console.log(
+              "runScraping時 userRef.current.sessionId",
+              userRef.current.sessionId,
+            );
             await logOut();
             dispatch(changeIsAuthed(false));
             dispatch(changePlanOnStore(""));
