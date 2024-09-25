@@ -23,7 +23,10 @@ export const createAccount = async (email: string, password: string) => {
         isAutoLogIn: false,
         isCancelProgress: false,
         isLockedRunScraping: true,
-        plan: "f",
+        // 有償化コメントアウト 有償化サービスが開始したら
+        // 「plan: s」→「plan: f」
+        // に変更する必要があります。
+        plan: "s",
         sessionId: sessionId,
         createdAt: "",
       }),

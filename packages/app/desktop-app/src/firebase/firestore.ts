@@ -62,7 +62,10 @@ export const createUserDoc = async (
   try {
     const initialData = {
       email: email,
-      plan: "f",
+      // 有償化コメントアウト 有償化サービスが開始したら
+      // 「plan: s」→「plan: f」
+      // に変更する必要があります。
+      plan: "s",
       is_authed: false,
       is_cancel_progress: false,
       is_locked_run_scraping: true,

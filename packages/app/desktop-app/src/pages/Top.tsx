@@ -48,6 +48,7 @@ import {
 } from "../slices/userSlice";
 
 function Top() {
+  // ASINリストの状態変数の取得
   const asinDataList = useSelector(
     (state: RootState) => state.asinDataList.value,
   );
@@ -57,7 +58,18 @@ function Top() {
   }, [asinDataList]);
 
   // システム関係の状態変数の取得
-  const systemStatus: number = useSelector(
+  // 変更時にコンポーネントの再描画が不必要な場合は useRef
+  const systemStatus = useSelector(
+    (state: RootState) => state.systemStatus.value,
+  );
+  const systemStatusRef = useRef(systemStatus);
+  useEffect(() => {
+    systemStatusRef.current = systemStatus;
+  }, [systemStatus]);
+
+  // 変更時にコンポーネントの再描画が必要な場合は useSelector
+  // (この場合はシンタックスとして、useSelectorから直接取得する必要がある。)
+  const systemStatusValue: number = useSelector(
     (state: RootState) => state.systemStatus.value.systemStatus,
   );
   const showButtonStatus = useSelector(
@@ -65,21 +77,17 @@ function Top() {
   );
 
   useEffect(() => {
-    if (systemStatus === 6) {
+    if (systemStatusValue === 6) {
       setIsOpenBlockMultiLoginSnackBar(true);
       dispatch(changeSystemStatus(0));
     }
-  }, [systemStatus]);
+  }, [systemStatusValue]);
 
   // ユーザーの状態変数の取得
   const user = useSelector((state: RootState) => state.user.value);
   const userRef = useRef(user);
   useEffect(() => {
     userRef.current = user;
-    // console.log(
-    //   "userRef.current.sessionId in useEffect",
-    //   userRef.current.sessionId,
-    // );
   }, [user]);
 
   // dispatch: storeへのreducer起動のお知らせ役
@@ -165,7 +173,10 @@ function Top() {
     const sessionIdOnFiretore: string | undefined =
       await fetchSessionIdOnFirestore(userRef.current.uid);
 
-    console.log("取得開始を押下時 sessionIdOnFiretore", sessionIdOnFiretore);
+    console.log(
+      "取得開始を押下時 systemStatusRef.current.sessionIdOnServer",
+      systemStatusRef.current.sessionIdOnServer,
+    );
     console.log(
       "取得開始を押下時 userRef.current.sessionId",
       userRef.current.sessionId,
@@ -179,7 +190,9 @@ function Top() {
 
       // ■ 同一アカウントの複数ログインをセッションIDでチェック
       // 一致しない場合 => ダイアログの表示 & ログアウト。
-    } else if (userRef.current.sessionId !== sessionIdOnFiretore) {
+    } else if (
+      userRef.current.sessionId !== systemStatusRef.current.sessionIdOnServer
+    ) {
       // ログアウト
       await logOut();
       dispatch(changeIsAuthed(false));
@@ -199,13 +212,17 @@ function Top() {
     ) {
       console.log("2 handleScrapingButton");
 
-      // プランリストのダイアログを表示
-      setIsOpenPlanListDialog(true);
+      // プラン選択ダイアログを表示
+      // 無料サービス期間中に誤って分岐に入って
+      // プラン選択ダイアログが表示されないように
+      // コードもコメントアウトしておく
+      // ■■■■■■■■■■■■■■■ 「有償化コメントアウト」 ■■■■■■■■■■■■■■■
+      // setIsOpenPlanListDialog(true);
 
       // ■ 待機状態での「取得開始」のクリック
     } else if (
       userRef.current.isAuthed === true &&
-      [0, 4, 5].includes(systemStatus) &&
+      [0, 4, 5].includes(systemStatusValue) &&
       asinDataListRef.current.length > 0
     ) {
       console.log("3 handleScrapingButton");
@@ -217,7 +234,7 @@ function Top() {
       // スクレイピング中の「取得停止」のクリック
     } else if (
       userRef.current.isAuthed === true &&
-      [1, 2, 3].includes(systemStatus) &&
+      [1, 2, 3].includes(systemStatusValue) &&
       showButtonStatus === 1
     ) {
       console.log("4 handleScrapingButton");
@@ -227,7 +244,7 @@ function Top() {
       // スクレイピング中の「本当に？」のクリック
     } else if (
       userRef.current.isAuthed === true &&
-      [1, 2, 3].includes(systemStatus) &&
+      [1, 2, 3].includes(systemStatusValue) &&
       showButtonStatus === 2
     ) {
       console.log("5 handleScrapingButton");
@@ -298,7 +315,7 @@ function Top() {
       window.myAPI.runScraping(asinDataListRef.current);
       dispatch(changeSystemStatus(1));
       dispatch(changeShowButtonStatus(1));
-      console.log("■ 2 handleRunScraping systemStatus =", systemStatus);
+      console.log("■ 2 handleRunScraping systemStatus =", systemStatusValue);
     } else {
       console.log("■ 3 handleRunScraping");
       // ■ 同日に前回の処理が中断されている場合の処理
@@ -368,17 +385,17 @@ function Top() {
   /// runScrapingの完了時に「取得停止」の表示の状態を
   /// 「取得開始」の表示の状態切り替える関数
   useEffect(() => {
-    if (systemStatus === 2) {
+    if (systemStatusValue === 2) {
       dispatch(changeShowButtonStatus(1));
 
       // systemStatusの変更が 5 の場合は
       // メインプロセスからの取得データの結果を
       // 受信したコールバックでの変更なので
       // そのコールバックでボタンを初期化する
-    } else if (systemStatus === 5) {
+    } else if (systemStatusValue === 5) {
       dispatch(changeShowButtonStatus(0));
     }
-  }, [systemStatus]);
+  }, [systemStatusValue]);
 
   return (
     <div className="App">
@@ -422,6 +439,7 @@ function Top() {
               : null}
           </Button>
 
+          {/* 有償化コメントアウト
           <Button
             className="top-square-space-menu-container-select-plan"
             onClick={() => setIsOpenPlanListDialog(true)}
@@ -431,6 +449,29 @@ function Top() {
               fontWeight: "bold",
               "&:hover": {
                 backgroundColor: "#CB0000", // ホバー時の背景色
+              },
+            }}
+          >
+            プラン変更
+          </Button>
+          */}
+
+          {/* 有償化コメントアウト　以下のButtonは上記でコメントアウトされてるButtonのプレイスホルダーです。
+        　　　 有料化サービスが開始されたら、上記のButtonを有効にします。*/}
+          <Button
+            className="top-square-space-menu-container-select-plan"
+            onClick={() => setIsOpenPlanListDialog(true)}
+            variant="contained"
+            sx={{
+              backgroundColor: "transparent", // 背景を透明に
+              color: "transparent", // テキストも透明に
+              cursor: "default", // カーソルを通常状態に
+              pointerEvents: "none", // クリック無効化
+              boxShadow: "none", // 影を消す
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "transparent", // ホバー時も透明
+                boxShadow: "none", // ホバー時も影を消す
               },
             }}
           >

@@ -69,6 +69,7 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
               {userRef.current.email}
             </p>
           </div>
+          {/* 有償化コメントアウト 有料化サービスが開始されたら、表示を有効にします。
           <div className="authed-login-section-email-line">
             <p className="authed-login-section-email-text">ご利用状況：</p>
             <p className="authed-login-section-email-adress">
@@ -81,13 +82,17 @@ export const AuthedLoginSection = ({ isChecked }: IsAutoLoginProps) => {
                 : null}
             </p>
           </div>
+          */}
         </div>
-        {userRef.current.plan === "s" ? (
+
+        {/* 有償化コメントアウト 有料化サービスが開始されたら、表示を有効にします。
+        userRef.current.plan === "s" ? (          
           <div className="authed-login-section-email-line">
             <p className="authed-login-section-email-text">次回更新日：</p>
             <p className="authed-login-section-email-adress">{periodEndDate}</p>
-          </div>
-        ) : null}
+          </div>          
+        ) : null
+        */}
 
         <button
           className="authed-login-section-login-button"

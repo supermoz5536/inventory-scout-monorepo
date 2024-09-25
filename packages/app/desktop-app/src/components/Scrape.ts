@@ -104,11 +104,13 @@ const scrapePromise = (async () => {
   return {
     launchBrowser: async () => {
       const browser = await puppeteer.launch({
+        // headless: "new" as any,
         headless: false,
         executablePath:
           process.platform === "win32"
             ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-            : undefined,
+            : // : undefined,
+              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         args: [
           "--no-sandbox", // サンドボックスはセキュリティ機能であり、これを無効にすることでブラウザがより軽量に実行されます。
           "--disable-setuid-sandbox", // --no-sandboxと一緒に使われ、同様の理由でサンドボックスを無効にします。
@@ -120,6 +122,7 @@ const scrapePromise = (async () => {
           "--disable-accelerated-2d-canvas", // 2Dキャンバスのハードウェアアクセラレーションを無効にすることで、描画の問題やブラウザのクラッシュを防ぎます。
           "--disable-gpu", // GPUを無効にすることで、GPU関連のクラッシュを防ぎます。
           "--window-size=1280,960",
+          // "--window-position=-2400,-2400", // windowsの白いバグウインドウを画面外に移動させる
         ],
       });
       return browser;

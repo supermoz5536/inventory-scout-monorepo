@@ -19,6 +19,7 @@ import { updateUser } from "../../../slices/userSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import PlanList from "../../plan/PlanList";
+import CreateAccountFormForFreePeriod from "../../account/CreateAccountFormForFreePeriod";
 
 const LoginFormDialog = ({
   isOpenLoginFormDialog,
@@ -46,6 +47,9 @@ const LoginFormDialog = ({
     setIsVisiblePassword(!isVisiblePassword);
   };
   const [isOpenPlanListDialog, setIsOpenPlanListDialog] =
+    useState<boolean>(false);
+
+  const [isOpenCreateAccountFormDialog, setIsOpenCreateAccountFormDialog] =
     useState<boolean>(false);
 
   // グローバル変数のuserの参照を定数で定義
@@ -132,7 +136,13 @@ const LoginFormDialog = ({
   };
 
   const handleLink = () => {
-    setIsOpenPlanListDialog(true);
+    // // 有償化コメントアウト 有料化サービスが開始されたら、表示を有効にします。
+    // setIsOpenPlanListDialog(true);
+
+    // 無償サービス中のアカウント作成フォームダイアログの呼び出し
+    // 有償化コメントアウト 有料化サービスが開始されたら、このコードは削除します。
+    setIsOpenCreateAccountFormDialog(true);
+
     setIsOpenLoginFormDialog(false);
   };
 
@@ -290,6 +300,15 @@ const LoginFormDialog = ({
         <PlanList
           isOpenPlanListDialog={isOpenPlanListDialog}
           setIsOpenPlanListDialog={setIsOpenPlanListDialog}
+        />
+      </div>
+      <div>
+        {/* 有償化コメントアウト この CreateAccountFormForFreePeriod は
+      　　   無償期間に、アカウント作成ダイアログを表示するためのものなので
+      　   　無償期間が終了したら削除します。*/}
+        <CreateAccountFormForFreePeriod
+          isOpenCreateAccountFormDialog={isOpenCreateAccountFormDialog}
+          setIsOpenCreateAccountFormDialog={setIsOpenCreateAccountFormDialog}
         />
       </div>
     </>
