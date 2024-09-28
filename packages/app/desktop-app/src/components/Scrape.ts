@@ -5,6 +5,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { ipcMain } from "electron";
 import { useSelector } from "react-redux";
 import UserAgent from "user-agents";
+import { execSync } from "child_process";
 
 // ■ クラスの定義
 // 即時関数で全体をラッピングしてあるので
@@ -103,28 +104,100 @@ const scrapePromise = (async () => {
   // 各メソッドの定義
   return {
     launchBrowser: async () => {
-      const browser = await puppeteer.launch({
-        // headless: "new" as any,
-        headless: false,
-        executablePath:
-          process.platform === "win32"
-            ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-            : // : undefined,
-              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        args: [
-          "--no-sandbox", // サンドボックスはセキュリティ機能であり、これを無効にすることでブラウザがより軽量に実行されます。
-          "--disable-setuid-sandbox", // --no-sandboxと一緒に使われ、同様の理由でサンドボックスを無効にします。
-          "--disable-infobars", // Chromeブラウザが「Chromeは自動テスト ソフトウェアによって制御されています」という情報バーを表示するのを無効にします。このバーが表示されると、スクレイピングツールの使用が検知されやすくなります。
-          "--window-position=0,0", // ウィンドウの位置を画面の左上に設定することで、ブラウザウィンドウが特定の位置に固定されます。これは人間が操作しているブラウザの挙動に近づけるために使われます。
-          "--ignore-certifcate-errors", // SSL証明書のエラーを無視することで、自己署名証明書や期限切れの証明書が原因でページの読み込みが失敗するのを防ぎます。
-          "--ignore-certifcate-errors-spki-list", // 特定のSPKIリストに関連する証明書エラーを無視します。これもSSL証明書の問題を回避するためです。
-          "--disable-dev-shm-usage", // 共有メモリの使用を無効にすることで、メモリ使用量を抑え、ブラウザのクラッシュを防ぐことができます。
-          "--disable-accelerated-2d-canvas", // 2Dキャンバスのハードウェアアクセラレーションを無効にすることで、描画の問題やブラウザのクラッシュを防ぎます。
-          "--disable-gpu", // GPUを無効にすることで、GPU関連のクラッシュを防ぎます。
-          "--window-size=1280,960",
-          // "--window-position=-2400,-2400", // windowsの白いバグウインドウを画面外に移動させる
-        ],
-      });
+      const commonArgs = [
+        "--no-sandbox", // サンドボックスはセキュリティ機能であり、これを無効にすることでブラウザがより軽量に実行されます。
+        "--disable-setuid-sandbox", // --no-sandboxと一緒に使われ、同様の理由でサンドボックスを無効にします。
+        "--disable-infobars", // Chromeブラウザが「Chromeは自動テスト ソフトウェアによって制御されています」という情報バーを表示するのを無効にします。このバーが表示されると、スクレイピングツールの使用が検知されやすくなります。
+        "--window-position=0,0", // ウィンドウの位置を画面の左上に設定することで、ブラウザウィンドウが特定の位置に固定されます。これは人間が操作しているブラウザの挙動に近づけるために使われます。
+        "--ignore-certifcate-errors", // SSL証明書のエラーを無視することで、自己署名証明書や期限切れの証明書が原因でページの読み込みが失敗するのを防ぎます。
+        "--ignore-certifcate-errors-spki-list", // 特定のSPKIリストに関連する証明書エラーを無視します。これもSSL証明書の問題を回避するためです。
+        "--disable-dev-shm-usage", // 共有メモリの使用を無効にすることで、メモリ使用量を抑え、ブラウザのクラッシュを防ぐことができます。
+        "--disable-accelerated-2d-canvas", // 2Dキャンバスのハードウェアアクセラレーションを無効にすることで、描画の問題やブラウザのクラッシュを防ぎます。
+        "--disable-gpu", // GPUを無効にすることで、GPU関連のクラッシュを防ぎます。
+        "--window-size=1280,960",
+        "--window-position=-2400,-2400", // windowsの白いバグウインドウを画面外に移動させる
+      ];
+
+      const headlessValue = "new" as any;
+      // const headlessValue = false;
+
+      let browser: any;
+      let chromePath =
+        process.platform === "win32"
+          ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" // 64bit Windows用のデフォルトパス
+          : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; // Mac用のデフォルトパス
+
+      // ① Win(64bit)、Mac 共にデフォルトパスでChrome起動を試行
+      try {
+        browser = await puppeteer.launch({
+          headless: headlessValue,
+          executablePath: chromePath,
+          args: commonArgs,
+        });
+        return browser; // 成功離脱
+      } catch (error) {
+        console.error("Chrome起動失敗[1]", error);
+      }
+
+      // ② フォールバック
+      // win → 4bitパスが失敗した場合、32bitのパスを試す
+      // mac → SpotlightでChromeのパスを取得する
+      if (process.platform === "win32") {
+        // Windows
+        try {
+          chromePath =
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+          browser = await puppeteer.launch({
+            headless: headlessValue,
+            executablePath: chromePath,
+            args: commonArgs,
+          });
+          return browser; // 成功離脱
+        } catch (error) {
+          console.error(console.error("Chrome起動失敗[2]", error));
+        }
+      } else {
+        // Mac
+        try {
+          // SpotlightでPathを取得
+          // 取得が失敗の場合の返り値は空文字
+          const spotlightPath = execSync(
+            "mdfind \"kMDItemFSName == 'Google Chrome.app'\"",
+          )
+            .toString()
+            .trim();
+
+          // 取得成功した場合
+          if (spotlightPath) {
+            chromePath = `${spotlightPath}/Contents/MacOS/Google Chrome`;
+            browser = await puppeteer.launch({
+              headless: false,
+              executablePath: chromePath,
+              args: commonArgs,
+            });
+            return browser; // 成功離脱
+          } else {
+            throw new Error("Spotlight could not find Chrome.");
+          }
+        } catch (error) {
+          console.error("Chrome起動失敗[2]", error);
+        }
+      }
+
+      // ③ フォールバック
+      try {
+        // ChromeをPuppeteerで自動探索（パス指定なし）
+        browser = await puppeteer.launch({
+          headless: headlessValue,
+          executablePath: undefined,
+          args: commonArgs,
+        });
+        return browser; // 成功離脱
+      } catch (error) {
+        // 全ての方法で失敗した場合
+        console.error("Chrome起動失敗[3]", error);
+      }
+
       return browser;
     },
 
