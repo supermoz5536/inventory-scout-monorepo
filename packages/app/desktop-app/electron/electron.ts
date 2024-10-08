@@ -27,163 +27,187 @@ let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
 let assignedPort: string;
+const gotTheLock = app.requestSingleInstanceLock();
 
-/// アプリ起動時にウインドウがない場合に
-/// 新しいウィンドウを生成する関数
-/// (Macだと表示されないことがあるので)
-app.whenReady().then(() => {
-  createMainWindow();
-  // "activate" はmacの場合のケースで
-  // ウインドウはないが、Docでアプリは起動し続けてる場合に
-  // アイコンをクリックすると、再びアプリがactivate状態になる
-  // この時にウインドウ数が０なので、メインウインドウを生成する
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length <= 1) createMainWindow();
+// 2回目のアプリ本体のインスタンス化
+if (!gotTheLock) {
+  app.quit(); // すでにアプリが起動している場合、新しいインスタンスを終了
+
+  // 1回目のアプリ本体のインスタンス化
+} else {
+  app.on("second-instance", (event, argv, workingDirectory) => {
+    // ここで、ウィンドウが存在する場合は、フォーカスを当てる
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
   });
-});
 
-app.whenReady().then(() => {
-  openBackGroundWindow();
-});
-
-/// 初期化処理として
-/// メニュー部分を生成する関数です。
-app.whenReady().then(() => {
-  const menu = new Menu();
-
-  // darwin はmacOXの意味
-  const isMac = process.platform === "darwin";
-  // メニューバーのアプリ変更はパッケージ化するまで反映されません
-  app.setName("在庫スカウター（ベータ版）");
-
-  // ■ macOS用のカスタムメニューアイテムを作成
-  if (isMac) {
-    const appMenu = new MenuItem({
-      label: app.name,
-      submenu: [
-        { label: "環境設定", click: openPreferences },
-        { type: "separator" },
-        { label: "終了", role: "quit" },
-      ],
+  /// アプリ起動時にウインドウがない場合に
+  /// 新しいウィンドウを生成する関数
+  /// (Macだと表示されないことがあるので)
+  app.whenReady().then(() => {
+    createMainWindow();
+    // "activate" はmacの場合のケースで
+    // ウインドウはないが、Docでアプリは起動し続けてる場合に
+    // アイコンをクリックすると、再びアプリがactivate状態になる
+    // この時にウインドウ数が０なので、メインウインドウを生成する
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length <= 1) createMainWindow();
     });
+  });
 
-    // macOSの場合は、メニューバーの２番目の項目に
-    // 自動で「音声入力を開始」と「絵文字と記号」が
-    // 追加されるので、ダミーデータを渡し非表示設定
-    const dummyMenu = new MenuItem({
-      label: "DummyData",
-      visible: false,
+  app.whenReady().then(() => {
+    openBackGroundWindow();
+  });
+
+  /// 初期化処理として
+  /// メニュー部分を生成する関数です。
+  app.whenReady().then(() => {
+    const menu = new Menu();
+
+    // darwin はmacOXの意味
+    const isMac = process.platform === "darwin";
+    // メニューバーのアプリ変更はパッケージ化するまで反映されません
+    app.setName("在庫スカウター（ベータ版）");
+
+    // ■ macOS用のカスタムメニューアイテムを作成
+    if (isMac) {
+      const appMenu = new MenuItem({
+        label: app.name,
+        submenu: [
+          { label: "環境設定", click: openPreferences },
+          { type: "separator" },
+          { label: "終了", role: "quit" },
+        ],
+      });
+
+      // macOSの場合は、メニューバーの２番目の項目に
+      // 自動で「音声入力を開始」と「絵文字と記号」が
+      // 追加されるので、ダミーデータを渡し非表示設定
+      const dummyMenu = new MenuItem({
+        label: "DummyData",
+        visible: false,
+      });
+
+      const fileMenu = new MenuItem({
+        label: "ファイル",
+        submenu: [
+          {
+            label: "読み込み",
+            submenu: [{ label: "移行データ...", click: loadTransferData }],
+          },
+          {
+            label: "書き出し",
+            submenu: [
+              { label: "CSV...", click: saveDataWithCSV },
+              { label: "移行データ...", click: saveTransferData },
+            ],
+          },
+        ],
+      });
+
+      const editMenu = new MenuItem({
+        label: "編集",
+        submenu: [
+          { label: "切り取り", role: "cut" },
+          { label: "コピー", role: "copy" },
+          { label: "ペースト", role: "paste" },
+          { type: "separator" },
+          { label: "取り消し", role: "undo" },
+          { label: "すべて選択", role: "selectAll" },
+        ],
+      });
+
+      menu.append(appMenu);
+      menu.append(dummyMenu);
+      menu.append(fileMenu);
+      menu.append(editMenu);
+    } else {
+      // ■ Windows用のカスタムメニューアイテムを作成
+      const appMenu = new MenuItem({
+        label: app.name,
+        submenu: [
+          { label: "環境設定", click: openPreferences },
+          { type: "separator" },
+          { label: "終了", role: "quit" },
+        ],
+      });
+
+      const fileMenu = new MenuItem({
+        label: "ファイル",
+        submenu: [
+          {
+            label: "読み込み",
+            submenu: [{ label: "移行データ...", click: loadTransferData }],
+          },
+          {
+            label: "書き出し",
+            submenu: [
+              { label: "CSV...", click: saveDataWithCSV },
+              { label: "移行データ...", click: saveTransferData },
+            ],
+          },
+        ],
+      });
+
+      const editMenu = new MenuItem({
+        label: "編集",
+        submenu: [
+          { label: "切り取り", role: "cut" },
+          { label: "コピー", role: "copy" },
+          { label: "ペースト", role: "paste" },
+          { type: "separator" },
+          { label: "取り消し", role: "undo" },
+          { label: "すべて選択", role: "selectAll" },
+        ],
+      });
+
+      menu.append(appMenu);
+      menu.append(fileMenu);
+      menu.append(editMenu);
+    }
+
+    // デフォルトのメニューを削除
+    Menu.setApplicationMenu(null);
+    // const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+  });
+
+  //====================================================================
+
+  // app.on メソッドは、
+  // Electronのライフサイクルに関連するイベントリスナーを
+  // 設定するために使用されます。
+  // これにより、アプリケーションが特定のイベント
+  // （例：起動、終了、ウィンドウが閉じられたときなど）
+  // に対して特定のアクションを実行することができます。
+
+  // macOS以外のプラットフォームでは
+  // 窓を全部閉じたら、アプリケーションも終了させる関数です
+  app.on("window-all-closed", () => {
+    // window-all-closedは、
+    // Electronのappオブジェクトのイベントの1つ。
+    // darwin は macOSのこと
+    if (process.platform !== "darwin") app.quit();
+  });
+
+  // アプリケーション終了前に状態を保存する
+  app.on("before-quit", async (event) => {
+    event.preventDefault(); // プロセスの終了を防ぐ
+    await persistor.flush();
+    console.log("State has been flushed to persistent storage before app quit");
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.destroy();
     });
-
-    const fileMenu = new MenuItem({
-      label: "ファイル",
-      submenu: [
-        {
-          label: "読み込み",
-          submenu: [{ label: "移行データ...", click: loadTransferData }],
-        },
-        {
-          label: "書き出し",
-          submenu: [
-            { label: "CSV...", click: saveDataWithCSV },
-            { label: "移行データ...", click: saveTransferData },
-          ],
-        },
-      ],
-    });
-
-    const editMenu = new MenuItem({
-      label: "編集",
-      submenu: [
-        { label: "切り取り", role: "cut" },
-        { label: "コピー", role: "copy" },
-        { label: "ペースト", role: "paste" },
-        { type: "separator" },
-        { label: "取り消し", role: "undo" },
-        { label: "すべて選択", role: "selectAll" },
-      ],
-    });
-
-    menu.append(appMenu);
-    menu.append(dummyMenu);
-    menu.append(fileMenu);
-    menu.append(editMenu);
-  } else {
-    // ■ Windows用のカスタムメニューアイテムを作成
-    const appMenu = new MenuItem({
-      label: app.name,
-      submenu: [
-        { label: "環境設定", click: openPreferences },
-        { type: "separator" },
-        { label: "終了", role: "quit" },
-      ],
-    });
-
-    const fileMenu = new MenuItem({
-      label: "ファイル",
-      submenu: [
-        {
-          label: "読み込み",
-          submenu: [{ label: "移行データ...", click: loadTransferData }],
-        },
-        {
-          label: "書き出し",
-          submenu: [
-            { label: "CSV...", click: saveDataWithCSV },
-            { label: "移行データ...", click: saveTransferData },
-          ],
-        },
-      ],
-    });
-
-    const editMenu = new MenuItem({
-      label: "編集",
-      submenu: [
-        { label: "切り取り", role: "cut" },
-        { label: "コピー", role: "copy" },
-        { label: "ペースト", role: "paste" },
-        { type: "separator" },
-        { label: "取り消し", role: "undo" },
-        { label: "すべて選択", role: "selectAll" },
-      ],
-    });
-
-    menu.append(appMenu);
-    menu.append(fileMenu);
-    menu.append(editMenu);
-  }
-
-  // デフォルトのメニューを削除
-  Menu.setApplicationMenu(null);
-  // const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
-});
-
-//====================================================================
-
-// app.on メソッドは、
-// Electronのライフサイクルに関連するイベントリスナーを
-// 設定するために使用されます。
-// これにより、アプリケーションが特定のイベント
-// （例：起動、終了、ウィンドウが閉じられたときなど）
-// に対して特定のアクションを実行することができます。
-
-// macOS以外のプラットフォームでは
-// 窓を全部閉じたら、アプリケーションも終了させる関数です
-app.on("window-all-closed", () => {
-  // window-all-closedは、
-  // Electronのappオブジェクトのイベントの1つ。
-  // darwin は macOSのこと
-  if (process.platform !== "darwin") app.quit();
-});
-
-// アプリケーション終了前に状態を保存する
-app.on("before-quit", async (event) => {
-  event.preventDefault(); // プロセスの終了を防ぐ
-  await persistor.flush();
-  console.log("State has been flushed to persistent storage before app quit");
-  app.exit(); // フラッシュ完了後にアプリケーションを終了
-});
+    if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
+    if (scheduledTask) scheduledTask.stop();
+    app.quit();
+    setTimeout(() => {
+      app.exit(0); // 強制終了
+    }, 1000);
+  });
+}
 
 //====================================================================
 
