@@ -36,6 +36,12 @@ declare global {
       initScheduledTime: (callback: () => void) => Promise<void>;
       startScheduledScraping: (callback: () => void) => void;
       scheduledScraping: (time: string) => void;
+      logMessage: (
+        callback: (
+          event: Electron.IpcRendererEvent,
+          logMessage: string,
+        ) => void,
+      ) => void;
       loadTransferData: (
         callback: (event: Electron.IpcRendererEvent, data: AsinData[]) => void,
       ) => void;

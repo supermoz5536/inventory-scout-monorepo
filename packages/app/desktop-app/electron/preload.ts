@@ -82,6 +82,10 @@ contextBridge.exposeInMainWorld("myAPI", {
     ipcRenderer.on("start-scheduled-scraping", callback);
   },
 
+  logMessage: (callback) => {
+    ipcRenderer.on("log-message", callback);
+  },
+
   // ====================================================================
 
   disposeListener: (channel, callback) =>

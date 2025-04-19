@@ -88,6 +88,11 @@ const BackGroundWindow = () => {
         try {
           console.log("Initializing process excuted");
 
+          // -1 メインプロセスのデバッグプリントのリスナー
+          window.myAPI.logMessage((event, logMessage) => {
+            console.log(logMessage);
+          });
+
           // ⓪
           dispatch(changeSystemStatus(0));
           dispatch(changeShowButtonStatus(0));

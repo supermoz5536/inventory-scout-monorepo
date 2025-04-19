@@ -14,7 +14,13 @@ import cron from "node-cron";
 import { Parser } from "@json2csv/plainjs";
 import express from "express";
 import { Server } from "http";
-
+import ps_tree from "ps-tree";
+import { exec, spawn } from "child_process";
+import treeKill from "tree-kill";
+import sudo from "sudo-prompt";
+var options = {
+  name: "Zaiko Z",
+};
 /// メインプロセスのグローバル変数です。
 let appURL: string;
 let appURLForStripe: string;
@@ -27,187 +33,528 @@ let prefWindow: any;
 let loginPromptWindow: any;
 let StockDetailWindow: any;
 let assignedPort: string;
-const gotTheLock = app.requestSingleInstanceLock();
+let httpServerObj: Server;
+let isQuitting = false;
+// const gotTheLock = app.requestSingleInstanceLock();
+// const logFilePathWin = path.join("C:\\temp", "log.txt");
+const logFilePathWin = path.join(
+  "C:\\Users\\windows\\Desktop\\temp",
+  "log.txt",
+);
+const logFilePathMac = path.join("/Users/administrator", "log.txt");
 
-// 2回目のアプリ本体のインスタンス化
-if (!gotTheLock) {
-  app.quit(); // すでにアプリが起動している場合、新しいインスタンスを終了
+// ログをファイルに書き込む関数
+const logToFileWin = (message: string) => {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  fs.appendFileSync(logFilePathWin, logMessage, { encoding: "utf8" });
+};
+// ログをファイルに書き込む関数
+const logToFileMac = (message: string) => {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  fs.appendFileSync(logFilePathMac, logMessage, { encoding: "utf8" });
+};
 
-  // 1回目のアプリ本体のインスタンス化
-} else {
-  app.on("second-instance", (event, argv, workingDirectory) => {
-    // ここで、ウィンドウが存在する場合は、フォーカスを当てる
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
+// // ■■■■ taskKill関数を定義
+// const psTreePromise = (parentPid) => {
+//   return new Promise<void>((resolve, reject) => {
+//     ps_tree(parentPid, (err, children) => {
+//       if (err) {
+//         reject(err);
+//       } else {
+//         // 子プロセスをすべてkillする
+//         if (children && children.length > 0) {
+//           children.forEach((child) => {
+//             try {
+//               process.kill(Number(child.PID), "SIGKILL");
+//               console.log(`Process ${child.PID} has been killed.`);
+//             } catch (e) {
+//               console.log(`Failed to kill childprocess ${child.PID}`, e);
+//             }
+//           });
+//         }
+//         resolve();
+//       }
+//     });
+//   });
+// };
 
-  /// アプリ起動時にウインドウがない場合に
-  /// 新しいウィンドウを生成する関数
-  /// (Macだと表示されないことがあるので)
-  app.whenReady().then(() => {
-    createMainWindow();
-    // "activate" はmacの場合のケースで
-    // ウインドウはないが、Docでアプリは起動し続けてる場合に
-    // アイコンをクリックすると、再びアプリがactivate状態になる
-    // この時にウインドウ数が０なので、メインウインドウを生成する
-    app.on("activate", () => {
-      if (BrowserWindow.getAllWindows().length <= 1) createMainWindow();
+// // ■■■■ taskKillPromise関数を定義
+// const taskKillPromiseWithAppName = (processName: String) => {
+//   return new Promise<void>((resolve, reject) => {
+//     // Windows の taskkill コマンドで
+//     // 親プロセスと子プロセスを強制終了
+
+//     // 実行するWindowsコマンドを文字列として格納する定数を宣言
+//     // /T は「ツリー状に終了する」という意味。派生したプロセスも含めて終了
+//     // /IM はプロセス名を指定
+//     // /F は強制終了
+//     const command = `taskkill /F /IM ${processName} /T`;
+
+//     // // デスクトップにログファイルを作成
+//     // const logFilePath = path.join("C:\\temp", "taskkill_log.txt");
+
+//     exec(command, (error, stdout, stderr) => {
+//       // error: コマンドの実行自体が失敗した場合
+//       // stdout: Standard Output(コマンドやプログラムが失敗した場合)
+//       // stderr: Standard Error(コマンドやプログラムが失敗した場合)
+//       if (error) {
+//         // // エラーが発生した場合、そのメッセージをログファイルに書き込む
+//         // // ファイルに追記（ファイルがなければ作成）
+//         // const errorMessage = `taskkill failed: ${error.message}\nstderr: ${stderr}\n`;
+//         // fs.appendFileSync(logFilePath, errorMessage);
+//         console.error(`taskkill failed: ${error.message}`);
+//         reject(error);
+//       } else {
+//         // // 成功した場合もログに成功のメッセージを記録
+//         // // ファイルに追記（ファイルがなければ作成）
+//         // const successMessage = `taskkill successful: ${stdout}\n`;
+//         // fs.appendFileSync(logFilePath, successMessage);
+//         console.log(`taskkill successful: ${stdout}`);
+//         resolve();
+//       }
+//     });
+//   });
+// };
+
+// // ■■■■ taskKillPromise関数を定義
+// const taskKillPromiseWithExec = (parentPid: number) => {
+//   return new Promise<void>((resolve, reject) => {
+//     // Windows の taskkill コマンドで
+//     // 親プロセスと子プロセスを強制終了
+
+//     // 実行するWindowsコマンドを文字列として格納する定数を宣言
+//     // /T は「ツリー状に終了する」という意味。派生したプロセスも含めて終了
+//     // /IM はプロセス名を指定
+//     // /F は強制終了
+//     const command = `taskkill /PID ${parentPid} /T /F`;
+
+//     // デスクトップにログファイルを作成
+//     logToFileWin("test log");
+
+//     exec(command, (error, stdout, stderr) => {
+//       // error: コマンドの実行自体が失敗した場合
+//       // stdout: Standard Output(コマンドやプログラムが失敗した場合)
+//       // stderr: Standard Error(コマンドやプログラムが失敗した場合)
+//       if (error) {
+//         // // エラーが発生した場合、そのメッセージをログファイルに書き込む
+//         // // ファイルに追記（ファイルがなければ作成）
+//         // const errorMessage = `taskkill failed: ${error.message}\nstderr: ${stderr}\n`;
+//         // fs.appendFileSync(logFilePath, errorMessage);
+//         console.error(`taskkill failed: ${error.message}`);
+//         reject(error);
+//       } else {
+//         // // 成功した場合もログに成功のメッセージを記録
+//         // // ファイルに追記（ファイルがなければ作成）
+//         // const successMessage = `taskkill successful: ${stdout}\n`;
+//         // fs.appendFileSync(logFilePath, successMessage);
+//         console.log(`taskkill successful: ${stdout}`);
+//         resolve();
+//       }
+//     });
+//   });
+// };
+
+// ■■■■
+const taskKillPromiseWithSudo = (parentPid: number) => {
+  return new Promise<void>((resolve, reject) => {
+    const taskKillPath = "C:\\Windows\\System32\\taskkill.exe"; // フルパスを指定
+    const command = ` ${taskKillPath} /PID ${parentPid} /T /F`;
+    console.log("test 2.1");
+
+    sudo.exec(command, options, function (error, stdout, stderr) {
+      console.log("test 2.2");
+      if (error) {
+        console.log("test 2.3");
+        console.error(`taskkill failed: ${error.message}`);
+        reject(error);
+      } else {
+        console.log("test 2.4 taskkill success");
+        resolve();
+      }
     });
   });
+};
 
-  app.whenReady().then(() => {
-    openBackGroundWindow();
+// ■■■■
+// const killParentWithSpawn = (parentPid: number) => {
+//   return new Promise<void>(async (resolve, reject) => {
+//     // PIDでプロセスリストを取得
+//     const list = await require("find-process")("pid", parentPid);
+//     // if (list[0] && list[0].pid === parentPid) {
+//     //   try {
+//     //     process.kill(parentPid);
+//     //     logToFileWin(`Parent process ${parentPid} killed successfully.`);
+//     //     resolve();
+//     //   } catch (e) {
+//     //     console.log("killParentWithSpawn process.kill failed", e);
+//     //     logToFileWin(`Failed to get child processes: ${e}`);
+//     //     reject();
+//     //   }
+//     // } else {
+//     //   logToFileWin(`Parent process ${parentPid} not found.`);
+//     //   resolve();
+//     // }
+
+//     // spawnを使って親プロセスをkillする
+//     const command = "taskkill";
+//     const args = ["/PID", `${parentPid}`, "/F"];
+
+//     // killを実行
+//     try {
+//       const killProcess = spawn(command, args);
+
+//       // 標準出力をキャプチャ
+//       killProcess.stdout.on("data", (data) => {
+//         console.log(`spawn stdout: ${data}`);
+//       });
+
+//       // エラー出力をキャプチャ
+//       killProcess.stderr.on("data", (data) => {
+//         console.error(`spawn stderr: ${data}`);
+//       });
+
+//       // プロセスが終了したときの処理
+//       killProcess.on("close", (code) => {
+//         if (code === 0) {
+//           resolve();
+//         } else {
+//           console.error(`Failed to kill process ${parentPid}, code: ${code}`);
+//           reject(
+//             new Error(`Failed to kill process ${parentPid}, code: ${code}`),
+//           );
+//         }
+//       });
+
+//       // エラーハンドリング
+//       killProcess.on("error", (error) => {
+//         console.error(`Failed to spawn process: ${error.message}`);
+//         reject(error);
+//       });
+//     } catch (e) {
+//       console.log("killProcess process.kill failed", e);
+//     }
+//   });
+// };
+
+// ■■■■
+// const killChildrenWithSpawn = (parentPid: number) => {
+//   return new Promise<void>((resolve, reject) => {
+//     ps_tree(parentPid, (err, children) => {
+//       if (err) {
+//         reject(err);
+//       } else if (children && children.length > 0) {
+//         // 子プロセスをすべてkillする
+//         const killPromises = children.map((child) => {
+//           return new Promise<void>((resolveChild, rejectChild) => {
+//             try {
+//               // killを実行
+//               const killProcess = spawn("taskkill", [
+//                 "/PID",
+//                 `${child.PID}`,
+//                 "/F",
+//               ]);
+
+//               // プロセスが正常に終了したときの処理
+//               killProcess.on("close", (code) => {
+//                 if (code === 0) {
+//                   resolveChild();
+//                 } else {
+//                   console.error(
+//                     `Failed to kill process ${parentPid}, code: ${code}`,
+//                   );
+//                   rejectChild(
+//                     new Error(
+//                       `Failed to kill process ${parentPid}, code: ${code}`,
+//                     ),
+//                   );
+//                 }
+//               });
+
+//               // エラーハンドリング
+//               killProcess.on("error", (error) => {
+//                 console.error(`Failed to spawn process: ${error.message}`);
+//                 rejectChild(error);
+//               });
+//               console.log(`Process ${child.PID} has been killed.`);
+//             } catch (e) {
+//               console.log(`Failed to kill childprocess ${child.PID}`, e);
+//               rejectChild(e);
+//             }
+//           });
+//         });
+//         Promise.all(killPromises)
+//           .then(() => resolve())
+//           .catch((error) => {
+//             reject(error);
+//           });
+//       } else {
+//         // childrenが存在しない、もしくは、配列が空の場合
+//         // killする必要のあるプロセスがないので解決させる
+//         resolve();
+//       }
+//     });
+//   });
+// };
+
+// // ■■■■ 指定されたPIDの親プロセスと子プロセスを終了する関数
+// const killParentWithTreeKill = async (parentPid: number) => {
+//   return new Promise<void>((resolve, reject) => {
+//     treeKill(parentPid, "SIGKILL", (err) => {
+//       if (err) {
+//         console.error(`プロセス ${parentPid} の終了に失敗しました:`, err);
+//         reject(err);
+//       } else {
+//         console.log(
+//           `プロセス ${parentPid} とその子プロセスが正常に終了しました`,
+//         );
+//         resolve();
+//       }
+//     });
+//   });
+// };
+
+const killServerPromise = () => {
+  return new Promise<void>((resolve) => {
+    httpServerObj.close(() => {
+      console.log("Server has been closed");
+      resolve();
+    });
+  });
+};
+
+// // 2回目のアプリ本体のインスタンス化
+// if (!gotTheLock) {
+//   app.quit(); // すでにアプリが起動している場合、新しいインスタンスを終了
+
+//   // 1回目のアプリ本体のインスタンス化
+// } else {
+//   app.on("second-instance", (event, argv, workingDirectory) => {
+//     // ここで、ウィンドウが存在する場合は、フォーカスを当てる
+//     if (mainWindow) {
+//       if (mainWindow.isMinimized()) mainWindow.restore();
+//       mainWindow.focus();
+//     }
+//   });
+// }
+
+/// アプリ起動時にウインドウがない場合に
+/// 新しいウィンドウを生成する関数
+/// (Macだと表示されないことがあるので)
+app.whenReady().then(() => {
+  createMainWindow();
+  // "activate" はmacの場合のケースで
+  // ウインドウはないが、Docでアプリは起動し続けてる場合に
+  // アイコンをクリックすると、再びアプリがactivate状態になる
+  // この時にウインドウ数が０なので、メインウインドウを生成する
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length <= 1) createMainWindow();
+  });
+});
+
+app.whenReady().then(() => {
+  openBackGroundWindow();
+});
+
+/// 初期化処理として
+/// メニュー部分を生成する関数です。
+app.whenReady().then(() => {
+  const menu = new Menu();
+
+  // darwin はmacOXの意味
+  const isMac = process.platform === "darwin";
+  // メニューバーのアプリ変更はパッケージ化するまで反映されません
+  app.setName("在庫スカウター（ベータ版）");
+
+  // ■ macOS用のカスタムメニューアイテムを作成
+  if (isMac) {
+    const appMenu = new MenuItem({
+      label: app.name,
+      submenu: [
+        { label: "環境設定", click: openPreferences },
+        { type: "separator" },
+        { label: "終了", role: "quit" },
+      ],
+    });
+
+    // macOSの場合は、メニューバーの２番目の項目に
+    // 自動で「音声入力を開始」と「絵文字と記号」が
+    // 追加されるので、ダミーデータを渡し非表示設定
+    const dummyMenu = new MenuItem({
+      label: "DummyData",
+      visible: false,
+    });
+
+    const fileMenu = new MenuItem({
+      label: "ファイル",
+      submenu: [
+        {
+          label: "読み込み",
+          submenu: [{ label: "移行データ...", click: loadTransferData }],
+        },
+        {
+          label: "書き出し",
+          submenu: [
+            { label: "CSV...", click: saveDataWithCSV },
+            { label: "移行データ...", click: saveTransferData },
+          ],
+        },
+      ],
+    });
+
+    const editMenu = new MenuItem({
+      label: "編集",
+      submenu: [
+        { label: "切り取り", role: "cut" },
+        { label: "コピー", role: "copy" },
+        { label: "ペースト", role: "paste" },
+        { type: "separator" },
+        { label: "取り消し", role: "undo" },
+        { label: "すべて選択", role: "selectAll" },
+      ],
+    });
+
+    menu.append(appMenu);
+    menu.append(dummyMenu);
+    menu.append(fileMenu);
+    menu.append(editMenu);
+  } else {
+    // ■ Windows用のカスタムメニューアイテムを作成
+    const appMenu = new MenuItem({
+      label: app.name,
+      submenu: [
+        { label: "環境設定", click: openPreferences },
+        { type: "separator" },
+        { label: "終了", role: "quit" },
+      ],
+    });
+
+    const fileMenu = new MenuItem({
+      label: "ファイル",
+      submenu: [
+        {
+          label: "読み込み",
+          submenu: [{ label: "移行データ...", click: loadTransferData }],
+        },
+        {
+          label: "書き出し",
+          submenu: [
+            { label: "CSV...", click: saveDataWithCSV },
+            { label: "移行データ...", click: saveTransferData },
+          ],
+        },
+      ],
+    });
+
+    const editMenu = new MenuItem({
+      label: "編集",
+      submenu: [
+        { label: "切り取り", role: "cut" },
+        { label: "コピー", role: "copy" },
+        { label: "ペースト", role: "paste" },
+        { type: "separator" },
+        { label: "取り消し", role: "undo" },
+        { label: "すべて選択", role: "selectAll" },
+      ],
+    });
+
+    menu.append(appMenu);
+    menu.append(fileMenu);
+    menu.append(editMenu);
+  }
+
+  // デフォルトのメニューを削除
+  Menu.setApplicationMenu(null);
+  // const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+});
+
+//====================================================================
+
+// app.on メソッドは、
+// Electronのライフサイクルに関連するイベントリスナーを
+// 設定するために使用されます。
+// これにより、アプリケーションが特定のイベント
+// （例：起動、終了、ウィンドウが閉じられたときなど）
+// に対して特定のアクションを実行することができます。
+
+// macOS以外のプラットフォームでは
+// 窓を全部閉じたら、アプリケーションも終了させる関数です
+app.on("window-all-closed", async () => {
+  // window-all-closedは、
+  // Electronのappオブジェクトのイベントの1つ。
+
+  if (process.platform !== "darwin") app.quit();
+});
+
+// アプリケーション終了前に状態を保存する
+app.on("before-quit", async (event) => {
+  if (isQuitting) return;
+  isQuitting = true;
+
+  event.preventDefault();
+
+  BrowserWindow.getAllWindows().forEach((window) => {
+    if (window && !window.isDestroyed()) window.destroy();
   });
 
-  /// 初期化処理として
-  /// メニュー部分を生成する関数です。
-  app.whenReady().then(() => {
-    const menu = new Menu();
+  if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
+  if (scheduledTask) scheduledTask.stop();
+  if (httpServerObj) await killServerPromise();
 
-    // darwin はmacOXの意味
-    const isMac = process.platform === "darwin";
-    // メニューバーのアプリ変更はパッケージ化するまで反映されません
-    app.setName("在庫スカウター（ベータ版）");
-
-    // ■ macOS用のカスタムメニューアイテムを作成
-    if (isMac) {
-      const appMenu = new MenuItem({
-        label: app.name,
-        submenu: [
-          { label: "環境設定", click: openPreferences },
-          { type: "separator" },
-          { label: "終了", role: "quit" },
-        ],
-      });
-
-      // macOSの場合は、メニューバーの２番目の項目に
-      // 自動で「音声入力を開始」と「絵文字と記号」が
-      // 追加されるので、ダミーデータを渡し非表示設定
-      const dummyMenu = new MenuItem({
-        label: "DummyData",
-        visible: false,
-      });
-
-      const fileMenu = new MenuItem({
-        label: "ファイル",
-        submenu: [
-          {
-            label: "読み込み",
-            submenu: [{ label: "移行データ...", click: loadTransferData }],
-          },
-          {
-            label: "書き出し",
-            submenu: [
-              { label: "CSV...", click: saveDataWithCSV },
-              { label: "移行データ...", click: saveTransferData },
-            ],
-          },
-        ],
-      });
-
-      const editMenu = new MenuItem({
-        label: "編集",
-        submenu: [
-          { label: "切り取り", role: "cut" },
-          { label: "コピー", role: "copy" },
-          { label: "ペースト", role: "paste" },
-          { type: "separator" },
-          { label: "取り消し", role: "undo" },
-          { label: "すべて選択", role: "selectAll" },
-        ],
-      });
-
-      menu.append(appMenu);
-      menu.append(dummyMenu);
-      menu.append(fileMenu);
-      menu.append(editMenu);
-    } else {
-      // ■ Windows用のカスタムメニューアイテムを作成
-      const appMenu = new MenuItem({
-        label: app.name,
-        submenu: [
-          { label: "環境設定", click: openPreferences },
-          { type: "separator" },
-          { label: "終了", role: "quit" },
-        ],
-      });
-
-      const fileMenu = new MenuItem({
-        label: "ファイル",
-        submenu: [
-          {
-            label: "読み込み",
-            submenu: [{ label: "移行データ...", click: loadTransferData }],
-          },
-          {
-            label: "書き出し",
-            submenu: [
-              { label: "CSV...", click: saveDataWithCSV },
-              { label: "移行データ...", click: saveTransferData },
-            ],
-          },
-        ],
-      });
-
-      const editMenu = new MenuItem({
-        label: "編集",
-        submenu: [
-          { label: "切り取り", role: "cut" },
-          { label: "コピー", role: "copy" },
-          { label: "ペースト", role: "paste" },
-          { type: "separator" },
-          { label: "取り消し", role: "undo" },
-          { label: "すべて選択", role: "selectAll" },
-        ],
-      });
-
-      menu.append(appMenu);
-      menu.append(fileMenu);
-      menu.append(editMenu);
-    }
-
-    // デフォルトのメニューを削除
-    Menu.setApplicationMenu(null);
-    // const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
-  });
-
-  //====================================================================
-
-  // app.on メソッドは、
-  // Electronのライフサイクルに関連するイベントリスナーを
-  // 設定するために使用されます。
-  // これにより、アプリケーションが特定のイベント
-  // （例：起動、終了、ウィンドウが閉じられたときなど）
-  // に対して特定のアクションを実行することができます。
-
-  // macOS以外のプラットフォームでは
-  // 窓を全部閉じたら、アプリケーションも終了させる関数です
-  app.on("window-all-closed", () => {
-    // window-all-closedは、
-    // Electronのappオブジェクトのイベントの1つ。
-    // darwin は macOSのこと
-    if (process.platform !== "darwin") app.quit();
-  });
-
-  // アプリケーション終了前に状態を保存する
-  app.on("before-quit", async (event) => {
-    event.preventDefault(); // プロセスの終了を防ぐ
+  console.log("test 1");
+  try {
     await persistor.flush();
-    console.log("State has been flushed to persistent storage before app quit");
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.destroy();
-    });
-    if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
-    if (scheduledTask) scheduledTask.stop();
-    app.quit();
-    setTimeout(() => {
-      app.exit(0); // 強制終了
-    }, 1000);
-  });
-}
+  } catch (e) {
+    console.error("Failed to flush state:", e);
+  }
+  console.log("test 2");
+
+  try {
+    await taskKillPromiseWithSudo(process.pid);
+  } catch (e) {
+    console.error("Failed to taskKillPromiseWithSudo:", e);
+  }
+
+  console.log("test 3");
+  app.exit();
+  console.log("test 3.2");
+});
+
+// プロセス終了のクリーンアップを行う
+app.on("will-quit", async () => {
+  // Windowsの場合のプロセス終了処理
+  if (process.platform === "win32") {
+    // 専用コマンドでプロセスを強制終了
+    // await taskKillPromiseWithAppName("desktop-app.exe");
+    // await taskKillPromiseWithAppName("在庫Z.exe");
+    // await taskKillPromiseWithPid(process.pid);
+    // await psTreePromise(process.pid);
+    // try {
+    //   await killChildrenWithSpawn(process.pid);
+    // } catch (e) {
+    //   console.log("taskKillPromise failed:", e);
+    // }
+    // try {
+    //   await killParentWithSpawn(process.pid);
+    //   logToFileWin("Parent process killed.");
+    // } catch (e) {
+    //   console.log("taskKillPromise failed:", e);
+    //   logToFileWin(`Parent process faliled : ${e.message}`);
+    // }
+    // try {
+    //   await killParentWithTreeKill;
+    //   process.pid;
+    //   logToFileWin("Parent process killed.");
+    // } catch (e) {
+    //   console.log("taskKillPromise failed:", e);
+    //   logToFileWin(`Parent process faliled : ${e.message}`);
+    // }
+  }
+  console.log("test 4");
+  // logToFileMac(`Parent process test : `);
+});
 
 //====================================================================
 
@@ -353,7 +700,7 @@ function openBackGroundWindow() {
     backGroundWindow.webContents.openDevTools();
   } else {
     // パッケージ化された状態でもデベロッパーツールを開く
-    // backGroundWindow.webContents.openDevTools();
+    backGroundWindow.webContents.openDevTools();
   }
 }
 
@@ -788,7 +1135,7 @@ async function localServerListener(): Promise<void> {
   // このコールバックは、サーバーが起動したときにのみ
   // 一度だけ実行されます。
   return new Promise((resolve, reject) => {
-    const httpServerObj: Server = localServer.listen(port, () => {
+    httpServerObj = localServer.listen(port, () => {
       // 割り当てられたポート番号を取得
       const address = httpServerObj.address();
       if (typeof address === "object" && address !== null) {
